@@ -1,0 +1,10 @@
+^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\EXAMPLES\INPUT_TEST\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine" "-BC:/Users/Jbilo/Desktop/pino game engine/build" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/examples/input_test/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

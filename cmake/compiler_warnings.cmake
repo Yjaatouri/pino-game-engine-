@@ -1,0 +1,5 @@
+if(MSVC)
+    add_compile_options(/W4)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()

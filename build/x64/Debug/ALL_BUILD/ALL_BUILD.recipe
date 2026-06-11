@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\x64\Debug\ZERO_CHECK</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\x64\Debug\sdl_headers_copy</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\arena_game.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\asset_demo.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\clear.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\collision_demo.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\cube.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\demo_game.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\fps_camera.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\game_demo.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\input_test.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\lit_scene.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\scene_graph.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\stability_test.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\triangle.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Jbilo\Desktop\pino game engine\build\x64\Debug\ALL_BUILD</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles />
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

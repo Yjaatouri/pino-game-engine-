@@ -1,0 +1,10 @@
+^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\8FF6DB311FD5A1714FFADB347808A860\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild" "-BC:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate.slnx"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

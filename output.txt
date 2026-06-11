@@ -1,0 +1,3 @@
+[18:00:19] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\stability_test\main.cpp:116 | === Engine Lifecycle Stability Test ===
+[18:00:19] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\stability_test\main.cpp:117 | Iterations: 2  Idle duration: 3.0 sec/iteration
+[18:00:19] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\stability_test\main.cpp:118 | Base memory: 8396 KB

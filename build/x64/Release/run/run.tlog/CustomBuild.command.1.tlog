@@ -1,0 +1,24 @@
+^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\CMAKEFILES\9D0C455186E8002AA6618B0341CDE936\RUN.RULE
+setlocal
+cd "C:\Users\Jbilo\Desktop\pino game engine\build\bin"
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Users\Jbilo\Desktop\pino game engine\build\bin\Release\game_demo.exe"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine" "-BC:/Users/Jbilo/Desktop/pino game engine/build" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

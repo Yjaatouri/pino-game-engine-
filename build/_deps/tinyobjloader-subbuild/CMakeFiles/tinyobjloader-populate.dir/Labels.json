@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/tinyobjloader-populate"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/8ff6db311fd5a1714ffadb347808a860/tinyobjloader-populate.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/9f097b74d8d74363b367ab0025608bc1/tinyobjloader-populate-complete.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-build.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-configure.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-download.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-install.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-mkdir.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-patch.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-test.rule"
+		},
+		{
+			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/e66b1a4643ccc0134ad988e0a5041547/tinyobjloader-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"tinyobjloader-populate"
+		],
+		"name" : "tinyobjloader-populate"
+	}
+}

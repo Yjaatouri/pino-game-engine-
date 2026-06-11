@@ -1,0 +1,10 @@
+^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\SDL2-SUBBUILD\CMAKEFILES\BF674A945CDC360AD9B9E860A4CFEE0F\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild" "-BC:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/sdl2-populate.slnx"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

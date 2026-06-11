@@ -1,0 +1,7 @@
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    set(PINO_SANITIZE_FLAGS "-fsanitize=address,undefined" "-fno-omit-frame-pointer")
+    foreach(flag ${PINO_SANITIZE_FLAGS})
+        string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${flag}")
+        string(APPEND CMAKE_C_FLAGS_DEBUG " ${flag}")
+    endforeach()
+endif()

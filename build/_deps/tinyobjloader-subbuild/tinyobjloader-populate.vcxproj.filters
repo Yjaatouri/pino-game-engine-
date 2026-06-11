@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\9f097b74d8d74363b367ab0025608bc1\tinyobjloader-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\8ff6db311fd5a1714ffadb347808a860\tinyobjloader-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\tinyobjloader-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{28F28622-8F64-3C8E-91C9-8F4EE557689C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

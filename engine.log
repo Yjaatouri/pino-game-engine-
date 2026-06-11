@@ -1,0 +1,22 @@
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\core\config_loader.cpp:128 | No config file found — using built-in defaults
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:88 | --- Pino Engine v0.1.0 ---
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:89 | Build: Debug  Platform: Windows
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:90 | CPU threads: 8
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:98 | Config: 1024x768  title="Pino Demo Game"  vsync=on  log=debug  fps=60
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\platform\sdl2\sdl2_window.cpp:47 | Window created: 1024x768 (OpenGL ES)
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\gl_es3.cpp:331 | OpenGL renderer: Intel(R) UHD Graphics 620
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\gl_es3.cpp:332 | OpenGL version:  OpenGL ES 3.0 - Build 30.0.101.1692
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\platform\sdl2\sdl2_file_system.cpp:17 | FileSystem base: C:/Users/Jbilo/Desktop/pino game engine/build/bin/Debug/
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:162 | Engine initialized
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\assets\asset_manager.cpp:143 | Fallback assets initialized
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\assets\asset_manager.cpp:315 | Loaded shader: ../../assets/shaders/lit.vert + ../../assets/shaders/lit.frag
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\assets\asset_manager.cpp:228 | Loaded mesh: ../../assets/models/cube.obj (36 verts, 36 indices)
+[18:04:09] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:289 | Game loop started (fixed update: 60 Hz)
+[18:04:56] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:296 | Game loop exited after 2826 frames  (avg FPS: 57.4)
+[18:04:56] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\demo_game\main.cpp:195 | === Performance ===
+[18:04:56] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\demo_game\main.cpp:196 | Update avg: 0.015ms  max: 0.394ms
+[18:04:56] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\demo_game\main.cpp:197 | Render avg: 16.354ms
+[18:04:56] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\demo_game\main.cpp:198 | Frame max: 17.623ms
+[18:04:56] INFO C:\Users\Jbilo\Desktop\pino game engine\examples\demo_game\main.cpp:199 | FPS min: 11.4  max: 2119.1
+[18:04:56] INFO C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp:170 | Engine shutting down
+[SHUTDOWN] Logger closed

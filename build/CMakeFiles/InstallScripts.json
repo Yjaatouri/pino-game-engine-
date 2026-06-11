@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/Jbilo/Desktop/pino game engine/build/cmake_install.cmake",
+		"C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-build/cmake_install.cmake",
+		"C:/Users/Jbilo/Desktop/pino game engine/build/_deps/glm-build/cmake_install.cmake",
+		"C:/Users/Jbilo/Desktop/pino game engine/build/_deps/glm-build/glm/cmake_install.cmake",
+		"C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/cmake_install.cmake",
+		"C:/Users/Jbilo/Desktop/pino game engine/build/engine/cmake_install.cmake",
+		"C:/Users/Jbilo/Desktop/pino game engine/build/examples/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
