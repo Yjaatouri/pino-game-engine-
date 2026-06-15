@@ -1,7 +1,8 @@
-#include <android_native_app_glue.h>
-#include <android/log.h>
+#if defined(__ANDROID__)
 
 #include "engine/engine.h"
+#include <android_native_app_glue.h>
+#include <android/log.h>
 #include "engine/renderer/gl_es3.h"
 #include "engine/renderer/shader.h"
 #include "engine/renderer/mesh.h"
@@ -267,8 +268,8 @@ void android_main(struct android_app* app) {
         if (state.initialized && state.has_window) {
             // Thermal-throttle-safe frame step
             engine.step_game(game);
-        }
     }
+}
 
     // Cleanup
     if (state.initialized) {
@@ -277,3 +278,5 @@ void android_main(struct android_app* app) {
         engine.shutdown();
     }
 }
+
+#endif // __ANDROID__

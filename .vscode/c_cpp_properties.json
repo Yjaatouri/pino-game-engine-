@@ -13,6 +13,9 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
+                "_CRT_SECURE_NO_WARNINGS",
+                "PINO_ENABLE_PHYSICS",
+                "PINO_VERSION=\"0.1.0\"",
                 "PINO_ASSET_DIR=\"../examples/assets/\""
             ],
             "cStandard": "c17",

@@ -1,3 +1,4 @@
+#if defined(__OBJC__)
 #import <UIKit/UIKit.h>
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES3/gl.h>
@@ -13,3 +14,4 @@
 - (void)deleteFramebuffer;
 
 @end
+#endif
