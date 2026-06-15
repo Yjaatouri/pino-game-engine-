@@ -22,7 +22,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8D990E6D-A2AD-3CF3-AE95-A0DBD048EE37}</ProjectGuid>
+    <ProjectGuid>{B16C112C-4529-30F5-B749-C9DD28E973BB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -59,25 +59,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\bin\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\bin\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">demo_game.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">demo_game</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\bin\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\bin\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">demo_game.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">demo_game</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\bin\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\bin\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">demo_game.dir\MinSizeRel\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">demo_game</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\bin\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\bin\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">demo_game.dir\RelWithDebInfo\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">demo_game</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-debug;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-debug;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -112,10 +112,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;PINO_ASSET_DIR=\"../../assets/\";CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-debug;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-debug;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-debug;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-debug;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -130,9 +130,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Jbilo/Desktop/pino game engine/build/lib/Debug/demo_game.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/Debug/demo_game.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino game engine/build/bin/Debug/demo_game.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino-game-engine-/build/bin/Debug/demo_game.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -142,7 +142,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-release;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-release;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -169,10 +169,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PINO_ASSET_DIR=\"../../assets/\";CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-release;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-release;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-release;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-release;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -187,9 +187,9 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Jbilo/Desktop/pino game engine/build/lib/Release/demo_game.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/Release/demo_game.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino game engine/build/bin/Release/demo_game.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino-game-engine-/build/bin/Release/demo_game.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -199,7 +199,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-minsizerel;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-minsizerel;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -226,10 +226,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PINO_ASSET_DIR=\"../../assets/\";CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-minsizerel;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-minsizerel;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-minsizerel;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-minsizerel;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -244,9 +244,9 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Jbilo/Desktop/pino game engine/build/lib/MinSizeRel/demo_game.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/MinSizeRel/demo_game.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino game engine/build/bin/MinSizeRel/demo_game.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino-game-engine-/build/bin/MinSizeRel/demo_game.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -256,7 +256,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-relwithdebinfo;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-relwithdebinfo;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -282,10 +282,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PINO_ASSET_DIR=\"../../assets/\";CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-relwithdebinfo;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-relwithdebinfo;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino game engine\engine\..;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\include-config-relwithdebinfo;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jbilo\Desktop\pino-game-engine-\engine\..;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\include-config-relwithdebinfo;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\glm-src\glm\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -300,9 +300,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/Jbilo/Desktop/pino game engine/build/lib/RelWithDebInfo/demo_game.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/RelWithDebInfo/demo_game.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino game engine/build/bin/RelWithDebInfo/demo_game.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/Jbilo/Desktop/pino-game-engine-/build/bin/RelWithDebInfo/demo_game.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -311,11 +311,11 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\examples\CMakeLists.txt">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\examples\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino game engine/examples/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino-game-engine-/examples/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine" "-BC:/Users/Jbilo/Desktop/pino game engine/build" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/examples/CMakeFiles/generate.stamp"
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jbilo/Desktop/pino-game-engine- -BC:/Users/Jbilo/Desktop/pino-game-engine-/build --check-stamp-file C:/Users/Jbilo/Desktop/pino-game-engine-/build/examples/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -324,11 +324,11 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\examples\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\examples\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino game engine/examples/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino-game-engine-/examples/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine" "-BC:/Users/Jbilo/Desktop/pino game engine/build" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/examples/CMakeFiles/generate.stamp"
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jbilo/Desktop/pino-game-engine- -BC:/Users/Jbilo/Desktop/pino-game-engine-/build --check-stamp-file C:/Users/Jbilo/Desktop/pino-game-engine-/build/examples/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -337,11 +337,11 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\examples\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\examples\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino game engine/examples/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino-game-engine-/examples/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine" "-BC:/Users/Jbilo/Desktop/pino game engine/build" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/examples/CMakeFiles/generate.stamp"
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jbilo/Desktop/pino-game-engine- -BC:/Users/Jbilo/Desktop/pino-game-engine-/build --check-stamp-file C:/Users/Jbilo/Desktop/pino-game-engine-/build/examples/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -350,11 +350,11 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\examples\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\examples\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino game engine/examples/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino-game-engine-/examples/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine" "-BC:/Users/Jbilo/Desktop/pino game engine/build" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/examples/CMakeFiles/generate.stamp"
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jbilo/Desktop/pino-game-engine- -BC:/Users/Jbilo/Desktop/pino-game-engine-/build --check-stamp-file C:/Users/Jbilo/Desktop/pino-game-engine-/build/examples/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -363,31 +363,31 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\examples\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\examples\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\Jbilo\Desktop\pino game engine\examples\demo_game\main.cpp" />
+    <ClCompile Include="C:\Users\Jbilo\Desktop\pino-game-engine-\examples\demo_game\main.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino game engine\build\ZERO_CHECK.vcxproj">
-      <Project>{63DFE2D4-E3B4-37DB-8D59-60007AD94898}</Project>
+    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\ZERO_CHECK.vcxproj">
+      <Project>{D947F788-DC8E-3D9C-BB1E-FF25E5225BEC}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-build\SDL2-static.vcxproj">
-      <Project>{7C16C496-D40C-3B7F-8963-563FF393F11F}</Project>
+    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-build\SDL2-static.vcxproj">
+      <Project>{DBDAA410-1CEE-35CE-8D07-F8D757FFD422}</Project>
       <Name>SDL2-static</Name>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.vcxproj">
-      <Project>{EDD87A3E-D139-3CB0-BA06-6C0246886620}</Project>
+    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.vcxproj">
+      <Project>{36F6C836-1085-3D21-9DD0-CBFF02865A26}</Project>
       <Name>engine_core</Name>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino game engine\build\engine\platform_desktop.vcxproj">
-      <Project>{7205BC29-F3FF-3825-B0E3-1688D78160FD}</Project>
+    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\platform_desktop.vcxproj">
+      <Project>{A9821CAD-4B30-36BD-9569-88341045641E}</Project>
       <Name>platform_desktop</Name>
     </ProjectReference>
   </ItemGroup>

@@ -3,6 +3,8 @@
 #include "android_input.h"
 #include "android_file_system.h"
 
+#if defined(__ANDROID__)
+
 namespace pino {
 
 std::unique_ptr<Window> create_window(const WindowConfig& config) {
@@ -18,3 +20,5 @@ std::unique_ptr<FileSystem> create_android_file_system(AAssetManager* mgr) {
 }
 
 } // namespace pino
+
+#endif // __ANDROID__

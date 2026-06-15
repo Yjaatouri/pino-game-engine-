@@ -1,8 +1,8 @@
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-MKDIR.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-MKDIR.RULE
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/tmp/stb-populate-mkdirs.cmake"
+"C:\Program Files\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/tmp/stb-populate-mkdirs.cmake
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-mkdir"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-mkdir
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -10,15 +10,15 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-DOWNLOAD.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-DOWNLOAD.RULE
 setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/tmp/stb-populate-gitclone.cmake"
+"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/tmp/stb-populate-gitclone.cmake
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-download"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-download
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -26,13 +26,13 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-UPDATE.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-UPDATE.RULE
 setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\stb-src"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\stb-src
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/tmp/stb-populate-gitupdate.cmake"
+"C:\Program Files\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/tmp/stb-populate-gitupdate.cmake
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -40,11 +40,11 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-PATCH.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-PATCH.RULE
 setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-patch"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-patch
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -52,31 +52,15 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-CONFIGURE.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-CONFIGURE.RULE
 setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\stb-build"
-if %errorlevel% neq 0 goto :cmEnd
-C:
-if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
-if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-configure"
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-BUILD.RULE
-setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\stb-build"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\stb-build
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-build"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-configure
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -84,15 +68,15 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-INSTALL.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-BUILD.RULE
 setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\stb-build"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\stb-build
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-install"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-build
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -100,15 +84,15 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\3957B385734A474583D06BFECE9F36D2\STB-POPULATE-TEST.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-INSTALL.RULE
 setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\stb-build"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\stb-build
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-test"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-install
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -116,13 +100,15 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\9D49C517B1BD318EE2EE64C2FD90CCFD\STB-POPULATE-COMPLETE.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\7B17E1C9A553B657668BA1CE94558F09\STB-POPULATE-TEST.RULE
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E make_directory "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/CMakeFiles/Debug"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\stb-build
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/CMakeFiles/Debug/stb-populate-complete"
+C:
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-done"
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-test
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -130,7 +116,21 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\40A23EE8EA3388FE746EF17818E8C5A3\STB-POPULATE.RULE
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\2FF92EB48479F743CF0DAC283F83DFD6\STB-POPULATE-COMPLETE.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/CMakeFiles/Debug/stb-populate-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/stb-populate-prefix/src/stb-populate-stamp/Debug/stb-populate-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKEFILES\4A4653472FA2400212204DE431636F87\STB-POPULATE.RULE
 setlocal
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
@@ -138,9 +138,9 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
-^C:\USERS\JBILO\DESKTOP\PINO GAME ENGINE\BUILD\_DEPS\STB-SUBBUILD\CMAKELISTS.TXT
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\STB-SUBBUILD\CMAKELISTS.TXT
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild" "-BC:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-subbuild/CMakeFiles/generate.stamp"
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild -BC:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild --check-stamp-file C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-subbuild/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

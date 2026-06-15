@@ -50,35 +50,35 @@ unset(_cmake_expected_targets)
 add_library(tinyobjloader STATIC IMPORTED)
 
 set_target_properties(tinyobjloader PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-src"
+  INTERFACE_INCLUDE_DIRECTORIES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-src"
 )
 
 # Import target "tinyobjloader" for configuration "Debug"
 set_property(TARGET tinyobjloader APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
 set_target_properties(tinyobjloader PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "CXX"
-  IMPORTED_LOCATION_DEBUG "C:/Users/Jbilo/Desktop/pino game engine/build/lib/Debug/tinyobjloader.lib"
+  IMPORTED_LOCATION_DEBUG "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/Debug/tinyobjloader.lib"
   )
 
 # Import target "tinyobjloader" for configuration "Release"
 set_property(TARGET tinyobjloader APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(tinyobjloader PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
-  IMPORTED_LOCATION_RELEASE "C:/Users/Jbilo/Desktop/pino game engine/build/lib/Release/tinyobjloader.lib"
+  IMPORTED_LOCATION_RELEASE "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/Release/tinyobjloader.lib"
   )
 
 # Import target "tinyobjloader" for configuration "MinSizeRel"
 set_property(TARGET tinyobjloader APPEND PROPERTY IMPORTED_CONFIGURATIONS MINSIZEREL)
 set_target_properties(tinyobjloader PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_MINSIZEREL "CXX"
-  IMPORTED_LOCATION_MINSIZEREL "C:/Users/Jbilo/Desktop/pino game engine/build/lib/MinSizeRel/tinyobjloader.lib"
+  IMPORTED_LOCATION_MINSIZEREL "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/MinSizeRel/tinyobjloader.lib"
   )
 
 # Import target "tinyobjloader" for configuration "RelWithDebInfo"
 set_property(TARGET tinyobjloader APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
 set_target_properties(tinyobjloader PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_RELWITHDEBINFO "CXX"
-  IMPORTED_LOCATION_RELWITHDEBINFO "C:/Users/Jbilo/Desktop/pino game engine/build/lib/RelWithDebInfo/tinyobjloader.lib"
+  IMPORTED_LOCATION_RELWITHDEBINFO "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/RelWithDebInfo/tinyobjloader.lib"
   )
 
 # This file does not depend on other imported targets which have

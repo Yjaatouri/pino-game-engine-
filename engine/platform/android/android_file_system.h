@@ -1,7 +1,12 @@
 #pragma once
 #include "engine/platform/file_system.h"
-#include <android/asset_manager.h>
 #include <string>
+
+#if defined(__ANDROID__)
+#include <android/asset_manager.h>
+#else
+struct AAssetManager;
+#endif
 
 namespace pino {
 

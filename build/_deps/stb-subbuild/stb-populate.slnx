@@ -5,16 +5,16 @@
 		<Platform Name="x64"/>
 	</Configurations>
 	<Folder Name="/CMakePredefinedTargets/">
-		<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="5901cec6-e74c-30fa-a1c6-2c520bf8eaff" DefaultStartup="true">
+		<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4335f6be-c001-3bd6-a74c-febe627bbc4e" DefaultStartup="true">
 			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 			<BuildDependency Project="stb-populate.vcxproj"/>
 			<Build Solution="Debug|*" Project="false"/>
 		</Project>
-		<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d4040129-c038-3256-97a5-0b211b7f97a5"/>
+		<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="671ac619-2944-37fb-998f-991d4797cce2"/>
 	</Folder>
 	<Folder Name="/ExternalProjectTargets/"/>
 	<Folder Name="/ExternalProjectTargets/stb-populate/">
-		<Project Path="stb-populate.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f697e874-f7dd-3f73-8017-edad718b97f9">
+		<Project Path="stb-populate.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e3aa5358-6f9e-3363-a560-f76df5ca37f4">
 			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		</Project>
 	</Folder>

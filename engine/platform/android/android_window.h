@@ -1,7 +1,19 @@
 #pragma once
 #include "engine/platform/window.h"
+
+#if defined(__ANDROID__)
 #include <android/native_window.h>
 #include <EGL/egl.h>
+#else
+struct ANativeWindow;
+using EGLDisplay = void*;
+using EGLSurface = void*;
+using EGLContext = void*;
+using EGLConfig  = void*;
+#define EGL_NO_DISPLAY  ((EGLDisplay)0)
+#define EGL_NO_CONTEXT  ((EGLContext)0)
+#define EGL_NO_SURFACE  ((EGLSurface)0)
+#endif
 
 namespace pino {
 

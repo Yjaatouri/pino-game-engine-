@@ -1,6 +1,10 @@
 #pragma once
 #include "engine/platform/input.h"
+#if defined(__ANDROID__)
 #include <android/input.h>
+#else
+struct AInputEvent;
+#endif
 
 namespace pino {
 

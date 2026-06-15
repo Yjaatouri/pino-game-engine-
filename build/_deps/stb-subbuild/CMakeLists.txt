@@ -28,8 +28,8 @@ set_property(GLOBAL PROPERTY _CMAKE_FindGit_GIT_EXECUTABLE_VERSION
 include(ExternalProject)
 ExternalProject_Add(stb-populate
                      "UPDATE_DISCONNECTED" "False" "GIT_REPOSITORY" "https://github.com/nothings/stb.git" "EXTERNALPROJECT_INTERNAL_ARGUMENT_SEPARATOR" "GIT_TAG" "31c1ad3" "GIT_SHALLOW" "TRUE"
-                    SOURCE_DIR          "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-src"
-                    BINARY_DIR          "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/stb-build"
+                    SOURCE_DIR          "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-src"
+                    BINARY_DIR          "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/stb-build"
                     CONFIGURE_COMMAND   ""
                     BUILD_COMMAND       ""
                     INSTALL_COMMAND     ""

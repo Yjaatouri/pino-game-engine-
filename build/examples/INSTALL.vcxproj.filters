@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\CMakeFiles\e18cb7dad9c1ff95656c5fa07251de72\INSTALL_force.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\CMakeFiles\948d59c2ab8361b24ce17376a9491686\INSTALL_force.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{8192FCFB-BD29-326A-9FAE-114F4D77FC2A}</UniqueIdentifier>
+      <UniqueIdentifier>{78F877E0-202D-3FEC-A7C2-157A845AC07A}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

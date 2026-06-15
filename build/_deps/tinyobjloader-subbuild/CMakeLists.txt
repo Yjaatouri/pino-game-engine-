@@ -28,8 +28,8 @@ set_property(GLOBAL PROPERTY _CMAKE_FindGit_GIT_EXECUTABLE_VERSION
 include(ExternalProject)
 ExternalProject_Add(tinyobjloader-populate
                      "UPDATE_DISCONNECTED" "False" "GIT_REPOSITORY" "https://github.com/tinyobjloader/tinyobjloader.git" "EXTERNALPROJECT_INTERNAL_ARGUMENT_SEPARATOR" "GIT_TAG" "v2.0.0rc10" "GIT_SHALLOW" "TRUE"
-                    SOURCE_DIR          "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-src"
-                    BINARY_DIR          "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build"
+                    SOURCE_DIR          "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-src"
+                    BINARY_DIR          "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build"
                     CONFIGURE_COMMAND   ""
                     BUILD_COMMAND       ""
                     INSTALL_COMMAND     ""

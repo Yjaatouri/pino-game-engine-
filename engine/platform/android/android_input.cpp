@@ -2,6 +2,8 @@
 #include <cmath>
 #include <cstring>
 
+#if defined(__ANDROID__)
+
 namespace pino {
 
 Input* Input::s_instance = nullptr;
@@ -346,3 +348,5 @@ bool AndroidInput::is_mouse_just_pressed(MouseButton b) const {
 }
 
 } // namespace pino
+
+#endif // __ANDROID__

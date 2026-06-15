@@ -10,7 +10,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A757C01C-F261-3158-8D51-3AB6F45CF9EF}</ProjectGuid>
+    <ProjectGuid>{6627F8A4-7679-3AAA-ACB4-FFEF528E79B4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -46,13 +46,13 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-mkdir.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-mkdir.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Creating directories for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-mkdirs.cmake"
+"C:\Program Files\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-mkdirs.cmake
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-mkdir"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-mkdir
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -61,21 +61,21 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-mkdir</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-mkdir</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-download.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-download.rule">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Performing download step (git clone) for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-gitclone.cmake"
+"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-gitclone.cmake
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-download"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-download
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -83,20 +83,20 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\tinyobjloader-populate-gitinfo.txt;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-mkdir;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-download</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\tinyobjloader-populate-gitinfo.txt;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-mkdir;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-download</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-update.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-update.rule">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Performing update step for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-src"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-src
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-gitupdate.cmake"
+"C:\Program Files\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-gitupdate.cmake
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -104,19 +104,19 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\tmp\tinyobjloader-populate-gitupdate.cmake;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\tinyobjloader-populate-update-info.txt;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-download;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-update</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\tmp\tinyobjloader-populate-gitupdate.cmake;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\tinyobjloader-populate-update-info.txt;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-download;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-update</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-patch.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-patch.rule">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">No patch step for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-patch"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-patch
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -124,24 +124,24 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\tinyobjloader-populate-patch-info.txt;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-update;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-patch</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\tinyobjloader-populate-patch-info.txt;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-update;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-patch</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-configure.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-configure.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">No configure step for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-build"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-configure"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-configure
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -149,23 +149,23 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\tmp\tinyobjloader-populate-cfgcmd.txt;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-patch;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-configure</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\tmp\tinyobjloader-populate-cfgcmd.txt;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-patch;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-configure</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-build.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-build.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">No build step for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-build"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-build"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-build
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -173,23 +173,23 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-configure;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-build</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-configure;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-build</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-install.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-install.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">No install step for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-build"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-install"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-install
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -197,23 +197,23 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-build;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-install</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-build;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-install</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\e66b1a4643ccc0134ad988e0a5041547\tinyobjloader-populate-test.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\f044b0a83c33465315a59f77d333e73a\tinyobjloader-populate-test.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">No test step for 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-cd "C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-build"
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
 "C:\Program Files\CMake\bin\cmake.exe" -E echo_append
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-test"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-test
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -221,21 +221,21 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-install;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-test</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-install;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-test</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\9f097b74d8d74363b367ab0025608bc1\tinyobjloader-populate-complete.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\7e7d1d8bbd6ba4f2665e668ef9a2df22\tinyobjloader-populate-complete.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Completed 'tinyobjloader-populate'</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E make_directory "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/Debug"
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/CMakeFiles/Debug
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/Debug/tinyobjloader-populate-complete"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/CMakeFiles/Debug/tinyobjloader-populate-complete
 if %errorlevel% neq 0 goto :cmEnd
-"C:\Program Files\CMake\bin\cmake.exe" -E touch "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-done"
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-done
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -243,14 +243,14 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-install;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-mkdir;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-download;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-update;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-patch;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-configure;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-build;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-test;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\Debug\tinyobjloader-populate-complete</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-install;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-mkdir;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-download;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-update;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-patch;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-configure;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-build;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\src\tinyobjloader-populate-stamp\Debug\tinyobjloader-populate-test;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\Debug\tinyobjloader-populate-complete</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\8ff6db311fd5a1714ffadb347808a860\tinyobjloader-populate.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\a5b94584d2fb63c04a4ac9c6efd7aec6\tinyobjloader-populate.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"></Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -260,18 +260,18 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\Debug\tinyobjloader-populate-complete;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\tinyobjloader-populate</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\Debug\tinyobjloader-populate-complete;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\tinyobjloader-populate</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeLists.txt">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild" "-BC:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild" --check-stamp-file "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/CMakeFiles/generate.stamp"
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild -BC:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild --check-stamp-file C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -279,19 +279,19 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\PatchInfo.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\RepositoryInfo.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\UpdateInfo.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\cfgcmd.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\gitclone.cmake.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\gitupdate.cmake.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\mkdirs.cmake.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\shared_internal_commands.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\Platform\WindowsPaths.cmake;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\4.3.1\CMakeSystem.cmake;C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\tmp\tinyobjloader-populate-mkdirs.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\PatchInfo.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\RepositoryInfo.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\UpdateInfo.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\cfgcmd.txt.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\gitclone.cmake.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\gitupdate.cmake.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\mkdirs.cmake.in;C:\Program Files\CMake\share\cmake-4.3\Modules\ExternalProject\shared_internal_commands.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.3\Modules\Platform\WindowsPaths.cmake;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\4.3.1\CMakeSystem.cmake;C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\tinyobjloader-populate-prefix\tmp\tinyobjloader-populate-mkdirs.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\CMakeFiles\tinyobjloader-populate">
+    <None Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\CMakeFiles\tinyobjloader-populate">
     </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\tinyobjloader-subbuild\ZERO_CHECK.vcxproj">
-      <Project>{BE98C2F3-F695-3BA0-8360-1C9FE5EC7A8D}</Project>
+    <ProjectReference Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-subbuild\ZERO_CHECK.vcxproj">
+      <Project>{A967600C-D8B8-3DCC-9B62-CD6E7555321E}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

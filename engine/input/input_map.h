@@ -29,19 +29,19 @@ public:
     // ---- Binding ----
     // Bind a keyboard key to an action in a specific context.
     void bind_key(const std::string& action, Key key, InputContext ctx = InputContext::Gameplay) {
-        m_bindings[ctx].key_bindings[action].push_back(key);
+        m_bindings[static_cast<usize>(ctx)].key_bindings[action].push_back(key);
     }
 
     // Unbind a specific key from an action in a context.
     void unbind_key(const std::string& action, Key key, InputContext ctx = InputContext::Gameplay) {
-        auto& vec = m_bindings[ctx].key_bindings[action];
+        auto& vec = m_bindings[static_cast<usize>(ctx)].key_bindings[action];
         vec.erase(std::remove(vec.begin(), vec.end(), key), vec.end());
     }
 
     // Unbind all keys from an action in a context.
     void unbind_action(const std::string& action, InputContext ctx = InputContext::Gameplay) {
-        m_bindings[ctx].key_bindings.erase(action);
-        m_bindings[ctx].button_bindings.erase(action);
+        m_bindings[static_cast<usize>(ctx)].key_bindings.erase(action);
+        m_bindings[static_cast<usize>(ctx)].button_bindings.erase(action);
     }
 
     // Remove all bindings for a context.

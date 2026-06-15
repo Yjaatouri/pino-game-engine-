@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\Jbilo\Desktop\pino game engine\examples\input_test\main.cpp">
+    <ClCompile Include="C:\Users\Jbilo\Desktop\pino-game-engine-\examples\input_test\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\examples\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\examples\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{3051F04F-D602-3D41-960A-9A9DA66A1E3F}</UniqueIdentifier>
+      <UniqueIdentifier>{60B5CFF7-CEDA-3719-A61D-81142927FA72}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

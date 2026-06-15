@@ -5,16 +5,16 @@
 		<Platform Name="x64"/>
 	</Configurations>
 	<Folder Name="/CMakePredefinedTargets/">
-		<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="39385221-6591-349b-9c65-65893811821e" DefaultStartup="true">
+		<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b9928a26-fa73-372f-8944-a100d39baaa3" DefaultStartup="true">
 			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 			<BuildDependency Project="tinyobjloader-populate.vcxproj"/>
 			<Build Solution="Debug|*" Project="false"/>
 		</Project>
-		<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="be98c2f3-f695-3ba0-8360-1c9fe5ec7a8d"/>
+		<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a967600c-d8b8-3dcc-9b62-cd6e7555321e"/>
 	</Folder>
 	<Folder Name="/ExternalProjectTargets/"/>
 	<Folder Name="/ExternalProjectTargets/tinyobjloader-populate/">
-		<Project Path="tinyobjloader-populate.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a757c01c-f261-3158-8d51-3ab6f45cf9ef">
+		<Project Path="tinyobjloader-populate.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6627f8a4-7679-3aaa-acb4-ffef528e79b4">
 			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		</Project>
 	</Folder>

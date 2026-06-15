@@ -1,0 +1,8 @@
+{
+    "C_Cpp.files.exclude": {
+        "engine/platform/android/**": true,
+        "engine/platform/ios/**": true,
+        "examples/android_lit_cube/**": true,
+        "examples/ios_lit_cube/**": true
+    }
+}

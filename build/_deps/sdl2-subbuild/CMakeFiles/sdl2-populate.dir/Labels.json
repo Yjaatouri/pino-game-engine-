@@ -2,37 +2,37 @@
 	"sources" : 
 	[
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/sdl2-populate"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/sdl2-populate"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/bf674a945cdc360ad9b9e860a4cfee0f/sdl2-populate.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/13a3314ea2f5db4ba22af95f273c8a8e/sdl2-populate.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/1eb3872d13d7a5c15ce37e700dc57eb1/sdl2-populate-complete.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/4adbd9e66c5a71491678f69f4bef0053/sdl2-populate-complete.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-build.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-build.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-configure.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-configure.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-download.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-download.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-install.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-install.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-mkdir.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-mkdir.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-patch.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-patch.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-test.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-test.rule"
 		},
 		{
-			"file" : "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/sdl2-subbuild/CMakeFiles/34fdb3770bff5a5a71ea370a84b51ed0/sdl2-populate-update.rule"
+			"file" : "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-subbuild/CMakeFiles/368e7d62bff2c6995472eab520cc5723/sdl2-populate-update.rule"
 		}
 	],
 	"target" : 

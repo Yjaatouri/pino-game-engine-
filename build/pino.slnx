@@ -7,7 +7,7 @@
 		<BuildType Name="RelWithDebInfo"/>
 		<Platform Name="x64"/>
 	</Configurations>
-	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3274b52a-4bb0-388f-bf82-9c724d346180" DefaultStartup="true">
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="8394d091-f9d6-346c-bc59-addfec123d2a" DefaultStartup="true">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="_deps/sdl2-build/SDL2main.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
@@ -28,7 +28,7 @@
 		<BuildDependency Project="_deps/tinyobjloader-build/tinyobjloader.vcxproj"/>
 		<BuildDependency Project="examples/triangle.vcxproj"/>
 	</Project>
-	<Project Path="INSTALL.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="384405d7-e25a-32a7-80d6-ace8d410db89">
+	<Project Path="INSTALL.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e0b5e2aa-785d-35f5-ae6c-c7f1d1a55211">
 		<BuildDependency Project="ALL_BUILD.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<Build Solution="Debug|*" Project="false"/>
@@ -36,85 +36,85 @@
 		<Build Solution="MinSizeRel|*" Project="false"/>
 		<Build Solution="RelWithDebInfo|*" Project="false"/>
 	</Project>
-	<Project Path="_deps/sdl2-build/SDL2-static.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7c16c496-d40c-3b7f-8963-563ff393f11f">
+	<Project Path="_deps/sdl2-build/SDL2-static.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="dbdaa410-1cee-35ce-8d07-f8d757ffd422">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="_deps/sdl2-build/sdl_headers_copy.vcxproj"/>
 	</Project>
-	<Project Path="_deps/sdl2-build/SDL2main.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7048ae00-c7c6-3371-88e6-11aaa69d47e4">
+	<Project Path="_deps/sdl2-build/SDL2main.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="5e9cee18-bdea-3a87-a801-384f3b0018ed">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="_deps/sdl2-build/sdl_headers_copy.vcxproj"/>
 	</Project>
-	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="63dfe2d4-e3b4-37db-8d59-60007ad94898"/>
-	<Project Path="examples/arena_game.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="17f23739-9778-31c5-a88d-56fa8e8189b1">
+	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d947f788-dc8e-3d9c-bb1e-ff25e5225bec"/>
+	<Project Path="examples/arena_game.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9592c884-4571-3233-addf-878238f7b04d">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/asset_demo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3d187d69-487d-3f08-a9dc-437da1bc81d2">
+	<Project Path="examples/asset_demo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="609d125b-4303-3efa-9b8b-f0f543db76eb">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/clear.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="cc71c3e3-7da1-3f10-9358-2f92d65782cf">
+	<Project Path="examples/clear.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9cc1f4ea-637a-31d1-8975-ea4ba0648f92">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/collision_demo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2f2121f2-ab41-346d-87ac-351bf3d0b546">
+	<Project Path="examples/collision_demo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9223ae64-ba39-314d-a93f-dc946967ea96">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/cube.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ab25c54b-9d52-3d58-ab9e-98d675b1aa8a">
+	<Project Path="examples/cube.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="78fe3eea-825a-3c79-af6d-61b4b024e7c6">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/demo_game.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="8d990e6d-a2ad-3cf3-ae95-a0dbd048ee37">
+	<Project Path="examples/demo_game.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b16c112c-4529-30f5-b749-c9dd28e973bb">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="engine/engine_core.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="edd87a3e-d139-3cb0-ba06-6c0246886620">
+	<Project Path="engine/engine_core.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="36f6c836-1085-3d21-9dd0-cbff02865a26">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/fps_camera.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ad3aa0fb-ff23-386b-ab34-bd545eb1a606">
+	<Project Path="examples/fps_camera.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7fbc9993-7e94-3fb8-ba73-789aeec29ccb">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/game_demo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3e8a614e-951d-31e1-a6e6-d3646b836f7b">
+	<Project Path="examples/game_demo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="88e291d5-264e-3e27-a5b3-fd10287f67de">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/input_test.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e3f43afd-feb2-312b-b486-7378a7ee4836">
+	<Project Path="examples/input_test.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="776a62b7-5db3-3746-9080-44760c2cdef6">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="examples/lit_scene.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="41261b25-2b82-355d-af39-78d1791c8b58">
+	<Project Path="examples/lit_scene.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ed81cdc5-e1a5-3da4-816c-41b615e26997">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="engine/platform_desktop.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7205bc29-f3ff-3825-b0e3-1688d78160fd">
+	<Project Path="engine/platform_desktop.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a9821cad-4b30-36bd-9569-88341045641e">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
-	<Project Path="run.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6ebe36d2-ce7d-35e2-98e0-9e06957684b7">
+	<Project Path="run.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="55321569-e931-323d-986a-51728e25c157">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="examples/game_demo.vcxproj"/>
 		<Build Solution="Debug|*" Project="false"/>
@@ -122,31 +122,31 @@
 		<Build Solution="MinSizeRel|*" Project="false"/>
 		<Build Solution="RelWithDebInfo|*" Project="false"/>
 	</Project>
-	<Project Path="examples/scene_graph.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="dbf30486-3061-37bf-adb2-60bf892b9f84">
+	<Project Path="examples/scene_graph.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f1af4747-774a-3b53-9e04-12f7aab14b7e">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="_deps/sdl2-build/sdl_headers_copy.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="1945f56d-afca-3cd0-9d59-fe516aa357e1">
+	<Project Path="_deps/sdl2-build/sdl_headers_copy.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ff2a6592-4e4d-3b09-8f12-d11eedf77077">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
-	<Project Path="examples/stability_test.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="62e9b7a9-3904-3be7-85ac-142822eb1021">
+	<Project Path="examples/stability_test.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3e905028-460e-317e-b95f-44069a34ef59">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="_deps/tinyobjloader-build/tinyobjloader.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="8ff619fa-a076-316b-a125-1285a45c6906">
+	<Project Path="_deps/tinyobjloader-build/tinyobjloader.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="8bdfaa7f-1d32-3c4f-84fd-5de9e79b2eff">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
-	<Project Path="examples/triangle.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d98de05f-c503-3426-9855-0529c51cda2e">
+	<Project Path="examples/triangle.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a9df4f22-1dbd-3cd8-87dc-a19fb55f4d5a">
 		<BuildDependency Project="_deps/sdl2-build/SDL2-static.vcxproj"/>
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="engine/engine_core.vcxproj"/>
 		<BuildDependency Project="engine/platform_desktop.vcxproj"/>
 	</Project>
-	<Project Path="_deps/sdl2-build/uninstall.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="61d478c2-3069-328a-888e-a372b4c9e616">
+	<Project Path="_deps/sdl2-build/uninstall.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="05a904c1-af00-37df-b51c-86aff7b024f1">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<Build Solution="Debug|*" Project="false"/>
 		<Build Solution="Release|*" Project="false"/>

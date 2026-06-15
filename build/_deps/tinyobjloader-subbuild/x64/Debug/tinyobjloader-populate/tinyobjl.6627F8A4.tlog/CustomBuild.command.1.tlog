@@ -1,0 +1,150 @@
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-MKDIR.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-mkdirs.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-mkdir
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-DOWNLOAD.RULE
+setlocal
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-gitclone.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-download
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-UPDATE.RULE
+setlocal
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-src
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp/tinyobjloader-populate-gitupdate.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-PATCH.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-patch
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-CONFIGURE.RULE
+setlocal
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-configure
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-BUILD.RULE
+setlocal
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-build
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-INSTALL.RULE
+setlocal
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-install
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\F044B0A83C33465315A59F77D333E73A\TINYOBJLOADER-POPULATE-TEST.RULE
+setlocal
+cd C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\tinyobjloader-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-test
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\7E7D1D8BBD6BA4F2665E668EF9A2DF22\TINYOBJLOADER-POPULATE-COMPLETE.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/CMakeFiles/Debug/tinyobjloader-populate-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/Debug/tinyobjloader-populate-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKEFILES\A5B94584D2FB63C04A4AC9C6EFD7AEC6\TINYOBJLOADER-POPULATE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\JBILO\DESKTOP\PINO-GAME-ENGINE-\BUILD\_DEPS\TINYOBJLOADER-SUBBUILD\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild -BC:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild --check-stamp-file C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

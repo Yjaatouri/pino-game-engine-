@@ -2,6 +2,8 @@
 #include "engine/core/log.h"
 #include <algorithm>
 
+#if defined(__ANDROID__)
+
 namespace pino {
 
 AndroidFileSystem::AndroidFileSystem(AAssetManager* mgr)
@@ -51,3 +53,5 @@ std::string AndroidFileSystem::resolve(const char* path) const {
 }
 
 } // namespace pino
+
+#endif // __ANDROID__

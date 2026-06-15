@@ -1,44 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-mkdir.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-mkdir.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-download.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-download.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-update.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-update.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-patch.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-patch.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-configure.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-configure.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-build.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-build.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-install.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-install.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\34fdb3770bff5a5a71ea370a84b51ed0\sdl2-populate-test.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\368e7d62bff2c6995472eab520cc5723\sdl2-populate-test.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\1eb3872d13d7a5c15ce37e700dc57eb1\sdl2-populate-complete.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\4adbd9e66c5a71491678f69f4bef0053\sdl2-populate-complete.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\bf674a945cdc360ad9b9e860a4cfee0f\sdl2-populate.rule">
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\13a3314ea2f5db4ba22af95f273c8a8e\sdl2-populate.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Users\Jbilo\Desktop\pino game engine\build\_deps\sdl2-subbuild\CMakeFiles\sdl2-populate" />
+    <None Include="C:\Users\Jbilo\Desktop\pino-game-engine-\build\_deps\sdl2-subbuild\CMakeFiles\sdl2-populate" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{E2EF8E6A-BB3A-3717-8151-A46E78955F5A}</UniqueIdentifier>
+      <UniqueIdentifier>{6D8051FD-545C-3B21-9D45-8092424E5015}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

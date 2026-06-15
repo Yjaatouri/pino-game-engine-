@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-src
+# Install script for directory: C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,25 +34,25 @@ endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino game engine/build/lib/Debug/tinyobjloader.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/Debug/tinyobjloader.lib")
   elseif(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino game engine/build/lib/Release/tinyobjloader.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/Release/tinyobjloader.lib")
   elseif(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino game engine/build/lib/MinSizeRel/tinyobjloader.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/MinSizeRel/tinyobjloader.lib")
   elseif(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino game engine/build/lib/RelWithDebInfo/tinyobjloader.lib")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/lib/RelWithDebInfo/tinyobjloader.lib")
   endif()
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    include("C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-Debug.cmake" OPTIONAL)
+    include("C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-Debug.cmake" OPTIONAL)
   elseif(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    include("C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-Release.cmake" OPTIONAL)
+    include("C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-Release.cmake" OPTIONAL)
   elseif(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    include("C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-MinSizeRel.cmake" OPTIONAL)
+    include("C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-MinSizeRel.cmake" OPTIONAL)
   elseif(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    include("C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-RelWithDebInfo.cmake" OPTIONAL)
+    include("C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/tinyobjloader.dir/install-cxx-module-bmi-RelWithDebInfo.cmake" OPTIONAL)
   endif()
 endif()
 
@@ -60,7 +60,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake/tinyobjloader-targets.cmake")
     file(DIFFERENT _cmake_export_file_changed FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake/tinyobjloader-targets.cmake"
-         "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets.cmake")
+         "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets.cmake")
     if(_cmake_export_file_changed)
       file(GLOB _cmake_old_config_files "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake/tinyobjloader-targets-*.cmake")
       if(_cmake_old_config_files)
@@ -73,43 +73,43 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
     endif()
     unset(_cmake_export_file_changed)
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets.cmake")
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-debug.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-debug.cmake")
   endif()
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-minsizerel.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-minsizerel.cmake")
   endif()
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-relwithdebinfo.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-relwithdebinfo.cmake")
   endif()
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-release.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/CMakeFiles/Export/ed38dc2cb1e14c44cc057c68af26fb32/tinyobjloader-targets-release.cmake")
   endif()
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-src/tiny_obj_loader.h")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-src/tiny_obj_loader.h")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/doc/tinyobjloader" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-src/LICENSE")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/doc/tinyobjloader" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-src/LICENSE")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/tinyobjloader/cmake" TYPE FILE FILES
-    "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/tinyobjloader-config.cmake"
-    "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/tinyobjloader-config-version.cmake"
+    "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/tinyobjloader-config.cmake"
+    "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/tinyobjloader-config-version.cmake"
     )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/tinyobjloader.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/tinyobjloader.pc")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build/install_local_manifest.txt"
+  file(WRITE "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

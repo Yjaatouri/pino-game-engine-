@@ -1,5 +1,7 @@
 #include "android_window.h"
 #include "engine/core/log.h"
+
+#if defined(__ANDROID__)
 #include <android/api-level.h>
 
 namespace pino {
@@ -209,3 +211,5 @@ void* AndroidWindow::gl_context() const {
 }
 
 } // namespace pino
+
+#endif // __ANDROID__

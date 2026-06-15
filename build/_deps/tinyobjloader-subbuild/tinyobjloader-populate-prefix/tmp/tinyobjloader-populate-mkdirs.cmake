@@ -6,22 +6,22 @@ cmake_minimum_required(VERSION ${CMAKE_VERSION}) # this file comes with cmake
 # If CMAKE_DISABLE_SOURCE_CHANGES is set to true and the source directory is an
 # existing directory in our source tree, calling file(MAKE_DIRECTORY) on it
 # would cause a fatal error, even though it would be a no-op.
-if(NOT EXISTS "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-src")
-  file(MAKE_DIRECTORY "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-src")
+if(NOT EXISTS "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-src")
+  file(MAKE_DIRECTORY "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-src")
 endif()
 file(MAKE_DIRECTORY
-  "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-build"
-  "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix"
-  "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp"
-  "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp"
-  "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src"
-  "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp"
+  "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-build"
+  "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix"
+  "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/tmp"
+  "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp"
+  "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src"
+  "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp"
 )
 
 set(configSubDirs Debug)
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/${subDir}")
+    file(MAKE_DIRECTORY "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "C:/Users/Jbilo/Desktop/pino game engine/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/tinyobjloader-subbuild/tinyobjloader-populate-prefix/src/tinyobjloader-populate-stamp${cfgdir}") # cfgdir has leading slash
 endif()
