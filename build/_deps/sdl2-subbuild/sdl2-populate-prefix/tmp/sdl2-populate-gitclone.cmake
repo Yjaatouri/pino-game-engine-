@@ -35,7 +35,7 @@ set(error_code 1)
 set(number_of_tries 0)
 while(error_code AND number_of_tries LESS 3)
   execute_process(
-    COMMAND "C:/Program Files/Git/cmd/git.exe"
+    COMMAND "C:/Program Files/Git/mingw64/bin/git.exe"
             clone --no-checkout --depth 1 --no-single-branch --config "advice.detachedHead=false" "https://github.com/libsdl-org/SDL.git" "sdl2-src"
     WORKING_DIRECTORY "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps"
     RESULT_VARIABLE error_code
@@ -51,7 +51,7 @@ if(error_code)
 endif()
 
 execute_process(
-  COMMAND "C:/Program Files/Git/cmd/git.exe"
+  COMMAND "C:/Program Files/Git/mingw64/bin/git.exe"
           checkout "release-2.26.5" --
   WORKING_DIRECTORY "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-src"
   RESULT_VARIABLE error_code
@@ -64,7 +64,7 @@ endif()
 set(init_submodules TRUE)
 if(init_submodules)
   execute_process(
-    COMMAND "C:/Program Files/Git/cmd/git.exe" 
+    COMMAND "C:/Program Files/Git/mingw64/bin/git.exe" 
             submodule update --recursive --init 
     WORKING_DIRECTORY "C:/Users/Jbilo/Desktop/pino-game-engine-/build/_deps/sdl2-src"
     RESULT_VARIABLE error_code

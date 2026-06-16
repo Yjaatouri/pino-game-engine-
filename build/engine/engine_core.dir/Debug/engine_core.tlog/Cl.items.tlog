@@ -1,27 +1,27 @@
-C:\Users\Jbilo\Desktop\pino game engine\engine\core\log.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\log.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\core\logger.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\logger.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\core\config_loader.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\config_loader.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\core\transform.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\transform.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\core\math_utils.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\math_utils.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\gl_es3.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\gl_es3.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\shader.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\shader.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\mesh.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\mesh.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\texture.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\texture.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\camera.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\camera.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\fps_controller.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\fps_controller.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\light.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\light.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\render_stats.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\render_stats.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\framebuffer.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\framebuffer.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\render_state.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\render_state.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\per_frame_ubo.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\per_frame_ubo.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\debug_renderer.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\debug_renderer.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\shadow_map.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\shadow_map.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\renderer\skybox.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\skybox.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\assets\stb_image.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\stb_image.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\assets\asset_manager.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\asset_manager.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\assets\asset_pack.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\asset_pack.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\scene\entity.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\entity.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\scene\scene.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\scene.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\engine.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\engine.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\physics\collision_world.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\collision_world.obj
-C:\Users\Jbilo\Desktop\pino game engine\engine\physics\debug_draw.cpp;C:\Users\Jbilo\Desktop\pino game engine\build\engine\engine_core.dir\Debug\debug_draw.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\core\log.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\log.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\core\logger.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\logger.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\core\config_loader.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\config_loader.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\core\transform.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\transform.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\core\math_utils.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\math_utils.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\gl_es3.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\gl_es3.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\shader.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\shader.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\mesh.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\mesh.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\texture.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\texture.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\camera.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\camera.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\fps_controller.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\fps_controller.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\light.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\light.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\render_stats.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\render_stats.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\framebuffer.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\framebuffer.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\render_state.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\render_state.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\per_frame_ubo.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\per_frame_ubo.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\debug_renderer.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\debug_renderer.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\shadow_map.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\shadow_map.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\renderer\skybox.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\skybox.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\assets\stb_image.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\stb_image.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\assets\asset_manager.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\asset_manager.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\assets\asset_pack.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\asset_pack.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\scene\entity.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\entity.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\scene\scene.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\scene.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\engine.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\engine.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\physics\collision_world.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\collision_world.obj
+C:\Users\Jbilo\Desktop\pino-game-engine-\engine\physics\debug_draw.cpp;C:\Users\Jbilo\Desktop\pino-game-engine-\build\engine\engine_core.dir\Debug\debug_draw.obj
