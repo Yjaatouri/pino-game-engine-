@@ -127,7 +127,7 @@ set_target_properties(pino_game PROPERTIES
 
 # Build-type specific defines
 if(PINO_BUILD_TYPE STREQUAL "debug")
-    target_compile_definitions(pino PRIVATE _DEBUG PINO_LOGGING_ENABLED)
+    target_compile_definitions(pino PRIVATE _DEBUG)
     target_compile_options(pino PRIVATE -g -O0)
 else()
     target_compile_definitions(pino PRIVATE NDEBUG)

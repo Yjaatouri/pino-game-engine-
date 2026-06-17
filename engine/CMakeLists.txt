@@ -75,10 +75,6 @@ target_link_libraries(engine_core
         glm::glm
 )
 
-if(PINO_ENABLE_PHYSICS)
-    target_compile_definitions(engine_core PRIVATE PINO_ENABLE_PHYSICS)
-endif()
-
 # Suppress MSVC CRT deprecation warnings (localtime, etc.)
 if(MSVC)
     target_compile_definitions(engine_core PRIVATE _CRT_SECURE_NO_WARNINGS)
