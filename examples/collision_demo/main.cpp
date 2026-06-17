@@ -23,14 +23,12 @@ int main(int, char**) {
     if (!engine.init(cfg)) return 1;
 
     pino::AssetManager assets(engine.filesystem());
-    const char* dir = PINO_ASSET_DIR;
 
-    auto* shader = assets.load_shader(
-        (std::string(dir) + "shaders/lit.vert").c_str(),
-        (std::string(dir) + "shaders/lit.frag").c_str());
+    auto* shader = assets.load_shader("shaders/lit.vert",
+                                      "shaders/lit.frag");
     if (!shader) return 1;
 
-    auto* cube_mesh = assets.load_mesh((std::string(dir) + "models/cube.obj").c_str());
+    auto* cube_mesh = assets.load_mesh("models/cube.obj");
     if (!cube_mesh) return 1;
 
     // Retrieve local bounds from the mesh (computed on upload)

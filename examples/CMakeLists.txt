@@ -1,21 +1,13 @@
-# Asset path from executable directory (build/bin[/<cfg>]) to copied assets (build/assets)
-if(CMAKE_CONFIGURATION_TYPES)
-    set(PINO_ASSET_DIR "../../assets/")
-else()
-    set(PINO_ASSET_DIR "../assets/")
-endif()
-
 # Helper: simple example without assets
 function(add_pino_example name)
     add_executable(${name} ${name}/main.cpp)
     target_link_libraries(${name} PRIVATE engine_core)
 endfunction()
 
-# Helper: example that needs PINO_ASSET_DIR
+# Helper: example with assets (engine resolves asset root at runtime)
 function(add_pino_example_assets name)
     add_executable(${name} ${name}/main.cpp)
     target_link_libraries(${name} PRIVATE engine_core)
-    target_compile_definitions(${name} PRIVATE PINO_ASSET_DIR="${PINO_ASSET_DIR}")
 endfunction()
 
 # ─── Simple examples (no assets) ───────────────────────────────

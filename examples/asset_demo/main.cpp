@@ -17,12 +17,10 @@ int main(int, char**) {
 
     pino::AssetManager assets(engine.filesystem());
 
-    const char* dir = PINO_ASSET_DIR;
-
-    auto* mesh   = assets.load_mesh(  (std::string(dir) + "models/cube.obj").c_str());
-    auto* shader = assets.load_shader((std::string(dir) + "shaders/textured.vert").c_str(),
-                                      (std::string(dir) + "shaders/textured.frag").c_str());
-    auto* tex    = assets.load_texture((std::string(dir) + "textures/checker.ppm").c_str());
+    auto* mesh   = assets.load_mesh(  "models/cube.obj");
+    auto* shader = assets.load_shader("shaders/textured.vert",
+                                      "shaders/textured.frag");
+    auto* tex    = assets.load_texture("textures/checker.ppm");
 
     if (!mesh || !shader || !tex) {
         PINO_ERROR("Failed to load assets");

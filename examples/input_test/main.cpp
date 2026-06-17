@@ -12,16 +12,11 @@ public:
     explicit InputTester(pino::Engine& e) : m_engine(e), m_assets(e.filesystem()) {}
 
     bool init() override {
-        const char* dir = PINO_ASSET_DIR;
-
-        std::string dir_str = dir;
-        std::string vert_path = dir_str + "shaders/lit.vert";
-        std::string frag_path = dir_str + "shaders/lit.frag";
-        m_shader = m_assets.load_shader(vert_path.c_str(), frag_path.c_str());
+        m_shader = m_assets.load_shader("shaders/lit.vert", "shaders/lit.frag");
         if (!m_shader) return false;
 
         // Cube mesh from .obj
-        m_cube = m_assets.load_mesh((std::string(dir) + "models/cube.obj").c_str());
+        m_cube = m_assets.load_mesh("models/cube.obj");
         if (!m_cube) return false;
 
         // Floor quad

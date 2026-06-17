@@ -3,7 +3,9 @@
 #include "engine/platform/platform.h"
 #include "engine/renderer/gl_es3.h"
 
+#include <filesystem>
 #include <thread>
+#include <system_error>
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
@@ -29,6 +31,27 @@ static u64 monotonic_now() {
 #endif
 
 namespace pino {
+
+// ─── Asset root discovery (desktop only) ───────────────────────
+// Walks up from the executable directory to find an "assets/"
+// directory at the build root. This eliminates the need for a
+// fragile compile-time PINO_ASSET_DIR relative path.
+#if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
+static std::string find_asset_root(const std::string& exe_dir) {
+    namespace fs = std::filesystem;
+    fs::path dir(exe_dir);
+    std::error_code ec;
+    for (int i = 0; i < 10; ++i) {
+        auto candidate = dir / "assets";
+        if (fs::is_directory(candidate, ec))
+            return candidate.string() + '/';
+        dir = dir.parent_path();
+        if (dir == dir.root_path()) break;
+    }
+    // Fallback: assume assets/ is next to the executable
+    return exe_dir + "assets/";
+}
+#endif
 
 Engine::Engine() = default;
 Engine::~Engine() { shutdown(); }
@@ -154,8 +177,12 @@ bool Engine::init(const EngineConfig& config) {
     m_last_tick  = monotonic_now();
 #else
     char* base = SDL_GetBasePath();
-    m_filesystem = create_file_system(base ? base : ".");
+    std::string exe_dir = base ? base : ".";
     SDL_free(base);
+    {
+        std::string asset_root = find_asset_root(exe_dir);
+        m_filesystem = create_file_system(asset_root);
+    }
     m_last_tick = SDL_GetPerformanceCounter();
 #endif
 

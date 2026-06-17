@@ -134,9 +134,6 @@ else()
     target_compile_options(pino PRIVATE -O2)
 endif()
 
-# Compile definition for asset path (empty on Android — assets are in APK root)
-target_compile_definitions(pino_game PRIVATE PINO_ASSET_DIR="")
-
 # Tell Gradle about the shared library
 set_target_properties(pino_game PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}

@@ -49,14 +49,11 @@ private:
 };
 
 bool Game::init() {
-    const char* dir = PINO_ASSET_DIR;
-
-    m_shader = m_assets.load_shader(
-        (std::string(dir) + "shaders/lit.vert").c_str(),
-        (std::string(dir) + "shaders/lit.frag").c_str());
+    m_shader = m_assets.load_shader("shaders/lit.vert",
+                                    "shaders/lit.frag");
     if (!m_shader) return false;
 
-    m_cube = m_assets.load_mesh((std::string(dir) + "models/cube.obj").c_str());
+    m_cube = m_assets.load_mesh("models/cube.obj");
     if (!m_cube) return false;
 
     m_sphere = pino::Mesh::create_sphere(0.5f, 32, 24);
