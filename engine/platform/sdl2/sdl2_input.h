@@ -1,7 +1,6 @@
 #pragma once
 
 #include "engine/platform/input.h"
-#include <SDL.h>
 
 namespace pino {
 
@@ -59,12 +58,12 @@ private:
     };
 
     struct TouchSlot {
-        SDL_FingerID finger_id = 0;
+        i64 finger_id = 0;
         bool in_use = false;
         TouchPt pt;
     };
 
-    i32 find_touch_slot(SDL_FingerID id) const;
+    i32 find_touch_slot(i64 id) const;
     void finish_touch(u32 idx);
 
     InputState m_state;
@@ -86,13 +85,15 @@ private:
     bool m_tap          = false;
 
     // Gamepad
+    static constexpr i32 MAX_GAMEPADS = 4;
+    static constexpr i32 MAX_GAMEPAD_BUTTONS = 15;  // matches SDL_CONTROLLER_BUTTON_MAX
+
     void open_gamepad(i32 device_index);
-    void close_gamepad(SDL_JoystickID instance_id);
-    void process_gamepad_event(const SDL_Event& e);
+    void close_gamepad(i32 instance_id);
 
     struct GamepadState {
-        SDL_GameController* controller = nullptr;
-        SDL_JoystickID      instance_id = -1;
+        void* controller = nullptr;  // SDL_GameController*
+        i32 instance_id = -1;
         bool attached = false;
 
         // Axis states (normalized -1..1 with deadzone)
@@ -104,11 +105,10 @@ private:
         float right_trigger = 0;
 
         // Button states
-        bool buttons[SDL_CONTROLLER_BUTTON_MAX] = {};
-        bool buttons_prev[SDL_CONTROLLER_BUTTON_MAX] = {};
+        bool buttons[MAX_GAMEPAD_BUTTONS] = {};
+        bool buttons_prev[MAX_GAMEPAD_BUTTONS] = {};
     };
 
-    static constexpr i32 MAX_GAMEPADS = 4;
     GamepadState m_gamepads[MAX_GAMEPADS];
     i32          m_gamepad_count = 0;
 

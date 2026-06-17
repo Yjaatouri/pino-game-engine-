@@ -132,7 +132,7 @@ Sdl2Input::Sdl2Input() {
 Sdl2Input::~Sdl2Input() {
     for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
         if (m_gamepads[i].controller) {
-            SDL_GameControllerClose(m_gamepads[i].controller);
+            SDL_GameControllerClose(static_cast<SDL_GameController*>(m_gamepads[i].controller));
         }
     }
     if (instance() == this) set_instance(nullptr);
@@ -147,7 +147,7 @@ void Sdl2Input::begin_frame() {
 
     // Save previous gamepad button states
     for (i32 g = 0; g < MAX_GAMEPADS; ++g) {
-        for (i32 b = 0; b < SDL_CONTROLLER_BUTTON_MAX; ++b)
+        for (i32 b = 0; b < Sdl2Input::MAX_GAMEPAD_BUTTONS; ++b)
             m_gamepads[g].buttons_prev[b] = m_gamepads[g].buttons[b];
     }
 
@@ -184,7 +184,7 @@ void Sdl2Input::reset_state() {
     m_tap = false;
 
     for (i32 g = 0; g < MAX_GAMEPADS; ++g) {
-        for (i32 b = 0; b < SDL_CONTROLLER_BUTTON_MAX; ++b)
+        for (i32 b = 0; b < Sdl2Input::MAX_GAMEPAD_BUTTONS; ++b)
             m_gamepads[g].buttons[b] = m_gamepads[g].buttons_prev[b] = false;
     }
 }
@@ -200,7 +200,7 @@ void Sdl2Input::capture_state(InputState& out_state) const {
 
 // ── Touch slot allocation ────────────────────────────────────────
 
-i32 Sdl2Input::find_touch_slot(SDL_FingerID id) const {
+i32 Sdl2Input::find_touch_slot(i64 id) const {
     for (u32 i = 0; i < MAX_TOUCH; ++i)
         if (m_touch_slots[i].in_use && m_touch_slots[i].finger_id == id)
             return static_cast<i32>(i);
@@ -354,7 +354,7 @@ void Sdl2Input::process_event(const void* ev) {
             for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
                 auto& g = m_gamepads[i];
                 if (!g.controller) continue;
-                if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(g.controller)) != e.caxis.which)
+                if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(static_cast<SDL_GameController*>(g.controller))) != e.caxis.which)
                     continue;
                 float val = static_cast<float>(e.caxis.value) / 32767.0f;
                 if (val > 1.0f) val = 1.0f;
@@ -377,7 +377,7 @@ void Sdl2Input::process_event(const void* ev) {
             for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
                 auto& g = m_gamepads[i];
                 if (!g.controller) continue;
-                if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(g.controller)) != e.cbutton.which)
+                if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(static_cast<SDL_GameController*>(g.controller))) != e.cbutton.which)
                     continue;
                 g.buttons[e.cbutton.button] = (e.cbutton.state == SDL_PRESSED);
                 break;
@@ -417,7 +417,7 @@ void Sdl2Input::open_gamepad(i32 device_index) {
             m_gamepads[i].controller = SDL_GameControllerOpen(device_index);
             if (m_gamepads[i].controller) {
                 m_gamepads[i].instance_id = SDL_JoystickInstanceID(
-                    SDL_GameControllerGetJoystick(m_gamepads[i].controller));
+                    SDL_GameControllerGetJoystick(static_cast<SDL_GameController*>(m_gamepads[i].controller)));
                 m_gamepads[i].attached = true;
                 ++m_gamepad_count;
             }
@@ -426,11 +426,11 @@ void Sdl2Input::open_gamepad(i32 device_index) {
     }
 }
 
-void Sdl2Input::close_gamepad(SDL_JoystickID instance_id) {
+void Sdl2Input::close_gamepad(i32 instance_id) {
     for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
         if (m_gamepads[i].instance_id == instance_id) {
             if (m_gamepads[i].controller)
-                SDL_GameControllerClose(m_gamepads[i].controller);
+                SDL_GameControllerClose(static_cast<SDL_GameController*>(m_gamepads[i].controller));
             std::memset(&m_gamepads[i], 0, sizeof(GamepadState));
             --m_gamepad_count;
             break;
