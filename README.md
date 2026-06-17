@@ -1,5 +1,19 @@
 # Pino Game Engine
 
+## Pino Game Engine v0.1.0
+
+Engine Core Foundation Stable.
+
+- **Stable engine foundation** — cleaned engine initialization, deterministic platform branching, removed dead code paths.
+- **Deterministic asset system** — runtime asset root discovery via `find_asset_root()`; no fragile CMake path dependency.
+- **Safe GL loader** — critical OpenGL ES 3.0 function validation; `gl::init()` returns `false` on missing entry points.
+- **Unified logging system** — project-prefixed `PINO_*` macros only; legacy `LOG_*` macros removed.
+- **Clean SDL integration** — SDL headers fully decoupled from project headers (`sdl2_input.h`, `sdl2_window.h`, `gamepad.h` use portable types only).
+- **Simplified EngineConfig system** — platform-safe data flow; fixed latent iOS compile error; no redundant field assignments.
+- **Lean CMake configuration** — removed 4 dead user-facing options; 3 live options remain.
+
+This release focuses on engine stability and internal architecture cleanup. It is not a feature-complete engine, but a stable base for future systems such as Audio, UI, and advanced rendering.
+
 Lightweight C++17 3D game engine with OpenGL ES 3.0 rendering.
 
 ## Platforms
