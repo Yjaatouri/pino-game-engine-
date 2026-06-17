@@ -86,17 +86,17 @@ bool Engine::init(const EngineConfig& config) {
             "Unknown";
 #endif
 
-        LOG_INFO("--- Pino Engine v%s ---", PINO_VERSION);
-        LOG_INFO("Build: %s  Platform: %s", build, platform);
-        LOG_INFO("CPU threads: %d", static_cast<int>(std::thread::hardware_concurrency()));
-        LOG_INFO("Config: %ux%u  title=\"%s\"  vsync=%s  log=%s  fps=%u",
-                 effective.window_width, effective.window_height,
-                 effective.app_title ? effective.app_title : "",
-                 effective.vsync ? "on" : "off",
-                 effective.log_level == LogLevel::Debug ? "debug" :
-                 effective.log_level == LogLevel::Info  ? "info"  :
-                 effective.log_level == LogLevel::Warn  ? "warn"  : "error",
-                 effective.fixed_update_rate);
+        PINO_INFO("--- Pino Engine v%s ---", PINO_VERSION);
+        PINO_INFO("Build: %s  Platform: %s", build, platform);
+        PINO_INFO("CPU threads: %d", static_cast<int>(std::thread::hardware_concurrency()));
+        PINO_INFO("Config: %ux%u  title=\"%s\"  vsync=%s  log=%s  fps=%u",
+                  effective.window_width, effective.window_height,
+                  effective.app_title ? effective.app_title : "",
+                  effective.vsync ? "on" : "off",
+                  effective.log_level == LogLevel::Debug ? "debug" :
+                  effective.log_level == LogLevel::Info  ? "info"  :
+                  effective.log_level == LogLevel::Warn  ? "warn"  : "error",
+                  effective.fixed_update_rate);
     }
 
     // ─── Window ───────────────────────────────────────────────
@@ -116,14 +116,14 @@ bool Engine::init(const EngineConfig& config) {
 
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) < 0) {
-        LOG_ERROR("SDL_Init failed: %s", SDL_GetError());
+        PINO_ERROR("SDL_Init failed: %s", SDL_GetError());
         return false;
     }
 #endif
 
     m_window = create_window(wc);
     if (!m_window || !m_window->native_handle()) {
-        LOG_ERROR("Window creation failed");
+        PINO_ERROR("Window creation failed");
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
         SDL_Quit();
 #endif
@@ -135,7 +135,7 @@ bool Engine::init(const EngineConfig& config) {
 #endif
 
     if (!gl::init()) {
-        LOG_ERROR("OpenGL loading failed");
+        PINO_ERROR("OpenGL loading failed");
         m_window.reset();
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
         SDL_Quit();
@@ -160,7 +160,7 @@ bool Engine::init(const EngineConfig& config) {
 #endif
 
     m_running   = true;
-    LOG_INFO("Engine initialized");
+    PINO_INFO("Engine initialized");
     return true;
 }
 
@@ -168,7 +168,7 @@ void Engine::shutdown() {
     if (m_engine_shutdown) return;
     m_engine_shutdown = true;
     m_running = false;
-    LOG_INFO("Engine shutting down");
+    PINO_INFO("Engine shutting down");
     m_timers.clear();
     m_filesystem.reset();
     m_input.reset();

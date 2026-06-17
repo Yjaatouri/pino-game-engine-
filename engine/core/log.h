@@ -28,12 +28,6 @@ inline LogLevel log_get_level() { return Logger::level(); }
 #define PINO_WARN(fmt, ...)   PINO_LOG(::pino::LogLevel::Warn,  fmt, ##__VA_ARGS__)
 #define PINO_ERROR(fmt, ...)  PINO_LOG(::pino::LogLevel::Error, fmt, ##__VA_ARGS__)
 
-// ─── Shorthand LOG_* macros ───────────────────────────────────
-#define LOG_DEBUG(fmt, ...)  PINO_DEBUG(fmt, ##__VA_ARGS__)
-#define LOG_INFO(fmt, ...)   PINO_INFO(fmt,  ##__VA_ARGS__)
-#define LOG_WARN(fmt, ...)   PINO_WARN(fmt,  ##__VA_ARGS__)
-#define LOG_ERROR(fmt, ...)  PINO_ERROR(fmt, ##__VA_ARGS__)
-
 // ─── Assertions ───────────────────────────────────────────────
 #if !defined(NDEBUG) || (defined(_DEBUG))
 #define ENGINE_ASSERT(cond) \

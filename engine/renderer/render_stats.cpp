@@ -16,8 +16,8 @@ void RenderStats::begin_frame() {
 }
 
 void RenderStats::end_frame() {
-    LOG_INFO("--- Frame stats: %u draws, %u triangles, %u shader switches, %u state changes ---",
-             draw_calls, triangles, shader_switches, state_changes);
+    PINO_INFO("--- Frame stats: %u draws, %u triangles, %u shader switches, %u state changes ---",
+              draw_calls, triangles, shader_switches, state_changes);
 }
 
 } // namespace pino

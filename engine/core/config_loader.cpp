@@ -36,11 +36,11 @@ EngineConfig load_config_ini(const char* path) {
 
     FILE* f = std::fopen(path, "r");
     if (!f) {
-        LOG_WARN("Config file not found: %s — using defaults", path);
+        PINO_WARN("Config file not found: %s — using defaults", path);
         return cfg;
     }
 
-    LOG_INFO("Loading config: %s", path);
+    PINO_INFO("Loading config: %s", path);
 
     char line[256];
     int line_num = 0;
@@ -56,7 +56,7 @@ EngineConfig load_config_ini(const char* path) {
 
         auto eq = s.find('=');
         if (eq == std::string::npos) {
-            LOG_WARN("config.ini:%d: skipping malformed line", line_num);
+            PINO_WARN("config.ini:%d: skipping malformed line", line_num);
             continue;
         }
 
@@ -66,7 +66,7 @@ EngineConfig load_config_ini(const char* path) {
         trim(val);
 
         if (key.empty()) {
-            LOG_WARN("config.ini:%d: empty key", line_num);
+            PINO_WARN("config.ini:%d: empty key", line_num);
             continue;
         }
 
@@ -74,11 +74,11 @@ EngineConfig load_config_ini(const char* path) {
         if (iequals(key, "width")) {
             int w = std::atoi(val.c_str());
             if (w > 0) cfg.window_width = static_cast<u32>(w);
-            else LOG_WARN("config.ini:%d: invalid width '%s'", line_num, val.c_str());
+            else PINO_WARN("config.ini:%d: invalid width '%s'", line_num, val.c_str());
         } else if (iequals(key, "height")) {
             int h = std::atoi(val.c_str());
             if (h > 0) cfg.window_height = static_cast<u32>(h);
-            else LOG_WARN("config.ini:%d: invalid height '%s'", line_num, val.c_str());
+            else PINO_WARN("config.ini:%d: invalid height '%s'", line_num, val.c_str());
         } else if (iequals(key, "title")) {
             // Store in static buffer since EngineConfig uses const char*
             static std::string s_title;
@@ -95,9 +95,9 @@ EngineConfig load_config_ini(const char* path) {
         } else if (iequals(key, "target_fps")) {
             int fps = std::atoi(val.c_str());
             if (fps > 0) cfg.fixed_update_rate = static_cast<u32>(fps);
-            else LOG_WARN("config.ini:%d: invalid target_fps '%s'", line_num, val.c_str());
+            else PINO_WARN("config.ini:%d: invalid target_fps '%s'", line_num, val.c_str());
         } else {
-            LOG_WARN("config.ini:%d: unknown key '%s'", line_num, key.c_str());
+            PINO_WARN("config.ini:%d: unknown key '%s'", line_num, key.c_str());
         }
     }
 
@@ -110,7 +110,7 @@ EngineConfig load_config() {
     FILE* test = std::fopen("config.json", "r");
     if (test) {
         std::fclose(test);
-        LOG_WARN("config.json found but JSON config loading is not yet supported — using defaults");
+        PINO_WARN("config.json found but JSON config loading is not yet supported — using defaults");
         EngineConfig cfg;
         cfg.app_title = "Pino Engine (defaults)";
         return cfg;
@@ -125,7 +125,7 @@ EngineConfig load_config() {
 
     // No config file — use defaults
     EngineConfig cfg;
-    LOG_INFO("No config file found — using built-in defaults");
+    PINO_INFO("No config file found — using built-in defaults");
     return cfg;
 }
 
