@@ -204,125 +204,148 @@ static void* load_gl_func(const char* name) {
     } while (0)
 #endif
 
-bool init() {
-    PINO_LOAD(glGetIntegerv);
-    PINO_LOAD(glGetError);
-    PINO_LOAD(glGetString);
+// Load a critical GL function — returns false from init() on failure
+#define PINO_LOAD_CRITICAL(func) \
+    do { \
+        PINO_LOAD(func); \
+        if (!func) { \
+            PINO_ERROR("Critical GL function not loaded: %s — aborting init", #func); \
+            return false; \
+        } \
+    } while (0)
 
-    PINO_LOAD(glViewport);
-    PINO_LOAD(glClearColor);
+bool init() {
+    // -- State & queries (critical) --
+    PINO_LOAD_CRITICAL(glGetIntegerv);
+    PINO_LOAD_CRITICAL(glGetError);
+    PINO_LOAD_CRITICAL(glGetString);
+
+    PINO_LOAD_CRITICAL(glViewport);
+    PINO_LOAD_CRITICAL(glClearColor);
     PINO_LOAD(glClearDepthf);
     PINO_LOAD(glClearStencil);
-    PINO_LOAD(glClear);
-    PINO_LOAD(glColorMask);
-    PINO_LOAD(glDepthMask);
+    PINO_LOAD_CRITICAL(glClear);
+    PINO_LOAD_CRITICAL(glColorMask);
+    PINO_LOAD_CRITICAL(glDepthMask);
 
-    PINO_LOAD(glEnable);
-    PINO_LOAD(glDisable);
+    PINO_LOAD_CRITICAL(glEnable);
+    PINO_LOAD_CRITICAL(glDisable);
     PINO_LOAD(glIsEnabled);
 
-    PINO_LOAD(glDepthFunc);
-    PINO_LOAD(glDepthRangef);
+    PINO_LOAD_CRITICAL(glDepthFunc);
+    PINO_LOAD_CRITICAL(glDepthRangef);
     PINO_LOAD(glStencilFunc);
     PINO_LOAD(glStencilMask);
     PINO_LOAD(glStencilOp);
 
-    PINO_LOAD(glBlendFunc);
+    PINO_LOAD_CRITICAL(glBlendFunc);
     PINO_LOAD(glBlendFuncSeparate);
-    PINO_LOAD(glBlendEquation);
+    PINO_LOAD_CRITICAL(glBlendEquation);
     PINO_LOAD(glBlendEquationSeparate);
     PINO_LOAD(glBlendColor);
 
-    PINO_LOAD(glCullFace);
-    PINO_LOAD(glFrontFace);
+    PINO_LOAD_CRITICAL(glCullFace);
+    PINO_LOAD_CRITICAL(glFrontFace);
     PINO_LOAD(glScissor);
     PINO_LOAD(glLineWidth);
 
-    PINO_LOAD(glPixelStorei);
+    PINO_LOAD_CRITICAL(glPixelStorei);
 
-    PINO_LOAD(glGenVertexArrays);
-    PINO_LOAD(glDeleteVertexArrays);
-    PINO_LOAD(glBindVertexArray);
+    // -- Vertex Array Objects (critical — Mesh cannot work without these) --
+    PINO_LOAD_CRITICAL(glGenVertexArrays);
+    PINO_LOAD_CRITICAL(glDeleteVertexArrays);
+    PINO_LOAD_CRITICAL(glBindVertexArray);
 
-    PINO_LOAD(glGenBuffers);
-    PINO_LOAD(glDeleteBuffers);
-    PINO_LOAD(glBindBuffer);
-    PINO_LOAD(glBufferData);
-    PINO_LOAD(glBufferSubData);
+    // -- Buffer Objects (critical) --
+    PINO_LOAD_CRITICAL(glGenBuffers);
+    PINO_LOAD_CRITICAL(glDeleteBuffers);
+    PINO_LOAD_CRITICAL(glBindBuffer);
+    PINO_LOAD_CRITICAL(glBufferData);
+    PINO_LOAD_CRITICAL(glBufferSubData);
     PINO_LOAD(glMapBufferRange);
     PINO_LOAD(glUnmapBuffer);
 
-    PINO_LOAD(glEnableVertexAttribArray);
-    PINO_LOAD(glDisableVertexAttribArray);
-    PINO_LOAD(glVertexAttribPointer);
+    // -- Vertex Attributes (critical) --
+    PINO_LOAD_CRITICAL(glEnableVertexAttribArray);
+    PINO_LOAD_CRITICAL(glDisableVertexAttribArray);
+    PINO_LOAD_CRITICAL(glVertexAttribPointer);
     PINO_LOAD(glVertexAttribDivisor);
 
-    PINO_LOAD(glCreateShader);
-    PINO_LOAD(glShaderSource);
-    PINO_LOAD(glCompileShader);
-    PINO_LOAD(glGetShaderiv);
-    PINO_LOAD(glGetShaderInfoLog);
-    PINO_LOAD(glDeleteShader);
+    // -- Shaders (critical) --
+    PINO_LOAD_CRITICAL(glCreateShader);
+    PINO_LOAD_CRITICAL(glShaderSource);
+    PINO_LOAD_CRITICAL(glCompileShader);
+    PINO_LOAD_CRITICAL(glGetShaderiv);
+    PINO_LOAD_CRITICAL(glGetShaderInfoLog);
+    PINO_LOAD_CRITICAL(glDeleteShader);
 
-    PINO_LOAD(glCreateProgram);
-    PINO_LOAD(glAttachShader);
-    PINO_LOAD(glDetachShader);
-    PINO_LOAD(glLinkProgram);
-    PINO_LOAD(glGetProgramiv);
-    PINO_LOAD(glGetProgramInfoLog);
-    PINO_LOAD(glUseProgram);
-    PINO_LOAD(glDeleteProgram);
+    // -- Programs (critical) --
+    PINO_LOAD_CRITICAL(glCreateProgram);
+    PINO_LOAD_CRITICAL(glAttachShader);
+    PINO_LOAD_CRITICAL(glDetachShader);
+    PINO_LOAD_CRITICAL(glLinkProgram);
+    PINO_LOAD_CRITICAL(glGetProgramiv);
+    PINO_LOAD_CRITICAL(glGetProgramInfoLog);
+    PINO_LOAD_CRITICAL(glUseProgram);
+    PINO_LOAD_CRITICAL(glDeleteProgram);
 
-    PINO_LOAD(glGetUniformLocation);
-    PINO_LOAD(glUniform1f);
+    // -- Uniforms (critical) --
+    PINO_LOAD_CRITICAL(glGetUniformLocation);
+    PINO_LOAD_CRITICAL(glUniform1f);
     PINO_LOAD(glUniform2f);
-    PINO_LOAD(glUniform3f);
-    PINO_LOAD(glUniform4f);
-    PINO_LOAD(glUniform1i);
+    PINO_LOAD_CRITICAL(glUniform3f);
+    PINO_LOAD_CRITICAL(glUniform4f);
+    PINO_LOAD_CRITICAL(glUniform1i);
     PINO_LOAD(glUniform2i);
     PINO_LOAD(glUniform3i);
     PINO_LOAD(glUniform4i);
     PINO_LOAD(glUniformMatrix3fv);
-    PINO_LOAD(glUniformMatrix4fv);
+    PINO_LOAD_CRITICAL(glUniformMatrix4fv);
     PINO_LOAD(glUniform1fv);
     PINO_LOAD(glUniform2fv);
     PINO_LOAD(glUniform3fv);
     PINO_LOAD(glUniform4fv);
 
-    PINO_LOAD(glGenTextures);
-    PINO_LOAD(glDeleteTextures);
-    PINO_LOAD(glBindTexture);
-    PINO_LOAD(glTexImage2D);
-    PINO_LOAD(glTexParameteri);
+    // -- Textures (critical) --
+    PINO_LOAD_CRITICAL(glGenTextures);
+    PINO_LOAD_CRITICAL(glDeleteTextures);
+    PINO_LOAD_CRITICAL(glBindTexture);
+    PINO_LOAD_CRITICAL(glTexImage2D);
+    PINO_LOAD_CRITICAL(glTexParameteri);
     PINO_LOAD(glTexParameterf);
-    PINO_LOAD(glGenerateMipmap);
-    PINO_LOAD(glActiveTexture);
-    PINO_LOAD(glTexSubImage2D);
+    PINO_LOAD_CRITICAL(glGenerateMipmap);
+    PINO_LOAD_CRITICAL(glActiveTexture);
+    PINO_LOAD_CRITICAL(glTexSubImage2D);
     PINO_LOAD(glCopyTexImage2D);
 
-    PINO_LOAD(glGenFramebuffers);
-    PINO_LOAD(glDeleteFramebuffers);
-    PINO_LOAD(glBindFramebuffer);
-    PINO_LOAD(glCheckFramebufferStatus);
-    PINO_LOAD(glFramebufferTexture2D);
-    PINO_LOAD(glFramebufferRenderbuffer);
+    // -- Framebuffer Objects (critical — shadow maps, render targets) --
+    PINO_LOAD_CRITICAL(glGenFramebuffers);
+    PINO_LOAD_CRITICAL(glDeleteFramebuffers);
+    PINO_LOAD_CRITICAL(glBindFramebuffer);
+    PINO_LOAD_CRITICAL(glCheckFramebufferStatus);
+    PINO_LOAD_CRITICAL(glFramebufferTexture2D);
+    PINO_LOAD_CRITICAL(glFramebufferRenderbuffer);
 
-    PINO_LOAD(glGenRenderbuffers);
-    PINO_LOAD(glDeleteRenderbuffers);
-    PINO_LOAD(glBindRenderbuffer);
-    PINO_LOAD(glRenderbufferStorage);
+    // -- Renderbuffer Objects (critical — depth/stencil attachments) --
+    PINO_LOAD_CRITICAL(glGenRenderbuffers);
+    PINO_LOAD_CRITICAL(glDeleteRenderbuffers);
+    PINO_LOAD_CRITICAL(glBindRenderbuffer);
+    PINO_LOAD_CRITICAL(glRenderbufferStorage);
 
-    PINO_LOAD(glGetUniformBlockIndex);
-    PINO_LOAD(glUniformBlockBinding);
-    PINO_LOAD(glBindBufferBase);
+    // -- Uniform Buffer Objects (critical — per_frame_ubo) --
+    PINO_LOAD_CRITICAL(glGetUniformBlockIndex);
+    PINO_LOAD_CRITICAL(glUniformBlockBinding);
+    PINO_LOAD_CRITICAL(glBindBufferBase);
     PINO_LOAD(glBindBufferRange);
     PINO_LOAD(glGetActiveUniformBlockiv);
 
-    PINO_LOAD(glDrawArrays);
-    PINO_LOAD(glDrawElements);
+    // -- Drawing (critical) --
+    PINO_LOAD_CRITICAL(glDrawArrays);
+    PINO_LOAD_CRITICAL(glDrawElements);
     PINO_LOAD(glDrawArraysInstanced);
     PINO_LOAD(glDrawElementsInstanced);
 
+    // -- Debug (non-critical) --
     PINO_LOAD(glDebugMessageCallback);
     PINO_LOAD(glDebugMessageControl);
 
@@ -334,6 +357,7 @@ bool init() {
     return true;
 }
 
+#undef PINO_LOAD_CRITICAL
 #undef PINO_LOAD
 
 } // namespace gl
