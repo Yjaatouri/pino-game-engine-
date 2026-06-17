@@ -51,6 +51,7 @@ set(PINO_ENGINE_SOURCES
     assets/asset_pack.cpp
     scene/entity.cpp
     scene/scene.cpp
+    input/gamepad.cpp
     engine.cpp
 )
 
