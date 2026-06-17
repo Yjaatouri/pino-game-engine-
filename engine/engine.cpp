@@ -23,6 +23,11 @@ static u64 monotonic_now() {
 #include <chrono>
 #endif
 
+// IntelliSense fallback — PINO_VERSION is set by CMake at build time
+#ifndef PINO_VERSION
+#define PINO_VERSION "0.0.0"
+#endif
+
 namespace pino {
 
 Engine::Engine() = default;
@@ -33,9 +38,10 @@ bool Engine::init(const EngineConfig& config) {
     Logger::init("engine.log");
     Logger::set_level(config.log_level);
 
-    // ─── Config file loading (desktop) ────────────────────────
+    // ─── Config loading ──────────────────────────────────────
     EngineConfig effective;
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
+    // Desktop: load config file, then override with any explicit EngineConfig fields
     effective = load_config();
     if (config.app_title && config.app_title[0]) effective.app_title = config.app_title;
     if (config.window_width  != 1280) effective.window_width  = config.window_width;
@@ -45,16 +51,11 @@ bool Engine::init(const EngineConfig& config) {
     if (config.vsync       != true)   effective.vsync       = config.vsync;
     if (config.fixed_update_rate != 60) effective.fixed_update_rate = config.fixed_update_rate;
     if (config.log_level   != LogLevel::Debug) effective.log_level = config.log_level;
-#if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
-    effective.native_window = config.native_window;
-    effective.asset_manager = config.asset_manager;
-#endif
 #else
+    // Mobile: use config as-is (config file not supported)
     effective = config;
-#if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
     effective.native_window = config.native_window;
     effective.asset_manager = config.asset_manager;
-#endif
 #endif
 
     m_config = effective;
@@ -85,7 +86,7 @@ bool Engine::init(const EngineConfig& config) {
             "Unknown";
 #endif
 
-        LOG_INFO("--- Pino Engine v" PINO_VERSION " ---");
+        LOG_INFO("--- Pino Engine v%s ---", PINO_VERSION);
         LOG_INFO("Build: %s  Platform: %s", build, platform);
         LOG_INFO("CPU threads: %d", static_cast<int>(std::thread::hardware_concurrency()));
         LOG_INFO("Config: %ux%u  title=\"%s\"  vsync=%s  log=%s  fps=%u",
