@@ -77,8 +77,6 @@ bool Engine::init(const EngineConfig& config) {
 #else
     // Mobile: use config as-is (config file not supported)
     effective = config;
-    effective.native_window = config.native_window;
-    effective.asset_manager = config.asset_manager;
 #endif
 
     m_config = effective;
@@ -129,7 +127,7 @@ bool Engine::init(const EngineConfig& config) {
     wc.height     = effective.window_height;
     wc.fullscreen = effective.fullscreen;
     wc.resizable  = effective.resizable;
-    wc.gl_es      = true;
+    wc.gl_es      = effective.gl_es;
     wc.gl_major   = effective.gl_major;
     wc.gl_minor   = effective.gl_minor;
 
