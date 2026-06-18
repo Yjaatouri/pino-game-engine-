@@ -186,11 +186,10 @@ bool Engine::init(const EngineConfig& config) {
     m_last_tick = SDL_GetPerformanceCounter();
 #endif
 
+    m_audio.reset(new AudioManager);
     if (effective.audio_enabled) {
-        m_audio.reset(new AudioManager);
         if (!m_audio->init(*m_filesystem)) {
             PINO_WARN("Audio disabled (init failed)");
-            m_audio.reset();
         }
     }
 

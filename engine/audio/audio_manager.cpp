@@ -5,6 +5,7 @@
 #include "engine/core/log.h"
 
 #include <unordered_map>
+#include <vector>
 
 namespace pino {
 
@@ -12,6 +13,7 @@ struct AudioManager::Impl {
     ma_engine engine;
     u64 next_id = 1;
     std::unordered_map<u64, ma_sound*> active_sounds;
+    std::vector<ma_sound*> one_shot_sounds;
 };
 
 AudioManager::AudioManager()
@@ -25,11 +27,17 @@ AudioManager::~AudioManager() {
 }
 
 bool AudioManager::init(FileSystem& filesystem) {
+    if (m_ready) {
+        PINO_WARN("AudioManager: already initialized");
+        return true;
+    }
+
     m_filesystem = &filesystem;
 
     ma_engine_config config = ma_engine_config_init();
     if (ma_engine_init(&config, &m_impl->engine) != MA_SUCCESS) {
         PINO_ERROR("AudioManager: failed to initialize audio engine");
+        m_filesystem = nullptr;
         return false;
     }
 
@@ -50,6 +58,15 @@ void AudioManager::shutdown() {
     }
     m_impl->active_sounds.clear();
 
+    for (auto& sound : m_impl->one_shot_sounds) {
+        if (sound) {
+            ma_sound_stop(sound);
+            ma_sound_uninit(sound);
+            delete sound;
+        }
+    }
+    m_impl->one_shot_sounds.clear();
+
     ma_engine_uninit(&m_impl->engine);
     m_ready = false;
     m_filesystem = nullptr;
@@ -57,14 +74,32 @@ void AudioManager::shutdown() {
 }
 
 void AudioManager::play_one_shot(const std::string& path, float volume) {
-    (void)volume;
     if (!m_ready || !m_filesystem) return;
+
+    // Sweep finished one-shot sounds (called from game thread, safe to uninit)
+    for (auto it = m_impl->one_shot_sounds.begin(); it != m_impl->one_shot_sounds.end(); ) {
+        if (!ma_sound_is_playing(*it)) {
+            ma_sound_uninit(*it);
+            delete *it;
+            it = m_impl->one_shot_sounds.erase(it);
+        } else {
+            ++it;
+        }
+    }
 
     std::string resolved = m_filesystem->resolve(path.c_str());
 
-    if (ma_engine_play_sound(&m_impl->engine, resolved.c_str(), nullptr) != MA_SUCCESS) {
-        PINO_WARN("AudioManager: failed to play '%s'", path.c_str());
+    ma_sound* sound = new ma_sound;
+    if (ma_sound_init_from_file(&m_impl->engine, resolved.c_str(), 0, nullptr, nullptr, sound) != MA_SUCCESS) {
+        PINO_WARN("AudioManager: failed to load '%s'", path.c_str());
+        delete sound;
+        return;
     }
+
+    ma_sound_set_volume(sound, volume);
+    ma_sound_start(sound);
+
+    m_impl->one_shot_sounds.push_back(sound);
 }
 
 u64 AudioManager::play(const std::string& path, bool looping, float volume) {
