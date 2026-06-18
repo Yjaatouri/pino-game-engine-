@@ -2,6 +2,7 @@
 #include "engine/core/config_loader.h"
 #include "engine/platform/platform.h"
 #include "engine/renderer/gl_es3.h"
+#include "engine/audio/audio_manager.h"
 
 #include <filesystem>
 #include <thread>
@@ -74,6 +75,7 @@ bool Engine::init(const EngineConfig& config) {
     if (config.vsync       != true)   effective.vsync       = config.vsync;
     if (config.fixed_update_rate != 60) effective.fixed_update_rate = config.fixed_update_rate;
     if (config.log_level   != LogLevel::Debug) effective.log_level = config.log_level;
+    if (config.audio_enabled != true) effective.audio_enabled = config.audio_enabled;
 #else
     // Mobile: use config as-is (config file not supported)
     effective = config;
@@ -184,6 +186,14 @@ bool Engine::init(const EngineConfig& config) {
     m_last_tick = SDL_GetPerformanceCounter();
 #endif
 
+    if (effective.audio_enabled) {
+        m_audio.reset(new AudioManager);
+        if (!m_audio->init(*m_filesystem)) {
+            PINO_WARN("Audio disabled (init failed)");
+            m_audio.reset();
+        }
+    }
+
     m_running   = true;
     PINO_INFO("Engine initialized");
     return true;
@@ -195,6 +205,7 @@ void Engine::shutdown() {
     m_running = false;
     PINO_INFO("Engine shutting down");
     m_timers.clear();
+    m_audio.reset();
     m_filesystem.reset();
     m_input.reset();
     m_window.reset();

@@ -96,6 +96,8 @@ EngineConfig load_config_ini(const char* path) {
             int fps = std::atoi(val.c_str());
             if (fps > 0) cfg.fixed_update_rate = static_cast<u32>(fps);
             else PINO_WARN("config.ini:%d: invalid target_fps '%s'", line_num, val.c_str());
+        } else if (iequals(key, "audio_enabled")) {
+            cfg.audio_enabled = iequals(val, "true") || iequals(val, "1") || iequals(val, "yes");
         } else {
             PINO_WARN("config.ini:%d: unknown key '%s'", line_num, key.c_str());
         }

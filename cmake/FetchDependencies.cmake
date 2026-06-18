@@ -61,6 +61,20 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(tinyobjloader)
 
 # ---------------------------------------------------------------------------
+# miniaudio — single-header audio library (header + .c split coming in 0.12)
+# ---------------------------------------------------------------------------
+FetchContent_Declare(
+    miniaudio
+    GIT_REPOSITORY  https://github.com/mackron/miniaudio.git
+    GIT_TAG         0.11.25
+    GIT_SHALLOW     TRUE
+)
+
+# miniaudio builds a static library; we'll link against it and
+# provide the implementation macro in our own translation unit.
+FetchContent_MakeAvailable(miniaudio)
+
+# ---------------------------------------------------------------------------
 # stb — single-header image loader
 # ---------------------------------------------------------------------------
 FetchContent_Declare(

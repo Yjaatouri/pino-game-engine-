@@ -8,6 +8,7 @@
 #include "engine/platform/input.h"
 #include "engine/platform/file_system.h"
 #include "engine/game.h"
+#include "engine/audio/audio_manager.h"
 
 #include <memory>
 
@@ -30,6 +31,7 @@ struct EngineConfig {
     u32         gl_minor        = 0;
     u32         fixed_update_rate = 60;
     LogLevel    log_level       = LogLevel::Debug;
+    bool        audio_enabled   = true;
 
 #if defined(__ANDROID__)
     ANativeWindow* native_window = nullptr;
@@ -68,6 +70,9 @@ public:
     Input&      input()      { return *m_input; }
     FileSystem& filesystem() { return *m_filesystem; }
 
+    // Access audio (may not be initialized if config disables it)
+    AudioManager& audio() { return *m_audio; }
+
     // Access config
     const EngineConfig& config() const { return m_config; }
 
@@ -99,6 +104,7 @@ private:
     std::unique_ptr<Window>     m_window;
     std::unique_ptr<Input>      m_input;
     std::unique_ptr<FileSystem> m_filesystem;
+    std::unique_ptr<AudioManager> m_audio;
 
     TimerManager  m_timers;
     EngineStats   m_stats;

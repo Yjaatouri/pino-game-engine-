@@ -52,6 +52,7 @@ set(PINO_ENGINE_SOURCES
     scene/entity.cpp
     scene/scene.cpp
     input/gamepad.cpp
+    audio/audio_manager.cpp
     engine.cpp
 )
 
@@ -73,6 +74,7 @@ target_link_libraries(engine_core
     PUBLIC
         platform_desktop
         glm::glm
+        miniaudio
 )
 
 # Suppress MSVC CRT deprecation warnings (localtime, etc.)
