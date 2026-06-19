@@ -2,6 +2,7 @@
 #include "engine/engine.h"
 #include "engine/renderer/font.h"
 #include "engine/renderer/text_renderer.h"
+#include "engine/renderer/render_stats.h"
 #include <cstdio>
 #include <chrono>
 #include <thread>
@@ -114,20 +115,26 @@ int main() {
         ++frames;
         auto t1 = std::chrono::steady_clock::now();
         f32 dt = std::chrono::duration<f32>(t1 - t0).count();
+        f32 frame_ms = dt * 1000.0f;
         fps_timer += dt;
         if (fps_timer >= 0.5f) { fps = frames / fps_timer; frames = 0; fps_timer = 0; }
         t0 = t1;
 
-        char fps_buf[64];
-        std::snprintf(fps_buf, sizeof(fps_buf), "FPS: %.1f  Errors: %d", fps, errs);
-        tr.draw_text(font, fps_buf, static_cast<f32>(fw - 200), static_cast<f32>(fh - 24),
-                     0.8f, 0.4f,0.8f,0.4f,1);
-
+        // Validation result banner (bottom-left)
         tr.draw_text(font, errs == 0 ? "ALL TESTS PASSED" : "SOME TESTS FAILED",
                      30.0f, static_cast<f32>(fh - 24), 0.9f,
                      errs == 0 ? 0.2f : 1.0f,
                      errs == 0 ? 0.9f : 0.2f,
                      errs == 0 ? 0.2f : 0.2f, 1);
+
+        // Debug overlay (top-right)
+        auto& stats = RenderStats::instance();
+        char dbg_buf[128];
+        std::snprintf(dbg_buf, sizeof(dbg_buf),
+                      "FPS: %.1f\nFrame: %.2f ms\nDraw calls: %u",
+                      fps, frame_ms, stats.draw_calls);
+        tr.draw_text(font, dbg_buf, static_cast<f32>(fw - 220), 30.0f,
+                     0.8f, 0.4f, 0.8f, 0.4f, 1);
 
         tr.render(fw, fh);
 
