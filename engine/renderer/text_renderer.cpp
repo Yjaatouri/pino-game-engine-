@@ -71,8 +71,6 @@ bool TextRenderer::init(i32 w, i32 h) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(idx), idx, GL_STATIC_DRAW);
     glBindVertexArray(0);
 
-    m_ortho = glm::ortho(0.0f, static_cast<f32>(w),
-                         static_cast<f32>(h), 0.0f, -1.0f, 1.0f);
     return true;
 }
 
@@ -118,15 +116,18 @@ void TextRenderer::rasterize(const TextCommand& cmd) {
     }
 }
 
-void TextRenderer::flush() {
+void TextRenderer::render(i32 w, i32 h) {
     if (m_commands.empty()) return;
+
+    glm::mat4 ortho = glm::ortho(0.0f, static_cast<f32>(w),
+                                 static_cast<f32>(h), 0.0f, -1.0f, 1.0f);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
 
     m_shader.bind();
-    m_shader.set_mat4("u_mvp", m_ortho);
+    m_shader.set_mat4("u_mvp", ortho);
 
     for (const auto& cmd : m_commands) {
         m_quad_count = 0;

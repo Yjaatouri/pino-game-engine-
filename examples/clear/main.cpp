@@ -130,7 +130,7 @@ int main() {
                      errs == 0 ? 0.9f : 0.2f,
                      errs == 0 ? 0.2f : 0.2f, 1);
 
-        tr.flush();
+        tr.render(fw, fh);
 
         eng.end_frame();
 
