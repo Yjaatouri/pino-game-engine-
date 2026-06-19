@@ -3,6 +3,10 @@
 #include "engine/platform/file_system.h"
 #include <stb_image.h>
 
+#include <sstream>
+#include <cstdio>
+#include <string>
+
 #include <cstring>
 #include <cmath>
 
@@ -322,7 +326,58 @@ bool Font::load(const char* atlas_path, FileSystem& fs) {
     m_decoded_pixels.clear();
     m_decoded_pixels.shrink_to_fit();
 
-    PINO_INFO("Font::load: decoded + uploaded '%s' (%dx%d)", atlas_path, m_image_w, m_image_h);
+    // Derive metrics file path from atlas path
+    std::string metrics_path(atlas_path);
+    {
+        auto dot = metrics_path.rfind('.');
+        if (dot != std::string::npos && dot > metrics_path.rfind('/')
+            && dot > metrics_path.rfind('\\'))
+            metrics_path.resize(dot);
+        metrics_path += ".fnt";
+    }
+
+    std::string metrics_text = fs.read_text(metrics_path.c_str());
+    if (metrics_text.empty()) {
+        PINO_ERROR("Font::load: failed to read metrics '%s'", metrics_path.c_str());
+        return false;
+    }
+
+    // Parse metrics: one line per char, fields = char_id x y w h xoff yoff advance
+    f32 atlas_w = static_cast<f32>(m_atlas.width());
+    f32 atlas_h = static_cast<f32>(m_atlas.height());
+    int parsed = 0;
+
+    std::istringstream stream(metrics_text);
+    std::string line;
+    while (std::getline(stream, line)) {
+        if (line.empty() || line[0] == '#') continue;
+        int id = 0, x = 0, y = 0, w = 0, h = 0, xoff = 0, yoff = 0, adv = 0;
+        if (std::sscanf(line.c_str(), "%d %d %d %d %d %d %d %d",
+                        &id, &x, &y, &w, &h, &xoff, &yoff, &adv) != 8)
+            continue;
+        if (id < 0 || id >= 128) continue;
+
+        Glyph& g = m_glyphs[id];
+        g.width     = static_cast<f32>(w);
+        g.height    = static_cast<f32>(h);
+        g.bearing_x = static_cast<f32>(xoff);
+        g.bearing_y = static_cast<f32>(yoff);
+        g.advance   = static_cast<f32>(adv);
+        g.u0 = static_cast<f32>(x)      / atlas_w;
+        g.v0 = 1.0f - static_cast<f32>(y) / atlas_h;
+        g.u1 = static_cast<f32>(x + w)  / atlas_w;
+        g.v1 = 1.0f - static_cast<f32>(y + h) / atlas_h;
+
+        ++parsed;
+    }
+
+    if (parsed == 0) {
+        PINO_ERROR("Font::load: no valid glyph entries in '%s'", metrics_path.c_str());
+        return false;
+    }
+
+    PINO_INFO("Font::load: '%s' + '%s' (%d glyphs, %dx%d atlas)",
+              atlas_path, metrics_path.c_str(), parsed, m_image_w, m_image_h);
     m_valid = true;
     return true;
 }
