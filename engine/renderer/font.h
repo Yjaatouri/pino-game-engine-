@@ -1,10 +1,10 @@
 #pragma once
 
 #include "engine/core/types.h"
+#include "engine/renderer/texture.h"
 
 namespace pino {
 
-class Texture;
 class FileSystem;
 
 class Font {
@@ -31,15 +31,17 @@ public:
 
     const Glyph& glyph(char c) const;
 
-    f32   font_size()   const { return m_font_size; }
-    f32   line_height() const { return m_line_height; }
-    bool  is_valid()    const { return m_valid; }
+    f32        font_size()   const { return m_font_size; }
+    f32        line_height() const { return m_line_height; }
+    bool       is_valid()    const { return m_valid; }
+    Texture&   atlas()             { return m_atlas; }
 
 private:
-    Glyph m_glyphs[128] = {};
-    f32   m_font_size   = 16.0f;
-    f32   m_line_height = 20.0f;
-    bool  m_valid       = false;
+    Glyph   m_glyphs[128] = {};
+    Texture m_atlas;
+    f32     m_font_size   = 16.0f;
+    f32     m_line_height = 20.0f;
+    bool    m_valid       = false;
 };
 
 } // namespace pino
