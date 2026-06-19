@@ -85,21 +85,27 @@ void TextRenderer::destroy() {
 }
 
 void TextRenderer::begin_frame() {
-    m_quad_count = 0;
+    m_commands.clear();
 }
 
-void TextRenderer::draw_string(Font& font, const char* text, f32 x, f32 y, f32 scale) {
-    f32 cx = x, cy = y;
-    for (const char* p = text; *p; ++p) {
-        if (m_quad_count >= MAX_QUADS) break;
-        if (*p == '\n') { cx = x; cy += font.line_height() * scale; continue; }
-        const auto& glyph = font.glyph(*p);
-        if (glyph.width == 0 && glyph.height == 0) { cx += 6.0f * scale; continue; }
+void TextRenderer::draw_text(Font& font, const char* text, f32 x, f32 y,
+                             f32 scale, f32 r, f32 g, f32 b, f32 a) {
+    m_commands.push_back({&font, std::string(text), x, y, scale, r, g, b, a});
+}
 
-        f32 x0 = cx + glyph.bearing_x * scale;
+void TextRenderer::rasterize(const TextCommand& cmd) {
+    Font& font = *cmd.font;
+    f32 cx = cmd.x, cy = cmd.y;
+    for (const char* p = cmd.text.c_str(); *p; ++p) {
+        if (m_quad_count >= MAX_QUADS) break;
+        if (*p == '\n') { cx = cmd.x; cy += font.line_height() * cmd.scale; continue; }
+        const auto& glyph = font.glyph(*p);
+        if (glyph.width == 0 && glyph.height == 0) { cx += 6.0f * cmd.scale; continue; }
+
+        f32 x0 = cx + glyph.bearing_x * cmd.scale;
         f32 y0 = cy;
-        f32 x1 = x0 + glyph.width * scale;
-        f32 y1 = y0 + glyph.height * scale;
+        f32 x1 = x0 + glyph.width * cmd.scale;
+        f32 y1 = y0 + glyph.height * cmd.scale;
 
         Vertex* v = &m_verts[m_quad_count * 4];
         v[0] = {x0, y0, glyph.u0, glyph.v0};
@@ -108,35 +114,43 @@ void TextRenderer::draw_string(Font& font, const char* text, f32 x, f32 y, f32 s
         v[3] = {x0, y1, glyph.u0, glyph.v1};
         ++m_quad_count;
 
-        cx += glyph.advance * scale;
+        cx += glyph.advance * cmd.scale;
     }
 }
 
-void TextRenderer::flush(f32 r, f32 g, f32 b, f32 a) {
-    if (m_quad_count == 0) return;
+void TextRenderer::flush() {
+    if (m_commands.empty()) return;
 
     m_shader.bind();
     m_shader.set_mat4("u_mvp", m_ortho);
-    glUniform1i(m_u_tex, 0);
-    glUniform4f(m_u_color, r, g, b, a);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(m_quad_count * 4 * sizeof(Vertex)),
-                 m_verts, GL_STREAM_DRAW);
+    for (const auto& cmd : m_commands) {
+        m_quad_count = 0;
+        rasterize(cmd);
+        if (m_quad_count == 0) continue;
 
-    glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLES, m_quad_count * 6, GL_UNSIGNED_SHORT, nullptr);
-    glBindVertexArray(0);
+        cmd.font->atlas().bind(0);
+        glUniform1i(m_u_tex, 0);
+        glUniform4f(m_u_color, cmd.r, cmd.g, cmd.b, cmd.a);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER,
+                     static_cast<GLsizeiptr>(m_quad_count * 4 * sizeof(Vertex)),
+                     m_verts, GL_STREAM_DRAW);
+
+        glBindVertexArray(m_vao);
+        glDrawElements(GL_TRIANGLES, m_quad_count * 6, GL_UNSIGNED_SHORT, nullptr);
+        glBindVertexArray(0);
+
+        RenderStats::instance().add_draw_call();
+        RenderStats::instance().add_triangles(m_quad_count * 2);
+    }
 
     m_shader.unbind();
-
-    RenderStats::instance().add_draw_call();
-    RenderStats::instance().add_triangles(m_quad_count * 2);
 }
 
 void TextRenderer::end_frame() {
-    m_quad_count = 0;
+    m_commands.clear();
 }
 
 } // namespace pino

@@ -5,6 +5,8 @@
 #include "engine/renderer/shader.h"
 #include "engine/renderer/font.h"
 #include <glm/glm.hpp>
+#include <vector>
+#include <string>
 
 namespace pino {
 
@@ -20,14 +22,25 @@ public:
     void destroy();
 
     void begin_frame();
-    void draw_string(Font& font, const char* text, f32 x, f32 y, f32 scale);
-    void flush(f32 r, f32 g, f32 b, f32 a);
+    void draw_text(Font& font, const char* text, f32 x, f32 y, f32 scale,
+                   f32 r, f32 g, f32 b, f32 a);
+    void flush();
     void end_frame();
 
     bool is_valid() const { return m_vao != 0; }
 
 private:
     struct Vertex { f32 x, y, u, v; };
+
+    struct TextCommand {
+        Font*   font;
+        std::string text;
+        f32     x, y;
+        f32     scale;
+        f32     r, g, b, a;
+    };
+
+    void rasterize(const TextCommand& cmd);
 
     Shader  m_shader;
     GLuint  m_vao = 0;
@@ -42,6 +55,8 @@ private:
     static constexpr i32 MAX_QUADS = 2048;
     Vertex  m_verts[MAX_QUADS * 4];
     i32     m_quad_count = 0;
+
+    std::vector<TextCommand> m_commands;
 };
 
 } // namespace pino
