@@ -45,6 +45,7 @@ set(PINO_ENGINE_SOURCES
     renderer/render_state.cpp
     renderer/per_frame_ubo.cpp
     renderer/debug_renderer.cpp
+    renderer/text_renderer.cpp
     renderer/shadow_map.cpp
     renderer/skybox.cpp
     assets/stb_image.cpp
