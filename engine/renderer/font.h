@@ -31,10 +31,10 @@ public:
 
     const Glyph& glyph(char c) const;
 
-    f32        font_size()   const { return m_font_size; }
-    f32        line_height() const { return m_line_height; }
-    bool       is_valid()    const { return m_valid; }
-    Texture&   atlas()             { return m_atlas; }
+    f32      font_size()   const;
+    f32      line_height() const;
+    bool     is_valid()    const;
+    Texture& atlas();
 
 private:
     Glyph   m_glyphs[128] = {};

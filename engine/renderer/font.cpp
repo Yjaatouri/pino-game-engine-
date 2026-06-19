@@ -301,6 +301,11 @@ const Font::Glyph& Font::glyph(char c) const {
     return m_glyphs[idx];
 }
 
+f32 Font::font_size() const { return m_font_size; }
+f32 Font::line_height() const { return m_line_height; }
+bool Font::is_valid() const { return m_valid; }
+Texture& Font::atlas() { return m_atlas; }
+
 Font::~Font() { destroy(); }
 
 Font::Font(Font&& other) noexcept
