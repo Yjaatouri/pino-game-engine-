@@ -1,6 +1,7 @@
 #include "font.h"
 #include "engine/core/log.h"
 #include "engine/platform/file_system.h"
+#include <stb_image.h>
 
 #include <cstring>
 #include <cmath>
@@ -296,7 +297,23 @@ bool Font::load(const char* atlas_path, FileSystem& fs) {
         return false;
     }
 
-    PINO_INFO("Font::load: read '%s' (%zu bytes)", atlas_path, m_loaded_data.size());
+    i32 channels = 0;
+    stbi_set_flip_vertically_on_load(1);
+    unsigned char* pixels = stbi_load_from_memory(
+        m_loaded_data.data(), static_cast<i32>(m_loaded_data.size()),
+        &m_image_w, &m_image_h, &channels, 4);
+
+    if (!pixels) {
+        PINO_ERROR("Font::load: stb_image failed to decode '%s'", atlas_path);
+        m_loaded_data.clear();
+        return false;
+    }
+
+    usize pixel_count = static_cast<usize>(m_image_w) * static_cast<usize>(m_image_h) * 4;
+    m_decoded_pixels.assign(pixels, pixels + pixel_count);
+    stbi_image_free(pixels);
+
+    PINO_INFO("Font::load: decoded '%s' (%dx%d RGBA)", atlas_path, m_image_w, m_image_h);
     m_valid = true;
     return true;
 }
@@ -305,6 +322,10 @@ void Font::destroy() {
     m_atlas.destroy();
     m_loaded_data.clear();
     m_loaded_data.shrink_to_fit();
+    m_decoded_pixels.clear();
+    m_decoded_pixels.shrink_to_fit();
+    m_image_w = 0;
+    m_image_h = 0;
     for (int i = 0; i < 128; ++i)
         m_glyphs[i] = Glyph{};
     m_font_size   = 16.0f;
@@ -329,6 +350,9 @@ Font::~Font() { destroy(); }
 Font::Font(Font&& other) noexcept
     : m_atlas(std::move(other.m_atlas))
     , m_loaded_data(std::move(other.m_loaded_data))
+    , m_decoded_pixels(std::move(other.m_decoded_pixels))
+    , m_image_w(other.m_image_w)
+    , m_image_h(other.m_image_h)
     , m_font_size(other.m_font_size)
     , m_line_height(other.m_line_height)
     , m_valid(other.m_valid)
@@ -340,11 +364,14 @@ Font::Font(Font&& other) noexcept
 
 Font& Font::operator=(Font&& other) noexcept {
     if (this != &other) {
-        m_atlas       = std::move(other.m_atlas);
-        m_loaded_data = std::move(other.m_loaded_data);
-        m_font_size   = other.m_font_size;
-        m_line_height = other.m_line_height;
-        m_valid       = other.m_valid;
+        m_atlas          = std::move(other.m_atlas);
+        m_loaded_data    = std::move(other.m_loaded_data);
+        m_decoded_pixels = std::move(other.m_decoded_pixels);
+        m_image_w        = other.m_image_w;
+        m_image_h        = other.m_image_h;
+        m_font_size      = other.m_font_size;
+        m_line_height    = other.m_line_height;
+        m_valid          = other.m_valid;
         for (int i = 0; i < 128; ++i)
             m_glyphs[i] = other.m_glyphs[i];
         other.m_valid = false;

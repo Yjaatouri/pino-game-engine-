@@ -38,12 +38,15 @@ public:
     Texture& atlas();
 
 private:
-    Glyph          m_glyphs[128] = {};
-    Texture        m_atlas;
-    std::vector<u8> m_loaded_data;
-    f32            m_font_size   = 16.0f;
-    f32            m_line_height = 20.0f;
-    bool           m_valid       = false;
+    Glyph           m_glyphs[128] = {};
+    Texture         m_atlas;
+    std::vector<u8>  m_loaded_data;
+    std::vector<u8>  m_decoded_pixels;
+    i32             m_image_w = 0;
+    i32             m_image_h = 0;
+    f32             m_font_size   = 16.0f;
+    f32             m_line_height = 20.0f;
+    bool            m_valid       = false;
 };
 
 } // namespace pino
