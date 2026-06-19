@@ -251,6 +251,14 @@ bool Font::load_builtin() {
                         static_cast<i32>(ATLAS_W),
                         static_cast<i32>(ATLAS_H));
 
+    // Override to nearest-neighbour filtering for crisp pixel font
+    glBindTexture(GL_TEXTURE_2D, m_atlas.handle());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     // Populate glyph metrics
     for (u32 ci = 0; ci < FONT_COUNT; ++ci) {
         u32 ch = ci + FONT_FIRST;
@@ -266,16 +274,15 @@ bool Font::load_builtin() {
         g.bearing_x = 0;
         g.bearing_y = static_cast<f32>(FONT_GLYPH_H);
 
-        // UV: flip V because GL (0,0) is bottom-left but our pixel data has row 0 at top
-        f32 left   = static_cast<f32>(gcol * FONT_GLYPH_W) / static_cast<f32>(ATLAS_W);
-        f32 right  = static_cast<f32>((gcol + 1) * FONT_GLYPH_W) / static_cast<f32>(ATLAS_W);
-        f32 top_uv = 1.0f - static_cast<f32>(grow * FONT_GLYPH_H) / static_cast<f32>(ATLAS_H);
-        f32 bot_uv = 1.0f - static_cast<f32>((grow + 1) * FONT_GLYPH_H) / static_cast<f32>(ATLAS_H);
+        // UV: pixel row 0 = top of glyph, GL maps row 0 to v=0 (bottom of texture),
+        // so (v0,v1) = (0/total, h/total) — top of quad samples row 0 = top of glyph.
+        f32 left  = static_cast<f32>(gcol * FONT_GLYPH_W) / static_cast<f32>(ATLAS_W);
+        f32 right = static_cast<f32>((gcol + 1) * FONT_GLYPH_W) / static_cast<f32>(ATLAS_W);
 
         g.u0 = left;
-        g.v0 = top_uv;
+        g.v0 = static_cast<f32>(grow * FONT_GLYPH_H) / static_cast<f32>(ATLAS_H);
         g.u1 = right;
-        g.v1 = bot_uv;
+        g.v1 = static_cast<f32>((grow + 1) * FONT_GLYPH_H) / static_cast<f32>(ATLAS_H);
     }
 
     m_font_size   = static_cast<f32>(FONT_GLYPH_H);
@@ -319,6 +326,14 @@ bool Font::load(const char* atlas_path, FileSystem& fs) {
 
     // Upload to GPU
     m_atlas.upload_rgba(m_decoded_pixels.data(), m_image_w, m_image_h);
+
+    // Override to nearest-neighbour filtering for crisp pixel font
+    glBindTexture(GL_TEXTURE_2D, m_atlas.handle());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Free CPU-side image data now that GPU has a copy
     m_loaded_data.clear();

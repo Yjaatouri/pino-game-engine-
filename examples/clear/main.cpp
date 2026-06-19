@@ -192,22 +192,54 @@ static int run_font_tests(Font& font) {
         if (!cond) { PINO_ERROR("  FAIL: %s", msg); ++errors; }
     };
 
+    // ── Atlas loaded ────────────────────────────────────────────
     check(font.is_valid(), "is_valid() after load_builtin()");
+    check(font.atlas().is_valid(), "atlas texture is_valid()");
+    check(font.atlas().handle() != 0, "atlas GL handle non-zero");
+    check(font.atlas().width() > 0, "atlas width > 0");
+    check(font.atlas().height() > 0, "atlas height > 0");
+
+    // ── Metadata ────────────────────────────────────────────────
     check(font.font_size() == 13.0f, "font_size == 13");
     check(font.line_height() == 15.0f, "line_height == 15");
+
+    // ── Specific glyph queries ──────────────────────────────────
     check(font.glyph('A').width == 8.0f, "glyph(A).width == 8");
     check(font.glyph('A').height == 13.0f, "glyph(A).height == 13");
     check(font.glyph('A').advance == 8.0f, "glyph(A).advance == 8");
     check(font.glyph('A').u1 > font.glyph('A').u0, "glyph(A).u1 > u0");
     check(font.glyph('A').v0 > font.glyph('A').v1, "glyph(A).v0 > v1 (V flip)");
+
+    check(font.glyph('B').width == 8.0f, "glyph(B).width == 8");
+    check(font.glyph('B').u1 > font.glyph('B').u0, "glyph(B).u1 > u0");
+
+    check(font.glyph('0').width == 8.0f, "glyph(0).width == 8");
+    check(font.glyph('0').height == 13.0f, "glyph(0).height == 13");
+    check(font.glyph('0').advance == 8.0f, "glyph(0).advance == 8");
+
+    check(font.glyph('?').width == 8.0f, "glyph(?).width == 8");
+    check(font.glyph('?').height == 13.0f, "glyph(?).height == 13");
+    check(font.glyph('?').advance == 8.0f, "glyph(?).advance == 8");
+
     check(font.glyph(' ').width == 8.0f, "glyph(space).width == 8");
     check(font.glyph('z').u1 > font.glyph('z').u0, "glyph(z).u1 > u0");
-    check(font.glyph('0').width == 8.0f, "glyph(0).width == 8");
     check(font.glyph('9').advance == 8.0f, "glyph(9).advance == 8");
 
+    // ── All printable ASCII (32–126) have valid metrics ─────────
+    for (int c = 32; c <= 126; ++c) {
+        const auto& g = font.glyph(static_cast<char>(c));
+        check(g.width > 0, "glyph(width>0) for all printable");
+        check(g.height > 0, "glyph(height>0) for all printable");
+        check(g.u1 > g.u0, "glyph(u1>u0) for all printable");
+        check(g.advance > 0, "glyph(advance>0) for all printable");
+    }
+
+    // ── Out-of-range returns null glyph ─────────────────────────
     const auto& null_g = font.glyph(static_cast<char>(200));
     check(null_g.width == 0 && null_g.height == 0 &&
           null_g.u0 == 0 && null_g.v0 == 0, "glyph(out-of-range) == null_glyph");
+
+    PINO_INFO("  %d errors, 0 warnings", errors);
     return errors;
 }
 
@@ -231,7 +263,6 @@ int main() {
     PINO_INFO("═══════════ Font Unit Validation ═══════════");
     PINO_INFO("  load_builtin(): %s", loaded ? "true" : "false");
     int errs = run_font_tests(font);
-    PINO_INFO("  %d errors, 0 warnings", errs);
     PINO_INFO("═══════════════════════════════════════════");
 
     // ── Init text renderer ─────────────────────────────────────
