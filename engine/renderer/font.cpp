@@ -1,5 +1,6 @@
 #include "font.h"
 #include "engine/core/log.h"
+#include "engine/platform/file_system.h"
 
 #include <cstring>
 #include <cmath>
@@ -281,12 +282,29 @@ bool Font::load_builtin() {
     return true;
 }
 
-bool Font::load(const char* /*atlas_path*/, FileSystem& /*fs*/) {
-    return false;
+bool Font::load(const char* atlas_path, FileSystem& fs) {
+    destroy();
+
+    if (!atlas_path || !atlas_path[0]) {
+        PINO_ERROR("Font::load: null or empty path");
+        return false;
+    }
+
+    m_loaded_data = fs.read_binary(atlas_path);
+    if (m_loaded_data.empty()) {
+        PINO_ERROR("Font::load: failed to read '%s' — file missing or empty", atlas_path);
+        return false;
+    }
+
+    PINO_INFO("Font::load: read '%s' (%zu bytes)", atlas_path, m_loaded_data.size());
+    m_valid = true;
+    return true;
 }
 
 void Font::destroy() {
     m_atlas.destroy();
+    m_loaded_data.clear();
+    m_loaded_data.shrink_to_fit();
     for (int i = 0; i < 128; ++i)
         m_glyphs[i] = Glyph{};
     m_font_size   = 16.0f;
@@ -310,6 +328,7 @@ Font::~Font() { destroy(); }
 
 Font::Font(Font&& other) noexcept
     : m_atlas(std::move(other.m_atlas))
+    , m_loaded_data(std::move(other.m_loaded_data))
     , m_font_size(other.m_font_size)
     , m_line_height(other.m_line_height)
     , m_valid(other.m_valid)
@@ -322,6 +341,7 @@ Font::Font(Font&& other) noexcept
 Font& Font::operator=(Font&& other) noexcept {
     if (this != &other) {
         m_atlas       = std::move(other.m_atlas);
+        m_loaded_data = std::move(other.m_loaded_data);
         m_font_size   = other.m_font_size;
         m_line_height = other.m_line_height;
         m_valid       = other.m_valid;

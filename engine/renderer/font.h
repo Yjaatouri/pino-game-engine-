@@ -2,6 +2,7 @@
 
 #include "engine/core/types.h"
 #include "engine/renderer/texture.h"
+#include <vector>
 
 namespace pino {
 
@@ -37,11 +38,12 @@ public:
     Texture& atlas();
 
 private:
-    Glyph   m_glyphs[128] = {};
-    Texture m_atlas;
-    f32     m_font_size   = 16.0f;
-    f32     m_line_height = 20.0f;
-    bool    m_valid       = false;
+    Glyph          m_glyphs[128] = {};
+    Texture        m_atlas;
+    std::vector<u8> m_loaded_data;
+    f32            m_font_size   = 16.0f;
+    f32            m_line_height = 20.0f;
+    bool           m_valid       = false;
 };
 
 } // namespace pino
