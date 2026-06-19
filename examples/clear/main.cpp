@@ -28,7 +28,7 @@ static int run_font_tests(Font& font) {
     check(font.glyph('A').height == 13.0f, "glyph(A).height == 13");
     check(font.glyph('A').advance == 8.0f, "glyph(A).advance == 8");
     check(font.glyph('A').u1 > font.glyph('A').u0, "glyph(A).u1 > u0");
-    check(font.glyph('A').v0 > font.glyph('A').v1, "glyph(A).v0 > v1 (V flip)");
+    check(font.glyph('A').v0 < font.glyph('A').v1, "glyph(A).v0 < v1 (no flip)");
 
     check(font.glyph('B').width == 8.0f, "glyph(B).width == 8");
     check(font.glyph('B').u1 > font.glyph('B').u0, "glyph(B).u1 > u0");
@@ -94,11 +94,6 @@ int main() {
         glClearColor(0.08f, 0.08f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        font.atlas().bind(0);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_DEPTH_TEST);
-
         tr.begin_frame();
 
         f32 y = 30;
@@ -136,8 +131,6 @@ int main() {
                      errs == 0 ? 0.2f : 0.2f, 1);
 
         tr.flush();
-
-        glDisable(GL_BLEND);
 
         eng.end_frame();
 

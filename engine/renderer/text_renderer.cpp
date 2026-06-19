@@ -121,6 +121,10 @@ void TextRenderer::rasterize(const TextCommand& cmd) {
 void TextRenderer::flush() {
     if (m_commands.empty()) return;
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
     m_shader.bind();
     m_shader.set_mat4("u_mvp", m_ortho);
 
