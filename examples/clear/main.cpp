@@ -1,6 +1,5 @@
 // clear — font foundation test: unit validation + visual text rendering
 #include "engine/engine.h"
-#include "engine/renderer/gl_es3.h"
 #include "engine/renderer/font.h"
 #include "engine/renderer/text_renderer.h"
 #include <cstdio>
