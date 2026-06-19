@@ -313,7 +313,16 @@ bool Font::load(const char* atlas_path, FileSystem& fs) {
     m_decoded_pixels.assign(pixels, pixels + pixel_count);
     stbi_image_free(pixels);
 
-    PINO_INFO("Font::load: decoded '%s' (%dx%d RGBA)", atlas_path, m_image_w, m_image_h);
+    // Upload to GPU
+    m_atlas.upload_rgba(m_decoded_pixels.data(), m_image_w, m_image_h);
+
+    // Free CPU-side image data now that GPU has a copy
+    m_loaded_data.clear();
+    m_loaded_data.shrink_to_fit();
+    m_decoded_pixels.clear();
+    m_decoded_pixels.shrink_to_fit();
+
+    PINO_INFO("Font::load: decoded + uploaded '%s' (%dx%d)", atlas_path, m_image_w, m_image_h);
     m_valid = true;
     return true;
 }
