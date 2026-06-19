@@ -376,7 +376,46 @@ bool Font::load(const char* atlas_path, FileSystem& fs) {
         return false;
     }
 
-    PINO_INFO("Font::load: '%s' + '%s' (%d glyphs, %dx%d atlas)",
+    // ── Validate parsed glyph data ──────────────────────────────
+    int errors = 0;
+    bool has_printable[95] = {};
+    for (int i = 0; i < 128; ++i) {
+        const Glyph& g = m_glyphs[i];
+        if (g.width == 0 && g.height == 0 && g.advance == 0
+            && g.u0 == 0 && g.v0 == 0 && g.u1 == 0 && g.v1 == 0)
+            continue;
+        if (i >= 32 && i <= 126) has_printable[i - 32] = true;
+
+        if (g.width < 0 || g.height < 0)
+            { PINO_ERROR("  [%d] negative size: %.0fx%.0f", i, g.width, g.height); ++errors; }
+        if (g.advance <= 0)
+            { PINO_ERROR("  [%d] advance <= 0: %.1f", i, g.advance); ++errors; }
+        if (g.advance < g.width)
+            { PINO_WARN("  [%d] advance < width: %.1f < %.1f", i, g.advance, g.width); ++errors; }
+        if (g.u0 < 0 || g.u0 > 1 || g.u1 < 0 || g.u1 > 1
+            || g.v0 < 0 || g.v0 > 1 || g.v1 < 0 || g.v1 > 1)
+            { PINO_ERROR("  [%d] UV out of [0,1]: (%.3f,%.3f)-(%.3f,%.3f)",
+                         i, g.u0, g.v0, g.u1, g.v1); ++errors; }
+        if (g.u1 <= g.u0)
+            { PINO_ERROR("  [%d] u1 <= u0: %.3f <= %.3f", i, g.u1, g.u0); ++errors; }
+        if (g.v0 == g.v1)
+            { PINO_WARN("  [%d] v0 == v1 (zero-height glyph)", i); ++errors; }
+    }
+
+    // Check that all printable ASCII (32–126) are present
+    for (int i = 0; i < 95; ++i) {
+        if (!has_printable[i]) {
+            PINO_ERROR("  [%d] missing glyph for printable char '%c'", i + 32, i + 32);
+            ++errors;
+        }
+    }
+
+    if (errors > 0) {
+        PINO_ERROR("Font::load: %d validation error(s) in '%s'", errors, metrics_path.c_str());
+        return false;
+    }
+
+    PINO_INFO("Font::load: '%s' + '%s' (%d glyphs, %dx%d atlas, validated OK)",
               atlas_path, metrics_path.c_str(), parsed, m_image_w, m_image_h);
     m_valid = true;
     return true;
