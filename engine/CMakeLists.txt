@@ -38,6 +38,7 @@ set(PINO_ENGINE_SOURCES
     renderer/texture.cpp
     renderer/camera.cpp
     renderer/fps_controller.cpp
+    renderer/font.cpp
     renderer/light.cpp
     renderer/render_stats.cpp
     renderer/framebuffer.cpp

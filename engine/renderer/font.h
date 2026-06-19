@@ -1,0 +1,45 @@
+#pragma once
+
+#include "engine/core/types.h"
+
+namespace pino {
+
+class Texture;
+class FileSystem;
+
+class Font {
+public:
+    Font() = default;
+    ~Font();
+
+    Font(const Font&) = delete;
+    Font& operator=(const Font&) = delete;
+
+    Font(Font&& other) noexcept;
+    Font& operator=(Font&& other) noexcept;
+
+    struct Glyph {
+        f32 u0 = 0, v0 = 0, u1 = 0, v1 = 0;
+        f32 advance = 0;
+        f32 bearing_x = 0, bearing_y = 0;
+        f32 width = 0, height = 0;
+    };
+
+    bool load_builtin();
+    bool load(const char* atlas_path, FileSystem& fs);
+    void destroy();
+
+    const Glyph& glyph(char c) const;
+
+    f32   font_size()   const { return m_font_size; }
+    f32   line_height() const { return m_line_height; }
+    bool  is_valid()    const { return m_valid; }
+
+private:
+    Glyph m_glyphs[128] = {};
+    f32   m_font_size   = 16.0f;
+    f32   m_line_height = 20.0f;
+    bool  m_valid       = false;
+};
+
+} // namespace pino
