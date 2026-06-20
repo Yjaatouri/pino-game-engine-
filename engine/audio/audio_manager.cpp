@@ -63,11 +63,11 @@ struct AudioManager::Impl {
         }
     }
 
-    void ensure_voice_available() {
+    void ensure_voice_available(u32 max_voices) {
         sweep_finished();
         u32 total = static_cast<u32>(active_sounds.size() + one_shot_sounds.size());
 
-        while (total >= AudioManager::MAX_VOICES) {
+        while (total >= max_voices) {
             int worst_prio = -1;
             int os_idx = -1;
             u64 active_id = 0;
@@ -113,13 +113,14 @@ AudioManager::~AudioManager() {
     delete m_impl;
 }
 
-bool AudioManager::init(FileSystem& filesystem) {
+bool AudioManager::init(FileSystem& filesystem, u32 max_voices) {
     if (m_ready) {
         PINO_WARN("AudioManager: already initialized");
         return true;
     }
 
     m_filesystem = &filesystem;
+    m_max_voices = max_voices;
 
     ma_engine_config config = ma_engine_config_init();
     if (ma_engine_init(&config, &m_impl->engine) != MA_SUCCESS) {
@@ -169,7 +170,7 @@ void AudioManager::play_one_shot(const std::string& path, float volume,
 {
     if (!m_ready || !m_filesystem) return;
 
-    m_impl->ensure_voice_available();
+    m_impl->ensure_voice_available(m_max_voices);
 
     std::string resolved = m_filesystem->resolve(path.c_str());
 
@@ -192,7 +193,7 @@ u64 AudioManager::play(const std::string& path, bool looping, float volume,
 {
     if (!m_ready || !m_filesystem) return 0;
 
-    m_impl->ensure_voice_available();
+    m_impl->ensure_voice_available(m_max_voices);
 
     std::string resolved = m_filesystem->resolve(path.c_str());
 
@@ -375,7 +376,7 @@ AudioDebugInfo AudioManager::debug_info() const {
     info.active_sounds = static_cast<u32>(m_impl->active_sounds.size());
     info.one_shot_sounds = static_cast<u32>(m_impl->one_shot_sounds.size());
     info.total_sounds = info.active_sounds + info.one_shot_sounds;
-    info.max_voices = MAX_VOICES;
+    info.max_voices = m_max_voices;
     info.master_volume = ma_engine_get_volume(&m_impl->engine);
     return info;
 }

@@ -76,6 +76,7 @@ bool Engine::init(const EngineConfig& config) {
     if (config.fixed_update_rate != 60) effective.fixed_update_rate = config.fixed_update_rate;
     if (config.log_level   != LogLevel::Debug) effective.log_level = config.log_level;
     if (config.audio_enabled != true) effective.audio_enabled = config.audio_enabled;
+    if (config.audio_max_voices != 32) effective.audio_max_voices = config.audio_max_voices;
 #else
     // Mobile: use config as-is (config file not supported)
     effective = config;
@@ -188,7 +189,7 @@ bool Engine::init(const EngineConfig& config) {
 
     m_audio.reset(new AudioManager);
     if (effective.audio_enabled) {
-        if (!m_audio->init(*m_filesystem)) {
+        if (!m_audio->init(*m_filesystem, effective.audio_max_voices)) {
             PINO_WARN("Audio disabled (init failed)");
         }
     }

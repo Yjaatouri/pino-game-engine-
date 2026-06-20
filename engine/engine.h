@@ -32,6 +32,7 @@ struct EngineConfig {
     u32         fixed_update_rate = 60;
     LogLevel    log_level       = LogLevel::Debug;
     bool        audio_enabled   = true;
+    u32         audio_max_voices = 32;
 
 #if defined(__ANDROID__)
     ANativeWindow* native_window = nullptr;

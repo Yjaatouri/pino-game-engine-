@@ -29,15 +29,14 @@ struct AudioDebugInfo {
 
 class AudioManager {
 public:
-    static constexpr u32 MAX_VOICES = 32;
-
     AudioManager();
     ~AudioManager();
 
     AudioManager(const AudioManager&) = delete;
     AudioManager& operator=(const AudioManager&) = delete;
 
-    bool init(FileSystem& filesystem);
+    bool init(FileSystem& filesystem, u32 max_voices = 32);
+    u32 max_voices() const { return m_max_voices; }
     void shutdown();
     void tick();
 
@@ -91,6 +90,7 @@ private:
     bool m_ready = false;
     bool m_muted = false;
     f32 m_pre_mute_volume = 1.0f;
+    u32 m_max_voices = 32;
     FileSystem* m_filesystem = nullptr;
 };
 
