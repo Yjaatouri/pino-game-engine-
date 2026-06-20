@@ -9,6 +9,8 @@
 
 namespace pino {
 
+class Frustum;
+
 struct RenderCommand {
     const Mesh*     mesh           = nullptr;
     const Material* material       = nullptr;
@@ -18,12 +20,16 @@ struct RenderCommand {
     float           depth          = 0.0f;   // camera distance (for transparent sorting)
     bool            instanced      = false;
     u32             instance_count = 0;       // 0 = regular draw, >0 = draw_instanced
+    bool            has_bounds     = false;   // set when aabb_min/aabb_max are valid
+    glm::vec3       aabb_min       = glm::vec3(0.0f);
+    glm::vec3       aabb_max       = glm::vec3(0.0f);
 };
 
 class RenderQueue {
 public:
     void submit(const RenderCommand& cmd);
     void sort();
+    void cull(const Frustum& frustum);
     void flush();
     void clear();
 

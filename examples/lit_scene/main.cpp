@@ -3,6 +3,9 @@
 #include "engine/renderer/mesh.h"
 #include "engine/renderer/material.h"
 #include "engine/renderer/render_queue.h"
+#include "engine/renderer/frustum.h"
+#include "engine/renderer/lod_group.h"
+#include "engine/core/log.h"
 #include "engine/renderer/camera.h"
 #include "engine/renderer/light.h"
 #include "engine/renderer/render_stats.h"
@@ -33,7 +36,7 @@ static pino::Mesh make_floor() {
 int main(int, char**) {
     pino::Engine engine;
     pino::EngineConfig cfg;
-    cfg.app_title     = "Lit Scene + RenderQueue";
+    cfg.app_title     = "Lit Scene + Frustum + LOD";
     cfg.window_width  = 1024;
     cfg.window_height = 768;
 
@@ -44,9 +47,18 @@ int main(int, char**) {
     if (!shader) return 1;
 
     auto cube_mesh = engine.assets().get_mesh("models/cube.obj");
-    pino::Mesh sphere_mesh = pino::Mesh::create_sphere(0.5f, 32, 24);
     pino::Mesh floor_mesh  = make_floor();
     if (!cube_mesh) return 1;
+
+    // LOD spheres — three detail levels
+    pino::Mesh sphere_high = pino::Mesh::create_sphere(0.5f, 32, 24);
+    pino::Mesh sphere_med  = pino::Mesh::create_sphere(0.5f, 16, 12);
+    pino::Mesh sphere_low  = pino::Mesh::create_sphere(0.5f,  8,  6);
+
+    pino::LODGroup sphere_lod;
+    sphere_lod.add_level(&sphere_high, 5.0f);  // 0–5 units: high detail
+    sphere_lod.add_level(&sphere_med, 12.0f);  // 5–12 units: medium
+    sphere_lod.add_level(&sphere_low, 1e9f);   // 12+ units: low
 
     pino::Camera cam;
     cam.perspective(45.0f, 1024.0f / 768.0f, 0.1f, 100.0f);
@@ -99,7 +111,6 @@ int main(int, char**) {
     mat_orbit.set_uniform("u_mat_shininess", 64.0f);
     mat_orbit.set_uniform("u_has_diffuse_tex", 0);
 
-    // Transparent sphere
     pino::Material mat_transparent;
     mat_transparent.set_shader(shader);
     mat_transparent.set_uniform("u_mat_ambient",   glm::vec3(0.0f, 0.0f, 0.0f));
@@ -126,6 +137,7 @@ int main(int, char**) {
     t_transparent.scale    = {1.5f, 1.5f, 1.5f};
 
     pino::RenderQueue queue;
+    pino::Frustum frustum;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -165,7 +177,7 @@ int main(int, char**) {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // ── Frame uniforms (set once on the shader before flush) ──
+        // ── Frame uniforms ──
         shader->bind();
         shader->set_mat4("u_view_proj", cam.view_proj());
         shader->set_vec3("u_camera_pos", cam_pos);
@@ -176,44 +188,76 @@ int main(int, char**) {
         // ── Build queue ──
         queue.clear();
 
-        // 1) Floor (opaque)
+        // 1) Floor
         {
             glm::mat4 model = t_floor.matrix();
             glm::mat3 nm = glm::transpose(glm::inverse(glm::mat3(model)));
-            queue.submit({&floor_mesh, &mat_floor, model, nm, false, 0.0f, false, 0});
+            glm::vec3 wmin, wmax;
+            pino::compute_world_aabb(floor_mesh.local_min(), floor_mesh.local_max(),
+                                     model, wmin, wmax);
+            queue.submit({&floor_mesh, &mat_floor, model, nm,
+                          false, 0.0f, false, 0,
+                          true, wmin, wmax});
         }
 
-        // 2) Center cube (opaque)
+        // 2) Center cube
         {
             glm::mat4 model = t_cube.matrix();
             glm::mat3 nm = glm::transpose(glm::inverse(glm::mat3(model)));
-            queue.submit({cube_mesh.get(), &mat_cube, model, nm, false, 0.0f, false, 0});
+            glm::vec3 wmin, wmax;
+            pino::compute_world_aabb(cube_mesh->local_min(), cube_mesh->local_max(),
+                                     model, wmin, wmax);
+            queue.submit({cube_mesh.get(), &mat_cube, model, nm,
+                          false, 0.0f, false, 0,
+                          true, wmin, wmax});
         }
 
-        // 3) Center sphere (opaque)
+        // 3) Center sphere — LOD selected per frame
         {
             glm::mat4 model = t_sphere.matrix();
             glm::mat3 nm = glm::transpose(glm::inverse(glm::mat3(model)));
-            queue.submit({&sphere_mesh, &mat_sphere, model, nm, false, 0.0f, false, 0});
+            float dist = glm::distance(glm::vec3(model[3]), cam_pos);
+            pino::Mesh* lod_mesh = sphere_lod.get_mesh(dist);
+            glm::vec3 wmin, wmax;
+            pino::compute_world_aabb(lod_mesh->local_min(), lod_mesh->local_max(),
+                                     model, wmin, wmax);
+            queue.submit({lod_mesh, &mat_sphere, model, nm,
+                          false, 0.0f, false, 0,
+                          true, wmin, wmax});
         }
 
-        // 4) 64 orbiting cubes — instanced (opaque)
+        // 4) 64 orbiting cubes (instanced, no per-instance culling)
         {
             queue.submit({cube_mesh.get(), &mat_orbit, glm::mat4(1.0f), glm::mat3(1.0f),
                           false, 0.0f, true, NUM_INSTANCES});
         }
 
-        // 5) Transparent sphere (rendered last after sorting)
+        // 5) Transparent sphere
         {
             glm::mat4 model = t_transparent.matrix();
             glm::mat3 nm = glm::transpose(glm::inverse(glm::mat3(model)));
             float depth = glm::distance(glm::vec3(model[3]), cam_pos);
-            queue.submit({&sphere_mesh, &mat_transparent, model, nm, true, depth, false, 0});
+            glm::vec3 wmin, wmax;
+            pino::compute_world_aabb(sphere_high.local_min(), sphere_high.local_max(),
+                                     model, wmin, wmax);
+            queue.submit({&sphere_high, &mat_transparent, model, nm,
+                          true, depth, false, 0,
+                          true, wmin, wmax});
         }
 
         queue.sort();
-        queue.flush();
 
+        // ── Frustum culling ──
+        frustum.extract(cam.view_proj());
+        u32 before = queue.command_count();
+        queue.cull(frustum);
+            u32 after = queue.command_count();
+            if (before != after) {
+                PINO_INFO("[Frustum] culled %u of %u commands",
+                          before - after, before);
+            }
+
+        queue.flush();
         engine.end_frame();
     }
 

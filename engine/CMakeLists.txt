@@ -51,6 +51,8 @@ set(PINO_ENGINE_SOURCES
     renderer/skybox.cpp
     renderer/material.cpp
     renderer/render_queue.cpp
+    renderer/frustum.cpp
+    renderer/lod_group.cpp
     assets/stb_image.cpp
     assets/asset_manager.cpp
     assets/asset_pack.cpp

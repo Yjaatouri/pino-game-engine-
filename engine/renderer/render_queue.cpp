@@ -1,4 +1,5 @@
 #include "engine/renderer/render_queue.h"
+#include "engine/renderer/frustum.h"
 #include "engine/renderer/render_stats.h"
 
 #include <algorithm>
@@ -27,6 +28,15 @@ void RenderQueue::sort() {
             // 4) Static draw order for opaque with same material
             return false;
         });
+}
+
+void RenderQueue::cull(const Frustum& frustum) {
+    m_commands.erase(
+        std::remove_if(m_commands.begin(), m_commands.end(),
+            [&](const RenderCommand& cmd) {
+                return cmd.has_bounds && !frustum.intersects(cmd.aabb_min, cmd.aabb_max);
+            }),
+        m_commands.end());
 }
 
 void RenderQueue::flush() {
