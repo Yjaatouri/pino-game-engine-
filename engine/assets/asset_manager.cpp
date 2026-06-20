@@ -66,11 +66,17 @@ void AssetManager::init_fallback_assets() {
     // Fallback texture: 8x8 magenta/black checkerboard
     m_fallback_tex = std::make_unique<Texture>();
     {
+        // RGBA bytes stored as u32 (little-endian: 0xAABBGGRR)
+        // Magenta = 0xFFFF00FF, Black (opaque) = 0xFF000000
         static const u32 fb_tex_data[8 * 8] = {
-            0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-            0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-            0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
-            0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+            0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,
+            0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,
+            0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,
+            0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,
+            0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,
+            0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,
+            0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,
+            0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,
         };
         m_fallback_tex->upload_rgba(reinterpret_cast<const u8*>(fb_tex_data), 8, 8);
     }
