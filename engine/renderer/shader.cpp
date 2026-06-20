@@ -5,6 +5,24 @@
 
 namespace pino {
 
+Shader::~Shader() { destroy(); }
+
+Shader::Shader(Shader&& other) noexcept
+    : m_program(other.m_program), m_uniform_cache(std::move(other.m_uniform_cache))
+{
+    other.m_program = 0;
+}
+
+Shader& Shader::operator=(Shader&& other) noexcept {
+    if (this != &other) {
+        destroy();
+        m_program = other.m_program;
+        m_uniform_cache = std::move(other.m_uniform_cache);
+        other.m_program = 0;
+    }
+    return *this;
+}
+
 static GLuint compile(GLenum type, const char* src) {
     GLuint s = glCreateShader(type);
     glShaderSource(s, 1, &src, nullptr);

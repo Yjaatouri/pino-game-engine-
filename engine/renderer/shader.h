@@ -12,6 +12,12 @@ namespace pino {
 class Shader {
 public:
     Shader() = default;
+    ~Shader();
+
+    Shader(Shader&& other) noexcept;
+    Shader& operator=(Shader&& other) noexcept;
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
 
     bool load(const char* vert_src, const char* frag_src);
     void destroy();
