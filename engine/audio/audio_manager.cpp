@@ -247,6 +247,57 @@ void AudioManager::stop(u64 source_id) {
     m_impl->active_sounds.erase(it);
 }
 
+void AudioManager::pause(u64 source_id) {
+    if (!m_ready) return;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return;
+
+    if (!ma_sound_is_playing(it->second.sound)) return;
+
+    ma_sound_stop(it->second.sound);
+}
+
+void AudioManager::resume(u64 source_id) {
+    if (!m_ready) return;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return;
+
+    if (ma_sound_is_playing(it->second.sound)) return;
+
+    if (ma_sound_at_end(it->second.sound)) return;
+
+    ma_sound_start(it->second.sound);
+}
+
+bool AudioManager::is_playing(u64 source_id) const {
+    if (!m_ready) return false;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return false;
+
+    return ma_sound_is_playing(it->second.sound) != MA_FALSE;
+}
+
+float AudioManager::get_volume(u64 source_id) const {
+    if (!m_ready) return 0.0f;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return 0.0f;
+
+    return ma_sound_get_volume(it->second.sound);
+}
+
+bool AudioManager::is_looping(u64 source_id) const {
+    if (!m_ready) return false;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return false;
+
+    return ma_sound_is_looping(it->second.sound) != MA_FALSE;
+}
+
 void AudioManager::stop_all() {
     if (!m_ready) return;
 
@@ -295,6 +346,66 @@ void AudioManager::set_master_volume(float volume) {
 float AudioManager::master_volume() const {
     if (!m_ready) return 0.0f;
     return ma_engine_get_volume(&m_impl->engine);
+}
+
+void AudioManager::mute() {
+    if (!m_ready) return;
+    if (m_muted) return;
+
+    m_muted = true;
+    m_pre_mute_volume = ma_engine_get_volume(&m_impl->engine);
+    ma_engine_set_volume(&m_impl->engine, 0.0f);
+}
+
+void AudioManager::unmute() {
+    if (!m_ready) return;
+    if (!m_muted) return;
+
+    m_muted = false;
+    ma_engine_set_volume(&m_impl->engine, m_pre_mute_volume);
+}
+
+bool AudioManager::is_muted() const {
+    return m_muted;
+}
+
+void AudioManager::set_bus_volume(AudioBus bus, float volume) {
+    if (!m_ready) return;
+
+    ma_sound_group* group = m_impl->group_for_bus(bus);
+    if (group) {
+        ma_sound_group_set_volume(group, Math::clamp(volume, 0.0f, 1.0f));
+    }
+}
+
+float AudioManager::get_bus_volume(AudioBus bus) const {
+    if (!m_ready) return 0.0f;
+
+    ma_sound_group* group = m_impl->group_for_bus(bus);
+    if (group) {
+        return ma_sound_group_get_volume(group);
+    }
+    return 0.0f;
+}
+
+void AudioManager::pause_all() {
+    if (!m_ready) return;
+
+    for (auto& [id, entry] : m_impl->active_sounds) {
+        if (ma_sound_is_playing(entry.sound)) {
+            ma_sound_stop(entry.sound);
+        }
+    }
+}
+
+void AudioManager::resume_all() {
+    if (!m_ready) return;
+
+    for (auto& [id, entry] : m_impl->active_sounds) {
+        if (!ma_sound_is_playing(entry.sound) && !ma_sound_at_end(entry.sound)) {
+            ma_sound_start(entry.sound);
+        }
+    }
 }
 
 AudioDebugInfo AudioManager::debug_info() const {

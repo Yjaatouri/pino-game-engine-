@@ -55,6 +55,26 @@ public:
     void set_volume(u64 source_id, float volume);
     void set_looping(u64 source_id, bool looping);
 
+    // Pause / Resume
+    void pause(u64 source_id);
+    void resume(u64 source_id);
+    void pause_all();
+    void resume_all();
+
+    // State queries
+    bool is_playing(u64 source_id) const;
+    float get_volume(u64 source_id) const;
+    bool is_looping(u64 source_id) const;
+
+    // Master mute
+    void mute();
+    void unmute();
+    bool is_muted() const;
+
+    // Bus volume
+    void set_bus_volume(AudioBus bus, float volume);
+    float get_bus_volume(AudioBus bus) const;
+
     // Master control
     void set_master_volume(float volume);
     float master_volume() const;
@@ -68,6 +88,8 @@ private:
     struct Impl;
     Impl* m_impl = nullptr;
     bool m_ready = false;
+    bool m_muted = false;
+    f32 m_pre_mute_volume = 1.0f;
     FileSystem* m_filesystem = nullptr;
 };
 
