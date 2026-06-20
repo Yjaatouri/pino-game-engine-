@@ -31,6 +31,11 @@ public:
 
     void draw() const;
 
+    // Instancing
+    void set_instance_data(const glm::mat4* transforms, u32 count);
+    void draw_instanced(u32 count) const;
+    u32  instance_capacity() const { return m_instance_capacity; }
+
     bool is_valid() const { return m_vao != 0; }
 
     u32 vertex_count()  const { return m_vertex_count; }
@@ -51,6 +56,9 @@ private:
     GLuint m_ebo  = 0;
     u32    m_vertex_count = 0;
     u32    m_index_count  = 0;
+
+    GLuint m_instance_vbo = 0;
+    u32    m_instance_capacity = 0;
 
     glm::vec3 m_local_min = { -0.5f, -0.5f, -0.5f };
     glm::vec3 m_local_max = {  0.5f,  0.5f,  0.5f };

@@ -11,6 +11,8 @@ Mesh::~Mesh() { destroy(); }
 Mesh::Mesh(Mesh&& other) noexcept
     : m_vao(other.m_vao), m_vbo(other.m_vbo), m_ebo(other.m_ebo),
       m_vertex_count(other.m_vertex_count), m_index_count(other.m_index_count),
+      m_instance_vbo(other.m_instance_vbo),
+      m_instance_capacity(other.m_instance_capacity),
       m_local_min(other.m_local_min), m_local_max(other.m_local_max)
 {
     other.m_vao = other.m_vbo = other.m_ebo = 0;
@@ -25,6 +27,8 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
         m_ebo  = other.m_ebo;  other.m_ebo  = 0;
         m_vertex_count = other.m_vertex_count; other.m_vertex_count = 0;
         m_index_count  = other.m_index_count;  other.m_index_count  = 0;
+        m_instance_vbo = other.m_instance_vbo; other.m_instance_vbo = 0;
+        m_instance_capacity = other.m_instance_capacity; other.m_instance_capacity = 0;
         m_local_min = other.m_local_min;
         m_local_max = other.m_local_max;
     }
@@ -86,8 +90,9 @@ void Mesh::destroy() {
     if (m_vao) glDeleteVertexArrays(1, &m_vao);
     if (m_vbo) glDeleteBuffers(1, &m_vbo);
     if (m_ebo) glDeleteBuffers(1, &m_ebo);
-    m_vao = m_vbo = m_ebo = 0;
-    m_vertex_count = m_index_count = 0;
+    if (m_instance_vbo) glDeleteBuffers(1, &m_instance_vbo);
+    m_vao = m_vbo = m_ebo = m_instance_vbo = 0;
+    m_vertex_count = m_index_count = m_instance_capacity = 0;
 }
 
 void Mesh::draw() const {
@@ -100,6 +105,58 @@ void Mesh::draw() const {
                        GL_UNSIGNED_INT, nullptr);
     } else {
         glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_vertex_count));
+    }
+    glBindVertexArray(0);
+}
+
+// ── Instancing ────────────────────────────────────────
+
+void Mesh::set_instance_data(const glm::mat4* transforms, u32 count) {
+    if (!m_vao || count == 0) return;
+
+    u32 needed = count * sizeof(glm::mat4);
+
+    if (!m_instance_vbo || count > m_instance_capacity) {
+        if (m_instance_vbo) glDeleteBuffers(1, &m_instance_vbo);
+
+        glGenBuffers(1, &m_instance_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_instance_vbo);
+        glBufferData(GL_ARRAY_BUFFER, needed, nullptr, GL_DYNAMIC_DRAW);
+        m_instance_capacity = count;
+
+        // Bind instance attributes to the VAO (locations 3-6 = 4 rows of mat4)
+        glBindVertexArray(m_vao);
+        for (u32 i = 0; i < 4; ++i) {
+            GLint loc = 3 + static_cast<GLint>(i);
+            glEnableVertexAttribArray(static_cast<GLuint>(loc));
+            glVertexAttribPointer(static_cast<GLuint>(loc), 4, GL_FLOAT, GL_FALSE,
+                                  sizeof(glm::mat4),
+                                  reinterpret_cast<const void*>(i * sizeof(glm::vec4)));
+            glVertexAttribDivisor(static_cast<GLuint>(loc), 1);
+        }
+        glBindVertexArray(0);
+    } else {
+        glBindBuffer(GL_ARRAY_BUFFER, m_instance_vbo);
+    }
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, needed, transforms);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Mesh::draw_instanced(u32 count) const {
+    if (!m_vao || !m_instance_vbo || count == 0) return;
+
+    RenderStats::instance().add_draw_call();
+    RenderStats::instance().add_triangles(
+        (m_ebo ? m_index_count / 3 : m_vertex_count / 3) * count);
+
+    glBindVertexArray(m_vao);
+    if (m_ebo) {
+        glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(m_index_count),
+                                GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(count));
+    } else {
+        glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(m_vertex_count),
+                              static_cast<GLsizei>(count));
     }
     glBindVertexArray(0);
 }
