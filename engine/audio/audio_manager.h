@@ -2,6 +2,7 @@
 
 #include "engine/core/types.h"
 #include <string>
+#include <unordered_set>
 
 namespace pino {
 
@@ -27,6 +28,20 @@ struct AudioDebugInfo {
     f32 master_volume;
 };
 
+class SoundHandle {
+public:
+    SoundHandle() = default;
+    explicit SoundHandle(std::string path) : m_path(std::move(path)) {}
+
+    const std::string& path() const { return m_path; }
+    bool is_valid() const { return !m_path.empty(); }
+
+private:
+    std::string m_path;
+
+    friend class AudioManager;
+};
+
 class AudioManager {
 public:
     AudioManager();
@@ -40,8 +55,16 @@ public:
     void shutdown();
     void tick();
 
+    // Preload / cache management
+    SoundHandle preload(const std::string& path);
+    void unload(const SoundHandle& handle);
+
     // Fire-and-forget: load, play, auto-destroy on completion
     void play_one_shot(const std::string& path, float volume = 1.0f,
+                       Priority priority = Priority::Gameplay,
+                       AudioBus bus = AudioBus::SFX);
+
+    void play_one_shot(const SoundHandle& handle, float volume = 1.0f,
                        Priority priority = Priority::Gameplay,
                        AudioBus bus = AudioBus::SFX);
 
@@ -50,6 +73,12 @@ public:
              Priority priority = Priority::Gameplay,
              AudioBus bus = AudioBus::SFX,
              bool stream = false);
+
+    u64 play(const SoundHandle& handle, bool looping = false, float volume = 1.0f,
+             Priority priority = Priority::Gameplay,
+             AudioBus bus = AudioBus::SFX,
+             bool stream = false);
+
     void stop(u64 source_id);
     void stop_all();
     void set_volume(u64 source_id, float volume);
@@ -92,6 +121,9 @@ private:
     f32 m_pre_mute_volume = 1.0f;
     u32 m_max_voices = 32;
     FileSystem* m_filesystem = nullptr;
+    std::unordered_set<std::string> m_preloaded_paths;
+
+    std::string normalize_path(const std::string& path) const;
 };
 
 } // namespace pino

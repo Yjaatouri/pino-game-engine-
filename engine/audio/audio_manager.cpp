@@ -160,6 +160,42 @@ void AudioManager::shutdown() {
     PINO_INFO("AudioManager shut down");
 }
 
+std::string AudioManager::normalize_path(const std::string& path) const {
+    return m_filesystem ? m_filesystem->resolve(path.c_str()) : path;
+}
+
+SoundHandle AudioManager::preload(const std::string& path) {
+    if (!m_ready || !m_filesystem) return SoundHandle{};
+
+    std::string resolved = normalize_path(path);
+
+    if (m_preloaded_paths.count(resolved)) {
+        return SoundHandle{resolved};
+    }
+
+    ma_resource_manager* rm = m_impl->engine.pResourceManager;
+    if (ma_resource_manager_register_file(rm, resolved.c_str(),
+                                          MA_RESOURCE_MANAGER_DATA_SOURCE_FLAG_DECODE) != MA_SUCCESS) {
+        PINO_WARN("AudioManager::preload: failed to register '%s'", path.c_str());
+        return SoundHandle{};
+    }
+
+    m_preloaded_paths.insert(resolved);
+    return SoundHandle{std::move(resolved)};
+}
+
+void AudioManager::unload(const SoundHandle& handle) {
+    if (!m_ready || !handle.is_valid()) return;
+
+    auto it = m_preloaded_paths.find(handle.m_path);
+    if (it == m_preloaded_paths.end()) return;
+
+    ma_resource_manager* rm = m_impl->engine.pResourceManager;
+    ma_resource_manager_unregister_file(rm, it->c_str());
+
+    m_preloaded_paths.erase(it);
+}
+
 void AudioManager::tick() {
     if (!m_ready) return;
     m_impl->sweep_finished();
@@ -188,6 +224,12 @@ void AudioManager::play_one_shot(const std::string& path, float volume,
     m_impl->one_shot_sounds.push_back({std::move(sound), priority});
 }
 
+void AudioManager::play_one_shot(const SoundHandle& handle, float volume,
+                                  Priority priority, AudioBus bus)
+{
+    play_one_shot(handle.path(), volume, priority, bus);
+}
+
 u64 AudioManager::play(const std::string& path, bool looping, float volume,
                         Priority priority, AudioBus bus, bool stream)
 {
@@ -212,6 +254,12 @@ u64 AudioManager::play(const std::string& path, bool looping, float volume,
     u64 id = m_impl->next_id++;
     m_impl->active_sounds[id] = {std::move(sound), priority};
     return id;
+}
+
+u64 AudioManager::play(const SoundHandle& handle, bool looping, float volume,
+                        Priority priority, AudioBus bus, bool stream)
+{
+    return play(handle.path(), looping, volume, priority, bus, stream);
 }
 
 void AudioManager::stop(u64 source_id) {
