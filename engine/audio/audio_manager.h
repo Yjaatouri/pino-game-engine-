@@ -39,6 +39,7 @@ public:
 
     bool init(FileSystem& filesystem);
     void shutdown();
+    void tick();
 
     // Fire-and-forget: load, play, auto-destroy on completion
     void play_one_shot(const std::string& path, float volume = 1.0f,

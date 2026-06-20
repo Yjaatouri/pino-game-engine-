@@ -215,6 +215,7 @@ void Engine::shutdown() {
 }
 
 void Engine::begin_frame() {
+    m_audio->tick();
     m_input->begin_frame();
 
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)

@@ -56,6 +56,7 @@ struct AudioManager::Impl {
     }
 
     void ensure_voice_available() {
+        sweep_finished();
         u32 total = static_cast<u32>(active_sounds.size() + one_shot_sounds.size());
 
         while (total >= AudioManager::MAX_VOICES) {
@@ -180,12 +181,16 @@ void AudioManager::shutdown() {
     PINO_INFO("AudioManager shut down");
 }
 
+void AudioManager::tick() {
+    if (!m_ready) return;
+    m_impl->sweep_finished();
+}
+
 void AudioManager::play_one_shot(const std::string& path, float volume,
                                   Priority priority, AudioBus bus)
 {
     if (!m_ready || !m_filesystem) return;
 
-    m_impl->sweep_finished();
     m_impl->ensure_voice_available();
 
     std::string resolved = m_filesystem->resolve(path.c_str());
@@ -210,7 +215,6 @@ u64 AudioManager::play(const std::string& path, bool looping, float volume,
 {
     if (!m_ready || !m_filesystem) return 0;
 
-    m_impl->sweep_finished();
     m_impl->ensure_voice_available();
 
     std::string resolved = m_filesystem->resolve(path.c_str());
