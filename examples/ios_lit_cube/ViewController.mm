@@ -21,7 +21,7 @@ public:
     pino::Mesh*          cube    = nullptr;
     pino::Texture*       texture = nullptr;
     pino::Camera         camera;
-    pino::Material       material;
+    pino::PhongMaterial       material;
     float                angle = 0;
 
     bool init() override {

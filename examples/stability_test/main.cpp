@@ -69,7 +69,7 @@ public:
         glm::mat4 model = glm::rotate(glm::mat4(1.0f), m_angle, glm::vec3{0,1,0});
         m_shader->set_mat4("u_model", model);
         m_shader->set_mat3("u_normal_matrix", glm::inverseTranspose(glm::mat3(model)));
-        pino::Material mat{{0.1f,0.1f,0.1f},{0.5f,0.5f,0.5f},{0.5f,0.5f,0.5f},{0,0,0},16};
+        pino::PhongMaterial mat{{0.1f,0.1f,0.1f},{0.5f,0.5f,0.5f},{0.5f,0.5f,0.5f},{0,0,0},16};
         pino::upload_material(*m_shader, mat);
         m_shader->set_int("u_has_diffuse_tex", 0);
         m_cube->draw();

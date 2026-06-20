@@ -40,7 +40,7 @@ private:
     pino::Mesh           m_floor;
     pino::Camera         m_cam;
     pino::Transform      m_t_cube, m_t_sphere, m_t_floor;
-    pino::Material       m_mat_cube, m_mat_sphere, m_mat_floor;
+    pino::PhongMaterial       m_mat_cube, m_mat_sphere, m_mat_floor;
     pino::PointLight     m_plight;
     pino::DirectionalLight m_dlight;
     pino::AmbientLight   m_ambient;
@@ -126,7 +126,7 @@ void Game::render(pino::f32 dt) {
     pino::upload_directional_light(*m_shader, m_dlight);
     pino::upload_point_lights(*m_shader, &m_plight, 1);
 
-    struct { pino::Mesh* m; pino::Transform* t; pino::Material* mat; } drawables[] = {
+    struct { pino::Mesh* m; pino::Transform* t; pino::PhongMaterial* mat; } drawables[] = {
         {&m_floor,  &m_t_floor,  &m_mat_floor},
         { m_cube.get(),   &m_t_cube,   &m_mat_cube},
         {&m_sphere, &m_t_sphere, &m_mat_sphere},

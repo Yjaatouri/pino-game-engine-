@@ -27,7 +27,7 @@ struct PointLight {
     float quadratic = 0.032f;
 };
 
-struct Material {
+struct PhongMaterial {
     glm::vec3 ambient  {0.2f, 0.2f, 0.2f};
     glm::vec3 diffuse  {0.8f, 0.8f, 0.8f};
     glm::vec3 specular {1.0f, 1.0f, 1.0f};
@@ -39,6 +39,6 @@ struct Material {
 void upload_ambient_light(Shader& shader, const AmbientLight& light);
 void upload_directional_light(Shader& shader, const DirectionalLight& light);
 void upload_point_lights(Shader& shader, const PointLight* lights, i32 count);
-void upload_material(Shader& shader, const Material& material);
+void upload_material(Shader& shader, const PhongMaterial& material);
 
 } // namespace pino

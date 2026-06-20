@@ -49,6 +49,7 @@ set(PINO_ENGINE_SOURCES
     renderer/text_renderer.cpp
     renderer/shadow_map.cpp
     renderer/skybox.cpp
+    renderer/material.cpp
     assets/stb_image.cpp
     assets/asset_manager.cpp
     assets/asset_pack.cpp

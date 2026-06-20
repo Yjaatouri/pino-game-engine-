@@ -1,6 +1,7 @@
 #include "engine/engine.h"
 #include "engine/assets/asset_manager.h"
 #include "engine/renderer/mesh.h"
+#include "engine/renderer/material.h"
 #include "engine/renderer/camera.h"
 #include "engine/renderer/light.h"
 #include "engine/core/transform.h"
@@ -64,24 +65,30 @@ int main(int, char**) {
     point.linear    = 0.09f;
     point.quadratic = 0.032f;
 
-    // Materials
+    // Materials with new Material API
     pino::Material mat_floor;
-    mat_floor.ambient   = {0.3f, 0.3f, 0.3f};
-    mat_floor.diffuse   = {0.6f, 0.6f, 0.6f};
-    mat_floor.specular  = {0.0f, 0.0f, 0.0f};
-    mat_floor.shininess = 1.0f;
+    mat_floor.set_shader(shader);
+    mat_floor.set_uniform("u_mat_ambient",   glm::vec3(0.3f, 0.3f, 0.3f));
+    mat_floor.set_uniform("u_mat_diffuse",   glm::vec3(0.6f, 0.6f, 0.6f));
+    mat_floor.set_uniform("u_mat_specular",  glm::vec3(0.0f, 0.0f, 0.0f));
+    mat_floor.set_uniform("u_mat_shininess", 1.0f);
+    mat_floor.set_uniform("u_has_diffuse_tex", 0);
 
     pino::Material mat_cube;
-    mat_cube.ambient   = {0.2f, 0.1f, 0.1f};
-    mat_cube.diffuse   = {0.9f, 0.3f, 0.2f};
-    mat_cube.specular  = {0.8f, 0.8f, 0.8f};
-    mat_cube.shininess = 64.0f;
+    mat_cube.set_shader(shader);
+    mat_cube.set_uniform("u_mat_ambient",   glm::vec3(0.2f, 0.1f, 0.1f));
+    mat_cube.set_uniform("u_mat_diffuse",   glm::vec3(0.9f, 0.3f, 0.2f));
+    mat_cube.set_uniform("u_mat_specular",  glm::vec3(0.8f, 0.8f, 0.8f));
+    mat_cube.set_uniform("u_mat_shininess", 64.0f);
+    mat_cube.set_uniform("u_has_diffuse_tex", 0);
 
     pino::Material mat_sphere;
-    mat_sphere.ambient   = {0.1f, 0.2f, 0.1f};
-    mat_sphere.diffuse   = {0.2f, 0.7f, 0.3f};
-    mat_sphere.specular  = {1.0f, 1.0f, 1.0f};
-    mat_sphere.shininess = 32.0f;
+    mat_sphere.set_shader(shader);
+    mat_sphere.set_uniform("u_mat_ambient",   glm::vec3(0.1f, 0.2f, 0.1f));
+    mat_sphere.set_uniform("u_mat_diffuse",   glm::vec3(0.2f, 0.7f, 0.3f));
+    mat_sphere.set_uniform("u_mat_specular",  glm::vec3(1.0f, 1.0f, 1.0f));
+    mat_sphere.set_uniform("u_mat_shininess", 32.0f);
+    mat_sphere.set_uniform("u_has_diffuse_tex", 0);
 
     // Transforms
     pino::Transform t_floor;
@@ -99,9 +106,9 @@ int main(int, char**) {
     glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
 
     struct Drawable {
-        pino::Mesh*     mesh;
-        pino::Transform* transform;
-        pino::Material*  material;
+        pino::Mesh*       mesh;
+        pino::Transform*  transform;
+        pino::Material*   material;
     };
 
     Drawable drawables[] = {
@@ -142,10 +149,9 @@ int main(int, char**) {
             glm::mat4 model = d.transform->matrix();
             glm::mat3 normal_mat = glm::transpose(glm::inverse(glm::mat3(model)));
 
+            d.material->apply();
             shader->set_mat4("u_model", model);
             shader->set_mat3("u_normal_matrix", normal_mat);
-
-            upload_material(*shader, *d.material);
             d.mesh->draw();
         }
 

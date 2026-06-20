@@ -60,19 +60,19 @@ int main(int, char**) {
     dir_l.color     = {0.6f, 0.6f, 0.7f};
 
     // Materials
-    pino::Material mat_ground;
+    pino::PhongMaterial mat_ground;
     mat_ground.ambient   = {0.1f, 0.1f, 0.1f};
     mat_ground.diffuse   = {0.3f, 0.3f, 0.3f};
     mat_ground.specular  = {0.5f, 0.5f, 0.5f};
     mat_ground.shininess = 4.0f;
 
-    pino::Material mat_player;
+    pino::PhongMaterial mat_player;
     mat_player.ambient   = {0.1f, 0.1f, 0.2f};
     mat_player.diffuse   = {0.3f, 0.5f, 0.9f};
     mat_player.specular  = {1,1,1};
     mat_player.shininess = 32.0f;
 
-    pino::Material mat_wall;
+    pino::PhongMaterial mat_wall;
     mat_wall.ambient   = {0.2f, 0.1f, 0.1f};
     mat_wall.diffuse   = {0.9f, 0.3f, 0.2f};
     mat_wall.specular  = {1,1,1};
@@ -159,7 +159,7 @@ int main(int, char**) {
         shader->set_mat4("u_view_proj", vp);
 
         // Helper lambda to draw an entity
-        auto draw_entity = [&](pino::Entity& entity, const pino::Material& mat, pino::Mesh* mesh) {
+        auto draw_entity = [&](pino::Entity& entity, const pino::PhongMaterial& mat, pino::Mesh* mesh) {
             glm::mat4 model = entity.world_matrix();
             shader->set_mat4("u_model", model);
             shader->set_mat3("u_normal_matrix", glm::inverseTranspose(glm::mat3(model)));

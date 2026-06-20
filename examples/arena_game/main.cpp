@@ -132,11 +132,11 @@ int main(int, char**) {
     pino::DirectionalLight dir_light = { {0.3f, -1, -0.4f}, {0.7f, 0.7f, 0.8f} };
 
     // ── Materials ─────────────────────────────────────────────────
-    pino::Material mat_floor  = { {0.12f,0.12f,0.12f}, {0.25f,0.25f,0.25f}, {0.2f,0.2f,0.2f}, {0,0,0}, 4.0f };
-    pino::Material mat_wall   = { {0.2f,0.2f,0.22f},   {0.35f,0.35f,0.4f}, {0.3f,0.3f,0.3f}, {0,0,0}, 8.0f };
-    pino::Material mat_player = { {0.08f,0.08f,0.2f},  {0.2f,0.5f,0.9f},   {1,1,1},          {0,0,0}, 32.0f };
-    pino::Material mat_enemy  = { {0.2f,0.05f,0.05f},  {0.9f,0.15f,0.15f}, {0.7f,0.7f,0.7f}, {0,0,0}, 24.0f };
-    pino::Material mat_coin   = { {0.2f,0.15f,0.05f},  {0.9f,0.8f,0.1f},   {1,1,1},          {0,0,0}, 48.0f };
+    pino::PhongMaterial mat_floor  = { {0.12f,0.12f,0.12f}, {0.25f,0.25f,0.25f}, {0.2f,0.2f,0.2f}, {0,0,0}, 4.0f };
+    pino::PhongMaterial mat_wall   = { {0.2f,0.2f,0.22f},   {0.35f,0.35f,0.4f}, {0.3f,0.3f,0.3f}, {0,0,0}, 8.0f };
+    pino::PhongMaterial mat_player = { {0.08f,0.08f,0.2f},  {0.2f,0.5f,0.9f},   {1,1,1},          {0,0,0}, 32.0f };
+    pino::PhongMaterial mat_enemy  = { {0.2f,0.05f,0.05f},  {0.9f,0.15f,0.15f}, {0.7f,0.7f,0.7f}, {0,0,0}, 24.0f };
+    pino::PhongMaterial mat_coin   = { {0.2f,0.15f,0.05f},  {0.9f,0.8f,0.1f},   {1,1,1},          {0,0,0}, 48.0f };
 
     // ── Debug draw ────────────────────────────────────────────────
     pino::DebugDraw debug_draw;
@@ -230,7 +230,7 @@ int main(int, char**) {
         pino::upload_directional_light(*lit_shader, dir_light);
         lit_shader->set_int("u_num_point_lights", 0);
 
-        auto draw = [&](pino::Entity& e, const pino::Material& m) {
+        auto draw = [&](pino::Entity& e, const pino::PhongMaterial& m) {
             glm::mat4 model = e.world_matrix();
             lit_shader->set_mat4("u_model", model);
             lit_shader->set_mat3("u_normal_matrix", glm::inverseTranspose(glm::mat3(model)));

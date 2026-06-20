@@ -35,7 +35,7 @@ void upload_point_lights(Shader& shader, const PointLight* lights, i32 count) {
     }
 }
 
-void upload_material(Shader& shader, const Material& material) {
+void upload_material(Shader& shader, const PhongMaterial& material) {
     shader.set_vec3("u_mat_ambient", material.ambient);
     shader.set_vec3("u_mat_diffuse", material.diffuse);
     shader.set_vec3("u_mat_specular", material.specular);

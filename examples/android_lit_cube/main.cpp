@@ -17,7 +17,7 @@ struct AppState {
     pino::AssetHandle<pino::Mesh>    cube;
     pino::AssetHandle<pino::Texture> texture;
     pino::Camera                     camera;
-    pino::Material                   material;
+    pino::PhongMaterial                   material;
 
     bool has_window  = false;
     bool initialized = false;

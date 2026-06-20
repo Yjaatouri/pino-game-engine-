@@ -237,7 +237,7 @@ public:
         sh.set_int("u_num_point_lights", 0);
 
         auto& mesh = *m_ctx.cube;
-        auto draw = [&](const glm::vec3& pos, const glm::vec3& scl, const pino::Material& mat) {
+        auto draw = [&](const glm::vec3& pos, const glm::vec3& scl, const pino::PhongMaterial& mat) {
             glm::mat4 m = glm::translate(glm::mat4(1), pos) * glm::scale(glm::mat4(1), scl);
             sh.set_mat4("u_model", m);
             sh.set_mat3("u_normal_matrix", glm::inverseTranspose(glm::mat3(m)));
@@ -247,7 +247,7 @@ public:
         };
 
         // Title cubes
-        pino::Material colors[] = {
+        pino::PhongMaterial colors[] = {
             {{0,0.15f,0.15f},{0,0.8f,0.9f},{1,1,1},{0,0,0},32},
             {{0.15f,0.15f,0.15f},{0.85f,0.85f,0.85f},{1,1,1},{0.05f,0.05f,0.05f},16},
             {{0.15f,0.08f,0},{0.9f,0.5f,0},{1,1,1},{0,0,0},32},
@@ -260,8 +260,8 @@ public:
         }
 
         // Menu options
-        pino::Material sel{{0.1f,0.05f,0.1f},{0.3f,0.2f,0.8f},{0.8f,0.8f,1},{0,0,0},32};
-        pino::Material norm{{0.08f,0.08f,0.08f},{0.25f,0.25f,0.3f},{0.2f,0.2f,0.2f},{0,0,0},8};
+        pino::PhongMaterial sel{{0.1f,0.05f,0.1f},{0.3f,0.2f,0.8f},{0.8f,0.8f,1},{0,0,0},32};
+        pino::PhongMaterial norm{{0.08f,0.08f,0.08f},{0.25f,0.25f,0.3f},{0.2f,0.2f,0.2f},{0,0,0},8};
 
         // Start Game button
         draw({0.5f, -0.3f, -2.0f}, {2.0f, 0.5f, 0.4f}, m_sel == 0 ? sel : norm);
@@ -271,7 +271,7 @@ public:
         // Selection arrow
         float arrow_y = (m_sel == 0) ? -0.3f : -1.3f;
         draw({-1.8f, arrow_y, -1.6f}, {0.2f, 0.2f, 0.2f},
-             pino::Material{{0.15f,0.15f,0},{0.9f,0.9f,0.1f},{1,1,1},{0.05f,0.05f,0},32});
+             pino::PhongMaterial{{0.15f,0.15f,0},{0.9f,0.9f,0.1f},{1,1,1},{0.05f,0.05f,0},32});
     }
 
 private:
@@ -440,7 +440,7 @@ public:
         sh.set_int("u_num_point_lights", 0);
 
         auto& mesh = *m_ctx.cube;
-        auto draw = [&](pino::Entity& e, const pino::Material& m) {
+        auto draw = [&](pino::Entity& e, const pino::PhongMaterial& m) {
             auto wm = e.world_matrix();
             sh.set_mat4("u_model", wm);
             sh.set_mat3("u_normal_matrix", glm::inverseTranspose(glm::mat3(wm)));
@@ -449,11 +449,11 @@ public:
             mesh.draw();
         };
 
-        pino::Material fmat{{0.1f,0.1f,0.1f},{0.22f,0.22f,0.22f},{0.2f,0.2f,0.2f},{0,0,0},4};
-        pino::Material wmat{{0.18f,0.18f,0.2f},{0.3f,0.3f,0.35f},{0.3f,0.3f,0.3f},{0,0,0},8};
-        pino::Material pmat{{0.05f,0.05f,0.15f},{0.15f,0.5f,0.9f},{1,1,1},{0,0,0},48};
-        pino::Material emat{{0.18f,0.03f,0.03f},{0.85f,0.1f,0.1f},{0.7f,0.7f,0.7f},{0,0,0},24};
-        pino::Material cmat{{0.12f,0.1f,0.02f},{0.8f,0.7f,0.05f},{1,1,1},{0,0,0},48};
+        pino::PhongMaterial fmat{{0.1f,0.1f,0.1f},{0.22f,0.22f,0.22f},{0.2f,0.2f,0.2f},{0,0,0},4};
+        pino::PhongMaterial wmat{{0.18f,0.18f,0.2f},{0.3f,0.3f,0.35f},{0.3f,0.3f,0.3f},{0,0,0},8};
+        pino::PhongMaterial pmat{{0.05f,0.05f,0.15f},{0.15f,0.5f,0.9f},{1,1,1},{0,0,0},48};
+        pino::PhongMaterial emat{{0.18f,0.03f,0.03f},{0.85f,0.1f,0.1f},{0.7f,0.7f,0.7f},{0,0,0},24};
+        pino::PhongMaterial cmat{{0.12f,0.1f,0.02f},{0.8f,0.7f,0.05f},{1,1,1},{0,0,0},48};
 
         draw(*m_floor, fmat);
         for (auto* w : m_walls) if (w->is_active()) draw(*w, wmat);
@@ -469,9 +469,9 @@ public:
 
         // UI overlay (no depth test)
         glDisable(GL_DEPTH_TEST);
-        pino::Material live_mat{{0.12f,0.02f,0.02f},{0.75f,0.1f,0.1f},{0.8f,0.8f,0.8f},{0,0,0},8};
-        pino::Material ded_mat{{0.04f,0.04f,0.04f},{0.12f,0.12f,0.12f},{0.2f,0.2f,0.2f},{0,0,0},4};
-        pino::Material s_mat{{0.02f,0.05f,0.02f},{0.1f,0.55f,0.2f},{0.5f,0.5f,0.5f},{0,0,0},8};
+        pino::PhongMaterial live_mat{{0.12f,0.02f,0.02f},{0.75f,0.1f,0.1f},{0.8f,0.8f,0.8f},{0,0,0},8};
+        pino::PhongMaterial ded_mat{{0.04f,0.04f,0.04f},{0.12f,0.12f,0.12f},{0.2f,0.2f,0.2f},{0,0,0},4};
+        pino::PhongMaterial s_mat{{0.02f,0.05f,0.02f},{0.1f,0.55f,0.2f},{0.5f,0.5f,0.5f},{0,0,0},8};
         glm::mat4 ui_mtx = glm::translate(glm::mat4(1), {-ARENA_HALF, ARENA_HALF + 0.8f, 0});
         for (int i = 0; i < glm::min(m_score, 40); ++i) {
             ui_mtx = glm::translate(glm::mat4(1), {-ARENA_HALF + 0.3f + i * 0.25f, ARENA_HALF + 0.5f, 0});
@@ -566,7 +566,7 @@ public:
         sh.set_int("u_num_point_lights", 0);
 
         auto& mesh = *m_ctx.cube;
-        auto draw = [&](const glm::vec3& p, const glm::vec3& s, const pino::Material& m) {
+        auto draw = [&](const glm::vec3& p, const glm::vec3& s, const pino::PhongMaterial& m) {
             glm::mat4 wm = glm::translate(glm::mat4(1), p) * glm::scale(glm::mat4(1), s);
             sh.set_mat4("u_model", wm);
             sh.set_mat3("u_normal_matrix", glm::inverseTranspose(glm::mat3(wm)));
@@ -576,26 +576,26 @@ public:
         };
 
         // Game Over title (colored cubes)
-        pino::Material red{{0.18f,0.02f,0.02f},{0.85f,0.1f,0.1f},{0.8f,0.8f,0.8f},{0,0,0},32};
+        pino::PhongMaterial red{{0.18f,0.02f,0.02f},{0.85f,0.1f,0.1f},{0.8f,0.8f,0.8f},{0,0,0},32};
         const char* go = "GAMEOVER";
         for (int i = 0; go[i]; ++i)
             draw({-2.8f + i * 0.7f, 1.8f, -1.5f}, {0.4f, 0.4f, 0.4f}, red);
 
         // Score
         int fs = *m_ctx.final_score;
-        pino::Material smat{{0.04f,0.04f,0.08f},{0.3f,0.65f,0.95f},{1,1,1},{0,0,0},32};
+        pino::PhongMaterial smat{{0.04f,0.04f,0.08f},{0.3f,0.65f,0.95f},{1,1,1},{0,0,0},32};
         for (int i = 0; i < glm::min(fs, 30); ++i)
             draw({-2.5f + i * 0.2f, 0.8f, -1.5f}, {0.1f, 0.1f, 0.1f}, smat);
 
         // Buttons
-        pino::Material sel{{0.1f,0.05f,0.1f},{0.3f,0.2f,0.8f},{0.8f,0.8f,1},{0,0,0},32};
-        pino::Material norm{{0.08f,0.08f,0.08f},{0.25f,0.25f,0.3f},{0.2f,0.2f,0.2f},{0,0,0},8};
+        pino::PhongMaterial sel{{0.1f,0.05f,0.1f},{0.3f,0.2f,0.8f},{0.8f,0.8f,1},{0,0,0},32};
+        pino::PhongMaterial norm{{0.08f,0.08f,0.08f},{0.25f,0.25f,0.3f},{0.2f,0.2f,0.2f},{0,0,0},8};
         draw({0.3f, -0.5f, -1.5f}, {1.8f, 0.4f, 0.3f}, m_sel == 0 ? sel : norm);
         draw({0.3f, -1.3f, -1.5f}, {1.8f, 0.4f, 0.3f}, m_sel == 1 ? sel : norm);
         // Arrow
         float ay = (m_sel == 0) ? -0.5f : -1.3f;
         draw({-1.6f, ay, -1.2f}, {0.15f, 0.15f, 0.15f},
-             pino::Material{{0.12f,0.12f,0},{0.85f,0.85f,0.1f},{1,1,1},{0.05f,0.05f,0},32});
+             pino::PhongMaterial{{0.12f,0.12f,0},{0.85f,0.85f,0.1f},{1,1,1},{0.05f,0.05f,0},32});
     }
 
 private:
