@@ -5,14 +5,26 @@
 #include "engine/core/log.h"
 #include "engine/core/math_utils.h"
 
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
 namespace pino {
 
 struct AudioManager::Impl {
+    struct SoundDeleter {
+        void operator()(ma_sound* s) {
+            if (s) {
+                ma_sound_stop(s);
+                ma_sound_uninit(s);
+                delete s;
+            }
+        }
+    };
+    using SoundPtr = std::unique_ptr<ma_sound, SoundDeleter>;
+
     struct SoundEntry {
-        ma_sound* sound = nullptr;
+        SoundPtr sound;
         Priority priority = Priority::Gameplay;
     };
 
@@ -35,9 +47,7 @@ struct AudioManager::Impl {
 
     void sweep_finished() {
         for (auto it = active_sounds.begin(); it != active_sounds.end(); ) {
-            if (!ma_sound_is_playing(it->second.sound)) {
-                ma_sound_uninit(it->second.sound);
-                delete it->second.sound;
+            if (!ma_sound_is_playing(it->second.sound.get())) {
                 it = active_sounds.erase(it);
             } else {
                 ++it;
@@ -45,9 +55,7 @@ struct AudioManager::Impl {
         }
 
         for (auto it = one_shot_sounds.begin(); it != one_shot_sounds.end(); ) {
-            if (!ma_sound_is_playing(it->sound)) {
-                ma_sound_uninit(it->sound);
-                delete it->sound;
+            if (!ma_sound_is_playing(it->sound.get())) {
                 it = one_shot_sounds.erase(it);
             } else {
                 ++it;
@@ -82,27 +90,12 @@ struct AudioManager::Impl {
                 }
             }
 
-            SoundEntry* victim = nullptr;
-            if (from_active) {
-                auto it = active_sounds.find(active_id);
-                if (it == active_sounds.end()) break;
-                victim = &it->second;
-            } else if (os_idx >= 0) {
-                victim = &one_shot_sounds[os_idx];
-            } else {
-                break;
-            }
-
-            if (victim && victim->sound) {
-                ma_sound_stop(victim->sound);
-                ma_sound_uninit(victim->sound);
-                delete victim->sound;
-            }
-
             if (from_active) {
                 active_sounds.erase(active_id);
             } else if (os_idx >= 0) {
                 one_shot_sounds.erase(one_shot_sounds.begin() + os_idx);
+            } else {
+                break;
             }
 
             total = static_cast<u32>(active_sounds.size() + one_shot_sounds.size());
@@ -153,22 +146,7 @@ bool AudioManager::init(FileSystem& filesystem) {
 void AudioManager::shutdown() {
     if (!m_ready) return;
 
-    for (auto& [id, entry] : m_impl->active_sounds) {
-        if (entry.sound) {
-            ma_sound_stop(entry.sound);
-            ma_sound_uninit(entry.sound);
-            delete entry.sound;
-        }
-    }
     m_impl->active_sounds.clear();
-
-    for (auto& entry : m_impl->one_shot_sounds) {
-        if (entry.sound) {
-            ma_sound_stop(entry.sound);
-            ma_sound_uninit(entry.sound);
-            delete entry.sound;
-        }
-    }
     m_impl->one_shot_sounds.clear();
 
     ma_sound_group_uninit(&m_impl->group_sfx);
@@ -195,19 +173,18 @@ void AudioManager::play_one_shot(const std::string& path, float volume,
 
     std::string resolved = m_filesystem->resolve(path.c_str());
 
-    ma_sound* sound = new ma_sound;
+    Impl::SoundPtr sound(new ma_sound);
     ma_uint32 flags = 0; // one-shots are never streamed
     if (ma_sound_init_from_file(&m_impl->engine, resolved.c_str(), flags,
-                                m_impl->group_for_bus(bus), nullptr, sound) != MA_SUCCESS) {
+                                m_impl->group_for_bus(bus), nullptr, sound.get()) != MA_SUCCESS) {
         PINO_WARN("AudioManager: failed to load '%s'", path.c_str());
-        delete sound;
         return;
     }
 
-    ma_sound_set_volume(sound, Math::clamp(volume, 0.0f, 1.0f));
-    ma_sound_start(sound);
+    ma_sound_set_volume(sound.get(), Math::clamp(volume, 0.0f, 1.0f));
+    ma_sound_start(sound.get());
 
-    m_impl->one_shot_sounds.push_back({sound, priority});
+    m_impl->one_shot_sounds.push_back({std::move(sound), priority});
 }
 
 u64 AudioManager::play(const std::string& path, bool looping, float volume,
@@ -219,21 +196,20 @@ u64 AudioManager::play(const std::string& path, bool looping, float volume,
 
     std::string resolved = m_filesystem->resolve(path.c_str());
 
-    ma_sound* sound = new ma_sound;
+    Impl::SoundPtr sound(new ma_sound);
     ma_uint32 flags = stream ? MA_SOUND_FLAG_STREAM : 0;
     if (ma_sound_init_from_file(&m_impl->engine, resolved.c_str(), flags,
-                                m_impl->group_for_bus(bus), nullptr, sound) != MA_SUCCESS) {
+                                m_impl->group_for_bus(bus), nullptr, sound.get()) != MA_SUCCESS) {
         PINO_WARN("AudioManager: failed to load '%s'", path.c_str());
-        delete sound;
         return 0;
     }
 
-    ma_sound_set_looping(sound, looping ? MA_TRUE : MA_FALSE);
-    ma_sound_set_volume(sound, Math::clamp(volume, 0.0f, 1.0f));
-    ma_sound_start(sound);
+    ma_sound_set_looping(sound.get(), looping ? MA_TRUE : MA_FALSE);
+    ma_sound_set_volume(sound.get(), Math::clamp(volume, 0.0f, 1.0f));
+    ma_sound_start(sound.get());
 
     u64 id = m_impl->next_id++;
-    m_impl->active_sounds[id] = {sound, priority};
+    m_impl->active_sounds[id] = {std::move(sound), priority};
     return id;
 }
 
@@ -243,11 +219,6 @@ void AudioManager::stop(u64 source_id) {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return;
 
-    if (it->second.sound) {
-        ma_sound_stop(it->second.sound);
-        ma_sound_uninit(it->second.sound);
-        delete it->second.sound;
-    }
     m_impl->active_sounds.erase(it);
 }
 
@@ -257,9 +228,9 @@ void AudioManager::pause(u64 source_id) {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return;
 
-    if (!ma_sound_is_playing(it->second.sound)) return;
+    if (!ma_sound_is_playing(it->second.sound.get())) return;
 
-    ma_sound_stop(it->second.sound);
+    ma_sound_stop(it->second.sound.get());
 }
 
 void AudioManager::resume(u64 source_id) {
@@ -268,11 +239,11 @@ void AudioManager::resume(u64 source_id) {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return;
 
-    if (ma_sound_is_playing(it->second.sound)) return;
+    if (ma_sound_is_playing(it->second.sound.get())) return;
 
-    if (ma_sound_at_end(it->second.sound)) return;
+    if (ma_sound_at_end(it->second.sound.get())) return;
 
-    ma_sound_start(it->second.sound);
+    ma_sound_start(it->second.sound.get());
 }
 
 bool AudioManager::is_playing(u64 source_id) const {
@@ -281,7 +252,7 @@ bool AudioManager::is_playing(u64 source_id) const {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return false;
 
-    return ma_sound_is_playing(it->second.sound) != MA_FALSE;
+    return ma_sound_is_playing(it->second.sound.get()) != MA_FALSE;
 }
 
 float AudioManager::get_volume(u64 source_id) const {
@@ -290,7 +261,7 @@ float AudioManager::get_volume(u64 source_id) const {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return 0.0f;
 
-    return ma_sound_get_volume(it->second.sound);
+    return ma_sound_get_volume(it->second.sound.get());
 }
 
 bool AudioManager::is_looping(u64 source_id) const {
@@ -299,28 +270,13 @@ bool AudioManager::is_looping(u64 source_id) const {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return false;
 
-    return ma_sound_is_looping(it->second.sound) != MA_FALSE;
+    return ma_sound_is_looping(it->second.sound.get()) != MA_FALSE;
 }
 
 void AudioManager::stop_all() {
     if (!m_ready) return;
 
-    for (auto& [id, entry] : m_impl->active_sounds) {
-        if (entry.sound) {
-            ma_sound_stop(entry.sound);
-            ma_sound_uninit(entry.sound);
-            delete entry.sound;
-        }
-    }
     m_impl->active_sounds.clear();
-
-    for (auto& entry : m_impl->one_shot_sounds) {
-        if (entry.sound) {
-            ma_sound_stop(entry.sound);
-            ma_sound_uninit(entry.sound);
-            delete entry.sound;
-        }
-    }
     m_impl->one_shot_sounds.clear();
 }
 
@@ -330,7 +286,7 @@ void AudioManager::set_volume(u64 source_id, float volume) {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return;
 
-    ma_sound_set_volume(it->second.sound, Math::clamp(volume, 0.0f, 1.0f));
+    ma_sound_set_volume(it->second.sound.get(), Math::clamp(volume, 0.0f, 1.0f));
 }
 
 void AudioManager::set_looping(u64 source_id, bool looping) {
@@ -339,7 +295,7 @@ void AudioManager::set_looping(u64 source_id, bool looping) {
     auto it = m_impl->active_sounds.find(source_id);
     if (it == m_impl->active_sounds.end()) return;
 
-    ma_sound_set_looping(it->second.sound, looping ? MA_TRUE : MA_FALSE);
+    ma_sound_set_looping(it->second.sound.get(), looping ? MA_TRUE : MA_FALSE);
 }
 
 void AudioManager::set_master_volume(float volume) {
@@ -396,8 +352,8 @@ void AudioManager::pause_all() {
     if (!m_ready) return;
 
     for (auto& [id, entry] : m_impl->active_sounds) {
-        if (ma_sound_is_playing(entry.sound)) {
-            ma_sound_stop(entry.sound);
+        if (ma_sound_is_playing(entry.sound.get())) {
+            ma_sound_stop(entry.sound.get());
         }
     }
 }
@@ -406,8 +362,8 @@ void AudioManager::resume_all() {
     if (!m_ready) return;
 
     for (auto& [id, entry] : m_impl->active_sounds) {
-        if (!ma_sound_is_playing(entry.sound) && !ma_sound_at_end(entry.sound)) {
-            ma_sound_start(entry.sound);
+        if (!ma_sound_is_playing(entry.sound.get()) && !ma_sound_at_end(entry.sound.get())) {
+            ma_sound_start(entry.sound.get());
         }
     }
 }
