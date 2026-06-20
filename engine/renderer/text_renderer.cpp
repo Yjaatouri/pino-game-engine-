@@ -35,6 +35,7 @@ void main() {
 TextRenderer::~TextRenderer() { destroy(); }
 
 bool TextRenderer::init(i32 w, i32 h) {
+    (void)w; (void)h;
     if (!m_shader.load(kVertSrc, kFragSrc)) {
         PINO_ERROR("TextRenderer: failed to load shader");
         return false;

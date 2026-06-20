@@ -99,11 +99,11 @@ bool Game::init() {
 }
 
 void Game::update(pino::f32 dt) {
-    // Physics / logic at fixed 60 Hz
-    // Rotations are time-based, not dt-based, for smoothness
+    (void)dt;
 }
 
 void Game::render(pino::f32 dt) {
+    (void)dt;
     pino::f32 t = m_engine.elapsed_time();
 
     // Orbit point light

@@ -21,8 +21,8 @@ public:
     virtual void shutdown() = 0;
 
     // Lifecycle hooks — called automatically by SceneManager.
-    virtual void on_enter(IScene* previous) {}
-    virtual void on_exit(IScene* next)      {}
+    virtual void on_enter(IScene* previous) { (void)previous; }
+    virtual void on_exit(IScene* next)      { (void)next; }
     virtual void on_pause()                 {}
     virtual void on_resume()                {}
 };
