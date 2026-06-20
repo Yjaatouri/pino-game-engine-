@@ -1,4 +1,5 @@
 #include <miniaudio.h>
+#include <ma_reverb_node.h>
 
 #include "engine/audio/audio_manager.h"
 #include "engine/platform/file_system.h"
@@ -8,6 +9,10 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
+#include <cmath>
+
+#include "engine/renderer/camera.h"
 
 namespace pino {
 
@@ -44,6 +49,16 @@ struct AudioManager::Impl {
         }
         return nullptr;
     }
+
+    // Spatial / zone state
+    std::vector<AudioZone> zones;
+    f32 zone_volume_scale = 1.0f;
+    glm::vec3 listener_pos{0.0f};
+    bool reverb_inited = false;
+
+    // Reverb node for zone-based reverb (inserted on SFX bus)
+    ma_reverb_node reverb_node;
+    bool reverb_attached = false;
 
     void sweep_finished() {
         for (auto it = active_sounds.begin(); it != active_sounds.end(); ) {
@@ -139,6 +154,21 @@ bool AudioManager::init(FileSystem& filesystem, u32 max_voices) {
         return false;
     }
 
+    // Initialize reverb node (not yet inserted into the graph)
+    {
+        ma_reverb_node_config rcfg = ma_reverb_node_config_init(2, 44100);
+        rcfg.wetVolume = 0.0f;
+        rcfg.dryVolume = 1.0f;
+        rcfg.roomSize  = 0.6f;
+        rcfg.damping   = 0.3f;
+        rcfg.width     = 1.0f;
+
+        if (ma_reverb_node_init(ma_engine_get_node_graph(&m_impl->engine),
+                                &rcfg, nullptr, &m_impl->reverb_node) == MA_SUCCESS) {
+            m_impl->reverb_inited = true;
+        }
+    }
+
     m_ready = true;
     PINO_INFO("AudioManager initialized");
     return true;
@@ -149,6 +179,12 @@ void AudioManager::shutdown() {
 
     m_impl->active_sounds.clear();
     m_impl->one_shot_sounds.clear();
+    m_impl->zones.clear();
+
+    if (m_impl->reverb_inited) {
+        ma_reverb_node_uninit(&m_impl->reverb_node, nullptr);
+        m_impl->reverb_inited = false;
+    }
 
     ma_sound_group_uninit(&m_impl->group_sfx);
     ma_sound_group_uninit(&m_impl->group_music);
@@ -199,6 +235,40 @@ void AudioManager::unload(const SoundHandle& handle) {
 void AudioManager::tick() {
     if (!m_ready) return;
     m_impl->sweep_finished();
+
+    // ---- Audio zones: find zones containing the listener ----
+    float v_scale = 1.0f;
+    for (const auto& zone : m_impl->zones) {
+        if (!zone.active) continue;
+        glm::vec3 d = m_impl->listener_pos - zone.center;
+        float dist = std::sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
+        if (dist < zone.radius) {
+            v_scale *= zone.volume_multiplier;
+        }
+    }
+    m_impl->zone_volume_scale = v_scale;
+
+    // Auto-sync listener from active camera
+    if (m_active_camera) {
+        const glm::vec3& pos = m_active_camera->position();
+        const glm::vec3& target = m_active_camera->target();
+        const glm::vec3 up(0.0f, 1.0f, 0.0f); // camera.h stores m_up but doesn't expose it
+
+        glm::vec3 forward = target - pos;
+        float len = forward.x * forward.x + forward.y * forward.y + forward.z * forward.z;
+        if (len > 0.0001f) {
+            float inv = 1.0f / std::sqrt(len);
+            forward = { forward.x * inv, forward.y * inv, forward.z * inv };
+        }
+
+        set_listener_position(pos);
+        ma_engine_listener_set_direction(&m_impl->engine, 0, forward.x, forward.y, forward.z);
+        ma_engine_listener_set_world_up(&m_impl->engine, 0, up.x, up.y, up.z);
+    }
+
+    // Apply final volume: mute → zone → target
+    float final_v = m_muted ? 0.0f : m_target_volume * v_scale;
+    ma_engine_set_volume(&m_impl->engine, final_v);
 }
 
 void AudioManager::play_one_shot(const std::string& path, float volume,
@@ -348,30 +418,19 @@ void AudioManager::set_looping(u64 source_id, bool looping) {
 }
 
 void AudioManager::set_master_volume(float volume) {
-    if (!m_ready) return;
-    ma_engine_set_volume(&m_impl->engine, Math::clamp(volume, 0.0f, 1.0f));
+    m_target_volume = Math::clamp(volume, 0.0f, 1.0f);
 }
 
 float AudioManager::master_volume() const {
-    if (!m_ready) return 0.0f;
-    return ma_engine_get_volume(&m_impl->engine);
+    return m_target_volume;
 }
 
 void AudioManager::mute() {
-    if (!m_ready) return;
-    if (m_muted) return;
-
     m_muted = true;
-    m_pre_mute_volume = ma_engine_get_volume(&m_impl->engine);
-    ma_engine_set_volume(&m_impl->engine, 0.0f);
 }
 
 void AudioManager::unmute() {
-    if (!m_ready) return;
-    if (!m_muted) return;
-
     m_muted = false;
-    ma_engine_set_volume(&m_impl->engine, m_pre_mute_volume);
 }
 
 bool AudioManager::is_muted() const {
@@ -425,8 +484,207 @@ AudioDebugInfo AudioManager::debug_info() const {
     info.one_shot_sounds = static_cast<u32>(m_impl->one_shot_sounds.size());
     info.total_sounds = info.active_sounds + info.one_shot_sounds;
     info.max_voices = m_max_voices;
-    info.master_volume = ma_engine_get_volume(&m_impl->engine);
+    info.master_volume = m_target_volume;
+    info.active_zones = static_cast<u32>(m_impl->zones.size());
+    info.zone_volume_scale = m_impl->zone_volume_scale;
     return info;
+}
+
+// ======================================================================
+// Spatial audio: listener
+// ======================================================================
+
+void AudioManager::set_listener_position(const glm::vec3& pos) {
+    if (!m_ready) return;
+    m_impl->listener_pos = pos;
+    ma_engine_listener_set_position(&m_impl->engine, 0, pos.x, pos.y, pos.z);
+}
+
+void AudioManager::set_listener_velocity(const glm::vec3& vel) {
+    if (!m_ready) return;
+    ma_engine_listener_set_velocity(&m_impl->engine, 0, vel.x, vel.y, vel.z);
+}
+
+void AudioManager::set_listener_orientation(const glm::vec3& forward, const glm::vec3& up) {
+    if (!m_ready) return;
+    ma_engine_listener_set_direction(&m_impl->engine, 0, forward.x, forward.y, forward.z);
+    ma_engine_listener_set_world_up(&m_impl->engine, 0, up.x, up.y, up.z);
+}
+
+glm::vec3 AudioManager::listener_position() const {
+    return m_impl->listener_pos;
+}
+
+// ======================================================================
+// Spatial audio: 3D playback
+// ======================================================================
+
+static ma_sound* create_3d_sound(
+    ma_engine* engine, ma_sound_group* group, const char* path,
+    const glm::vec3& position, bool looping, bool stream)
+{
+    ma_sound* sound = new ma_sound;
+    ma_uint32 flags = stream ? MA_SOUND_FLAG_STREAM : 0;
+    if (ma_sound_init_from_file(engine, path, flags, group, nullptr, sound) != MA_SUCCESS) {
+        delete sound;
+        return nullptr;
+    }
+
+    ma_sound_set_position(sound, position.x, position.y, position.z);
+    ma_sound_set_looping(sound, looping ? MA_TRUE : MA_FALSE);
+    ma_sound_set_attenuation_model(sound, ma_attenuation_model_inverse);
+
+    return sound;
+}
+
+u64 AudioManager::play_3d(const std::string& path, const glm::vec3& position,
+                           bool looping, float volume,
+                           Priority priority, AudioBus bus, bool stream)
+{
+    if (!m_ready || !m_filesystem) return 0;
+
+    m_impl->ensure_voice_available(m_max_voices);
+
+    std::string resolved = m_filesystem->resolve(path.c_str());
+    ma_sound* raw = create_3d_sound(&m_impl->engine, m_impl->group_for_bus(bus),
+                                     resolved.c_str(), position, looping, stream);
+    if (!raw) {
+        PINO_WARN("AudioManager::play_3d: failed to load '%s'", path.c_str());
+        return 0;
+    }
+
+    Impl::SoundPtr sound(raw);
+    ma_sound_set_volume(sound.get(), Math::clamp(volume, 0.0f, 1.0f));
+    ma_sound_start(sound.get());
+
+    u64 id = m_impl->next_id++;
+    m_impl->active_sounds[id] = {std::move(sound), priority};
+    return id;
+}
+
+u64 AudioManager::play_3d(const SoundHandle& handle, const glm::vec3& position,
+                           bool looping, float volume,
+                           Priority priority, AudioBus bus, bool stream)
+{
+    return play_3d(handle.path(), position, looping, volume, priority, bus, stream);
+}
+
+void AudioManager::play_one_shot_3d(const std::string& path, const glm::vec3& position,
+                                     float volume, Priority priority, AudioBus bus)
+{
+    if (!m_ready || !m_filesystem) return;
+
+    m_impl->ensure_voice_available(m_max_voices);
+
+    std::string resolved = m_filesystem->resolve(path.c_str());
+    ma_sound* raw = create_3d_sound(&m_impl->engine, m_impl->group_for_bus(bus),
+                                     resolved.c_str(), position, false, false);
+    if (!raw) {
+        PINO_WARN("AudioManager::play_one_shot_3d: failed to load '%s'", path.c_str());
+        return;
+    }
+
+    Impl::SoundPtr sound(raw);
+    ma_sound_set_volume(sound.get(), Math::clamp(volume, 0.0f, 1.0f));
+    ma_sound_start(sound.get());
+
+    m_impl->one_shot_sounds.push_back({std::move(sound), priority});
+}
+
+void AudioManager::play_one_shot_3d(const SoundHandle& handle, const glm::vec3& position,
+                                     float volume, Priority priority, AudioBus bus)
+{
+    play_one_shot_3d(handle.path(), position, volume, priority, bus);
+}
+
+// ======================================================================
+// Spatial audio: per-sound control
+// ======================================================================
+
+void AudioManager::set_position(u64 source_id, const glm::vec3& pos) {
+    if (!m_ready) return;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return;
+
+    ma_sound_set_position(it->second.sound.get(), pos.x, pos.y, pos.z);
+}
+
+void AudioManager::set_velocity(u64 source_id, const glm::vec3& vel) {
+    if (!m_ready) return;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return;
+
+    ma_sound_set_velocity(it->second.sound.get(), vel.x, vel.y, vel.z);
+}
+
+void AudioManager::set_attenuation_model(u64 source_id, AttenuationModel model) {
+    if (!m_ready) return;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return;
+
+    static const ma_attenuation_model table[] = {
+        ma_attenuation_model_none,          // None
+        ma_attenuation_model_inverse,       // Inverse
+        ma_attenuation_model_linear,        // Linear
+        ma_attenuation_model_exponential    // Exponential
+    };
+    ma_sound_set_attenuation_model(it->second.sound.get(),
+                                    table[static_cast<u8>(model)]);
+}
+
+void AudioManager::set_attenuation_params(u64 source_id, float min_distance,
+                                           float max_distance, float rolloff) {
+    if (!m_ready) return;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return;
+
+    ma_sound_set_min_distance(it->second.sound.get(), min_distance);
+    ma_sound_set_max_distance(it->second.sound.get(), max_distance);
+    ma_sound_set_rolloff(it->second.sound.get(), rolloff);
+}
+
+void AudioManager::set_doppler_factor(u64 source_id, float factor) {
+    if (!m_ready) return;
+
+    auto it = m_impl->active_sounds.find(source_id);
+    if (it == m_impl->active_sounds.end()) return;
+
+    ma_sound_set_doppler_factor(it->second.sound.get(), factor);
+}
+
+// ======================================================================
+// Audio zones
+// ======================================================================
+
+u32 AudioManager::create_zone(const AudioZone& zone) {
+    if (!m_ready) return UINT32_MAX;
+
+    m_impl->zones.push_back(zone);
+    return static_cast<u32>(m_impl->zones.size() - 1);
+}
+
+void AudioManager::update_zone(u32 zone_id, const AudioZone& zone) {
+    if (!m_ready) return;
+    if (zone_id >= m_impl->zones.size()) return;
+
+    m_impl->zones[zone_id] = zone;
+}
+
+void AudioManager::destroy_zone(u32 zone_id) {
+    if (!m_ready) return;
+    if (zone_id >= m_impl->zones.size()) return;
+
+    // Swap-and-pop to keep O(1)
+    m_impl->zones[zone_id] = m_impl->zones.back();
+    m_impl->zones.pop_back();
+}
+
+void AudioManager::set_active_camera(Camera* cam) {
+    m_active_camera = cam;
 }
 
 } // namespace pino

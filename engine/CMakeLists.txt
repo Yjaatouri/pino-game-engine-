@@ -78,6 +78,8 @@ target_link_libraries(engine_core
         platform_desktop
         glm::glm
         miniaudio
+    PRIVATE
+        miniaudio_reverb_node
 )
 
 # Suppress MSVC CRT deprecation warnings (localtime, etc.)
