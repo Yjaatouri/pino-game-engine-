@@ -23,6 +23,7 @@ public:
     bool is_loaded() const { return m_ptr != nullptr; }
     T*   get()       const { return m_ptr.get(); }
     T*   operator->() const { return m_ptr.get(); }
+    T&   operator*()  const { return *m_ptr; }
     explicit operator bool() const { return is_loaded(); }
 
     // Fallback: returns a default-constructed value if not loaded
@@ -54,15 +55,12 @@ public:
     AssetManager& operator=(const AssetManager&) = delete;
 
     // ---- Mesh loading (via tinyobjloader) ----
-    Mesh* load_mesh(const char* path);
     AssetHandle<Mesh> get_mesh(const char* path);
 
     // ---- Texture loading (via stb_image) ----
-    Texture* load_texture(const char* path);
     AssetHandle<Texture> get_texture(const char* path);
 
     // ---- Shader loading ----
-    Shader* load_shader(const char* vert_path, const char* frag_path);
     AssetHandle<Shader> get_shader(const char* vert_path, const char* frag_path);
 
     // ---- Fallback assets (always valid) ----
@@ -91,6 +89,10 @@ public:
     FileSystem& filesystem() const { return m_fs; }
 
 private:
+    Mesh*    load_mesh(const char* path);
+    Texture* load_texture(const char* path);
+    Shader*  load_shader(const char* vert_path, const char* frag_path);
+
     void init_fallback_assets();
 
     FileSystem& m_fs;

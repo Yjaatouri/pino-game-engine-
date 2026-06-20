@@ -1,5 +1,4 @@
 #include "engine/engine.h"
-#include "engine/assets/asset_manager.h"
 #include "engine/renderer/mesh.h"
 #include "engine/renderer/camera.h"
 #include "engine/renderer/light.h"
@@ -26,7 +25,7 @@ static pino::Mesh make_floor() {
 
 class Game final : public pino::IGame {
 public:
-    explicit Game(pino::Engine& engine) : m_engine(engine), m_assets(engine.filesystem()) {}
+    explicit Game(pino::Engine& engine) : m_engine(engine) {}
 
     bool init() override;
     void update(pino::f32 dt) override;
@@ -34,10 +33,9 @@ public:
     void shutdown() override;
 
 private:
-    pino::Engine&        m_engine;
-    pino::AssetManager   m_assets;
-    pino::Shader*        m_shader  = nullptr;
-    pino::Mesh*          m_cube    = nullptr;
+    pino::Engine&                m_engine;
+    pino::AssetHandle<pino::Shader> m_shader;
+    pino::AssetHandle<pino::Mesh>   m_cube;
     pino::Mesh           m_sphere;
     pino::Mesh           m_floor;
     pino::Camera         m_cam;
@@ -49,11 +47,11 @@ private:
 };
 
 bool Game::init() {
-    m_shader = m_assets.load_shader("shaders/lit.vert",
-                                    "shaders/lit.frag");
+    m_shader = m_engine.assets().get_shader("shaders/lit.vert",
+                                             "shaders/lit.frag");
     if (!m_shader) return false;
 
-    m_cube = m_assets.load_mesh("models/cube.obj");
+    m_cube = m_engine.assets().get_mesh("models/cube.obj");
     if (!m_cube) return false;
 
     m_sphere = pino::Mesh::create_sphere(0.5f, 32, 24);
@@ -130,7 +128,7 @@ void Game::render(pino::f32 dt) {
 
     struct { pino::Mesh* m; pino::Transform* t; pino::Material* mat; } drawables[] = {
         {&m_floor,  &m_t_floor,  &m_mat_floor},
-        { m_cube,   &m_t_cube,   &m_mat_cube},
+        { m_cube.get(),   &m_t_cube,   &m_mat_cube},
         {&m_sphere, &m_t_sphere, &m_mat_sphere},
     };
 

@@ -68,7 +68,6 @@ enum class GameAction { None, StartGame, GameOver, Restart, MainMenu, Quit };
 
 struct GameContext {
     DemoGame*          game       = nullptr;
-    pino::AssetManager* assets    = nullptr;
     pino::Shader*      shader     = nullptr;
     pino::Mesh*        cube       = nullptr;
     pino::Camera*      cam        = nullptr;
@@ -610,13 +609,13 @@ private:
 
 class DemoGame final : public pino::IGame {
 public:
-    explicit DemoGame(pino::Engine& engine) : m_eng(engine), m_assets(engine.filesystem()) {}
+    explicit DemoGame(pino::Engine& engine) : m_eng(engine) {}
 
     bool init() override {
-        m_shader = m_assets.load_shader("shaders/lit.vert",
-                                        "shaders/lit.frag");
+        m_shader = m_eng.assets().get_shader("shaders/lit.vert",
+                                             "shaders/lit.frag");
         if (!m_shader) return false;
-        m_cube = m_assets.load_mesh("models/cube.obj");
+        m_cube = m_eng.assets().get_mesh("models/cube.obj");
         if (!m_cube) return false;
         if (!m_dr.init()) return false;
 
@@ -630,9 +629,8 @@ public:
         glClearColor(0.05f, 0.05f, 0.08f, 1.0f);
 
         m_ctx.game        = this;
-        m_ctx.assets      = &m_assets;
-        m_ctx.shader      = m_shader;
-        m_ctx.cube        = m_cube;
+        m_ctx.shader      = m_shader.get();
+        m_ctx.cube        = m_cube.get();
         m_ctx.cam         = &m_cam;
         m_ctx.scenes      = &m_scenes;
         m_ctx.world       = &m_world;
@@ -676,10 +674,9 @@ public:
     }
 
 private:
-    pino::Engine&         m_eng;
-    pino::AssetManager    m_assets;
-    pino::Shader*         m_shader  = nullptr;
-    pino::Mesh*           m_cube    = nullptr;
+    pino::Engine&                m_eng;
+    pino::AssetHandle<pino::Shader> m_shader;
+    pino::AssetHandle<pino::Mesh>   m_cube;
     pino::Camera          m_cam;
     pino::SceneManager    m_scenes;
     pino::Scene           m_world;

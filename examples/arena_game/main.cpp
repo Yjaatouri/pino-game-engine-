@@ -51,13 +51,11 @@ int main(int, char**) {
     int fb_w = static_cast<int>(engine.window().width());
     int fb_h = static_cast<int>(engine.window().height());
 
-    pino::AssetManager assets(engine.filesystem());
-
-    auto* lit_shader = assets.load_shader("shaders/lit.vert",
-                                          "shaders/lit.frag");
+    auto lit_shader = engine.assets().get_shader("shaders/lit.vert",
+                                                  "shaders/lit.frag");
     if (!lit_shader) return 1;
 
-    auto* cube_mesh = assets.load_mesh("models/cube.obj");
+    auto cube_mesh = engine.assets().get_mesh("models/cube.obj");
     if (!cube_mesh) return 1;
 
     // ── Scene ──────────────────────────────────────────────────────

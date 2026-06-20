@@ -1,7 +1,5 @@
 #include "engine/engine.h"
 #include "engine/renderer/gl_es3.h"
-#include "engine/core/log.h"
-#include "engine/assets/asset_manager.h"
 #include "engine/renderer/shader.h"
 #include "engine/renderer/mesh.h"
 
@@ -9,14 +7,14 @@
 
 class InputTester : public pino::IGame {
 public:
-    explicit InputTester(pino::Engine& e) : m_engine(e), m_assets(e.filesystem()) {}
+    explicit InputTester(pino::Engine& e) : m_engine(e) {}
 
     bool init() override {
-        m_shader = m_assets.load_shader("shaders/lit.vert", "shaders/lit.frag");
+        m_shader = m_engine.assets().get_shader("shaders/lit.vert", "shaders/lit.frag");
         if (!m_shader) return false;
 
         // Cube mesh from .obj
-        m_cube = m_assets.load_mesh("models/cube.obj");
+        m_cube = m_engine.assets().get_mesh("models/cube.obj");
         if (!m_cube) return false;
 
         // Floor quad
@@ -136,10 +134,9 @@ public:
     void shutdown() override {}
 
 private:
-    pino::Engine&      m_engine;
-    pino::AssetManager m_assets;
-    pino::Shader*      m_shader = nullptr;
-    pino::Mesh*    m_cube   = nullptr;
+    pino::Engine&              m_engine;
+    pino::AssetHandle<pino::Shader> m_shader;
+    pino::AssetHandle<pino::Mesh>   m_cube;
     pino::Mesh     m_quad;
     glm::mat4      m_proj;
 

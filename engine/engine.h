@@ -9,6 +9,8 @@
 #include "engine/platform/file_system.h"
 #include "engine/game.h"
 #include "engine/audio/audio_manager.h"
+#include "engine/assets/asset_manager.h"
+#include "engine/core/engine_context.h"
 
 #include <memory>
 
@@ -74,6 +76,9 @@ public:
     // Access audio (may not be initialized if config disables it)
     AudioManager& audio() { return *m_audio; }
 
+    // Access asset manager (always available after init)
+    AssetManager& assets() { return *m_assets; }
+
     // Access config
     const EngineConfig& config() const { return m_config; }
 
@@ -106,6 +111,7 @@ private:
     std::unique_ptr<Input>      m_input;
     std::unique_ptr<FileSystem> m_filesystem;
     std::unique_ptr<AudioManager> m_audio;
+    std::unique_ptr<AssetManager> m_assets;
 
     TimerManager  m_timers;
     EngineStats   m_stats;

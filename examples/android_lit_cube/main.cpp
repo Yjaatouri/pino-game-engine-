@@ -4,25 +4,20 @@
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include "engine/renderer/gl_es3.h"
-#include "engine/renderer/shader.h"
-#include "engine/renderer/mesh.h"
-#include "engine/renderer/texture.h"
 #include "engine/renderer/camera.h"
 #include "engine/renderer/light.h"
-#include "engine/assets/asset_manager.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
 struct AppState {
-    pino::Engine*          engine   = nullptr;
-    pino::IGame*           game     = nullptr;
-    pino::AssetManager*    assets   = nullptr;
-    pino::Shader*          shader   = nullptr;
-    pino::Mesh*            cube     = nullptr;
-    pino::Texture*         texture  = nullptr;
-    pino::Camera           camera;
-    pino::Material         material;
+    pino::Engine*                    engine   = nullptr;
+    pino::IGame*                     game     = nullptr;
+    pino::AssetHandle<pino::Shader>  shader;
+    pino::AssetHandle<pino::Mesh>    cube;
+    pino::AssetHandle<pino::Texture> texture;
+    pino::Camera                     camera;
+    pino::Material                   material;
 
     bool has_window  = false;
     bool initialized = false;
@@ -103,15 +98,15 @@ public:
     explicit LitCubeGame(AppState& s) : state(s) {}
 
     bool init() override {
-        auto& fs = state.engine->filesystem();
+        auto& am = state.engine->assets();
 
-        state.shader = state.assets->load_shader("shaders/lit.vert", "shaders/lit.frag");
+        state.shader = am.get_shader("shaders/lit.vert", "shaders/lit.frag");
         if (!state.shader) return false;
 
-        state.cube = state.assets->load_mesh("models/cube.obj");
+        state.cube = am.get_mesh("models/cube.obj");
         if (!state.cube) return false;
 
-        state.texture = state.assets->load_texture("textures/checker.ppm");
+        state.texture = am.get_texture("textures/checker.ppm");
         if (!state.texture) return false;
 
         state.camera.perspective(
@@ -168,19 +163,19 @@ public:
 
     void on_context_lost() override {
         PINO_INFO("Context lost — invalidating GPU resources");
-        state.assets->invalidate_all();
-        state.shader  = nullptr;
-        state.cube    = nullptr;
-        state.texture = nullptr;
+        state.engine->assets().invalidate_all();
+        state.shader = {};
+        state.cube   = {};
+        state.texture = {};
     }
 
     void on_context_restored() override {
         PINO_INFO("Context restored — re-uploading GPU resources");
-        auto& fs = state.engine->filesystem();
+        auto& am = state.engine->assets();
 
-        state.shader = state.assets->load_shader("shaders/lit.vert", "shaders/lit.frag");
-        state.cube   = state.assets->load_mesh("models/cube.obj");
-        state.texture = state.assets->load_texture("textures/checker.ppm");
+        state.shader = am.get_shader("shaders/lit.vert", "shaders/lit.frag");
+        state.cube   = am.get_mesh("models/cube.obj");
+        state.texture = am.get_texture("textures/checker.ppm");
 
         state.camera.perspective(
             pino::radians(60.0f),
@@ -245,8 +240,6 @@ void android_main(struct android_app* app) {
                 break;
             }
 
-            state.assets = new pino::AssetManager(engine.filesystem());
-
             if (!game.init()) {
                 __android_log_print(ANDROID_LOG_ERROR, "PinoEngine",
                                     "Game init failed");
@@ -274,7 +267,6 @@ void android_main(struct android_app* app) {
     // Cleanup
     if (state.initialized) {
         game.shutdown();
-        delete state.assets;
         engine.shutdown();
     }
 }

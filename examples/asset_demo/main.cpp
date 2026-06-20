@@ -15,12 +15,10 @@ int main(int, char**) {
 
     if (!engine.init(cfg)) return 1;
 
-    pino::AssetManager assets(engine.filesystem());
-
-    auto* mesh   = assets.load_mesh(  "models/cube.obj");
-    auto* shader = assets.load_shader("shaders/textured.vert",
-                                      "shaders/textured.frag");
-    auto* tex    = assets.load_texture("textures/checker.ppm");
+    auto mesh   = engine.assets().get_mesh(  "models/cube.obj");
+    auto shader = engine.assets().get_shader("shaders/textured.vert",
+                                             "shaders/textured.frag");
+    auto tex    = engine.assets().get_texture("textures/checker.ppm");
 
     if (!mesh || !shader || !tex) {
         PINO_ERROR("Failed to load assets");

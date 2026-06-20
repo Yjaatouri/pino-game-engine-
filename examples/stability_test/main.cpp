@@ -1,6 +1,5 @@
 #include "engine/engine.h"
 #include "engine/core/log.h"
-#include "engine/assets/asset_manager.h"
 #include "engine/renderer/shader.h"
 #include "engine/renderer/mesh.h"
 #include "engine/renderer/camera.h"
@@ -35,15 +34,14 @@ static double now_sec() {
 
 class IdleGame final : public pino::IGame {
 public:
-    IdleGame(pino::Engine& engine, pino::AssetManager& assets,
-             float duration) : m_eng(engine), m_assets(assets), m_duration(duration) {}
+    IdleGame(pino::Engine& engine, float duration) : m_eng(engine), m_duration(duration) {}
 
     bool init() override {
         m_elapsed = 0.0f;
-        m_shader = m_assets.load_shader("shaders/lit.vert",
-                                        "shaders/lit.frag");
+        m_shader = m_eng.assets().get_shader("shaders/lit.vert",
+                                             "shaders/lit.frag");
         if (!m_shader) return false;
-        m_cube = m_assets.load_mesh("models/cube.obj");
+        m_cube = m_eng.assets().get_mesh("models/cube.obj");
         if (!m_cube) return false;
         m_cam.perspective(45.0f, 640.0f / 480.0f, 0.1f, 50.0f);
         glEnable(GL_DEPTH_TEST);
@@ -80,10 +78,9 @@ public:
     void shutdown() override {}
 
 private:
-    pino::Engine&     m_eng;
-    pino::AssetManager& m_assets;
-    pino::Shader*     m_shader = nullptr;
-    pino::Mesh*       m_cube   = nullptr;
+    pino::Engine&                m_eng;
+    pino::AssetHandle<pino::Shader> m_shader;
+    pino::AssetHandle<pino::Mesh>   m_cube;
     pino::Camera      m_cam;
     float m_elapsed = 0.0f;
     float m_duration;
@@ -131,8 +128,7 @@ int main(int argc, char** argv) {
             ++failures; continue;
         }
 
-        pino::AssetManager assets(engine.filesystem());
-        IdleGame game(engine, assets, idle_sec);
+        IdleGame game(engine, idle_sec);
         engine.run(game);
 
         SIZE_T mem = current_mem_kb();

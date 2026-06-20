@@ -22,13 +22,11 @@ int main(int, char**) {
 
     if (!engine.init(cfg)) return 1;
 
-    pino::AssetManager assets(engine.filesystem());
-
-    auto* shader = assets.load_shader("shaders/lit.vert",
-                                      "shaders/lit.frag");
+    auto shader = engine.assets().get_shader("shaders/lit.vert",
+                                             "shaders/lit.frag");
     if (!shader) return 1;
 
-    auto* cube_mesh = assets.load_mesh("models/cube.obj");
+    auto cube_mesh = engine.assets().get_mesh("models/cube.obj");
     if (!cube_mesh) return 1;
 
     // Retrieve local bounds from the mesh (computed on upload)
@@ -174,9 +172,9 @@ int main(int, char**) {
             mesh->draw();
         };
 
-        draw_entity(*ground, mat_ground, cube_mesh);
-        draw_entity(*wall,   mat_wall,   cube_mesh);
-        draw_entity(*player, mat_player, cube_mesh);
+        draw_entity(*ground, mat_ground, cube_mesh.get());
+        draw_entity(*wall,   mat_wall,   cube_mesh.get());
+        draw_entity(*player, mat_player, cube_mesh.get());
 
         // Debug visualization
         if (cw.show_debug) {

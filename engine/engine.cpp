@@ -194,6 +194,12 @@ bool Engine::init(const EngineConfig& config) {
         }
     }
 
+    m_assets.reset(new AssetManager(*m_filesystem));
+
+    EngineContext::create(*m_window, *m_input, *m_filesystem,
+                          *m_audio, *m_assets,
+                          m_timers, m_stats, m_config);
+
     m_running   = true;
     PINO_INFO("Engine initialized");
     return true;
@@ -205,6 +211,8 @@ void Engine::shutdown() {
     m_running = false;
     PINO_INFO("Engine shutting down");
     m_timers.clear();
+    EngineContext::destroy();
+    m_assets.reset();
     m_audio.reset();
     m_filesystem.reset();
     m_input.reset();

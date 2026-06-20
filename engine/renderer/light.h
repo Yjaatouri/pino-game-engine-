@@ -2,7 +2,7 @@
 
 #include "engine/core/types.h"
 #include "engine/renderer/shader.h"
-#include "engine/renderer/texture.h"
+#include "engine/assets/asset_manager.h"
 #include <glm/glm.hpp>
 
 namespace pino {
@@ -33,7 +33,7 @@ struct Material {
     glm::vec3 specular {1.0f, 1.0f, 1.0f};
     glm::vec3 emissive {0.0f, 0.0f, 0.0f};
     float shininess = 32.0f;
-    Texture* diffuse_tex = nullptr;
+    AssetHandle<Texture> diffuse_tex;
 };
 
 void upload_ambient_light(Shader& shader, const AmbientLight& light);

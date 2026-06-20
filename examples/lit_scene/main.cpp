@@ -32,15 +32,13 @@ int main(int, char**) {
 
     if (!engine.init(cfg)) return 1;
 
-    pino::AssetManager assets(engine.filesystem());
-
     // Load shader
-    auto* shader = assets.load_shader("shaders/lit.vert",
-                                      "shaders/lit.frag");
+    auto shader = engine.assets().get_shader("shaders/lit.vert",
+                                             "shaders/lit.frag");
     if (!shader) return 1;
 
     // Meshes
-    auto* cube_mesh = assets.load_mesh("models/cube.obj");
+    auto cube_mesh = engine.assets().get_mesh("models/cube.obj");
     pino::Mesh sphere_mesh = pino::Mesh::create_sphere(0.5f, 32, 24);
     pino::Mesh floor_mesh  = make_floor();
 
@@ -108,7 +106,7 @@ int main(int, char**) {
 
     Drawable drawables[] = {
         {&floor_mesh,  &t_floor,  &mat_floor},
-        { cube_mesh,   &t_cube,   &mat_cube},
+        { cube_mesh.get(),   &t_cube,   &mat_cube},
         {&sphere_mesh, &t_sphere, &mat_sphere},
     };
 
