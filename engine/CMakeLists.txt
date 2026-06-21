@@ -61,6 +61,7 @@ set(PINO_ENGINE_SOURCES
     input/gamepad.cpp
     audio/audio_manager.cpp
     ecs/prefab.cpp
+    renderer/debug_overlay.cpp
     engine.cpp
 )
 

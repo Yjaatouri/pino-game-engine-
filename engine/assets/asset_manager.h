@@ -65,6 +65,11 @@ public:
     // ---- Cache management ----
     void clear();
 
+    // ---- Cache size queries ----
+    u32 mesh_cache_size()    const { return static_cast<u32>(m_mesh_cache.size()); }
+    u32 texture_cache_size() const { return static_cast<u32>(m_tex_cache.size()); }
+    u32 shader_cache_size()  const { return static_cast<u32>(m_shader_cache.size()); }
+
     FileSystem& filesystem() const { return m_fs; }
 
 private:

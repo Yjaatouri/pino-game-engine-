@@ -29,11 +29,10 @@ int main() {
         TEST("no component initially", !pool.has(e0));
         TEST("get returns null", pool.get(e0) == nullptr);
 
-        auto& rc = pool.add(e0);
-        rc.mesh = reinterpret_cast<const Mesh*>(0x1);
+        pool.add(e0);
         TEST("has after add", pool.has(e0));
         TEST("get returns non-null", pool.get(e0) != nullptr);
-        TEST("mesh preserved", pool.get(e0)->mesh == reinterpret_cast<const Mesh*>(0x1));
+        TEST("default mesh is null", !pool.get(e0)->mesh.is_loaded());
 
         pool.remove(e0);
         TEST("no component after remove", !pool.has(e0));

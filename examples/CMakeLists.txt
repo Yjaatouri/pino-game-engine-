@@ -21,6 +21,7 @@ add_pino_example(scene_graph_test)
 add_pino_example(component_test)
 add_pino_example(scene_lifecycle_test)
 add_pino_example(prefab_test)
+add_pino_example(debug_overlay_test)
 
 # ─── Asset-using examples ─────────────────────────────────────
 add_pino_example_assets(asset_demo)
