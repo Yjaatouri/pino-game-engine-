@@ -10,6 +10,7 @@
 #include "engine/game.h"
 #include "engine/audio/audio_manager.h"
 #include "engine/assets/asset_manager.h"
+#include "engine/input/gamepad.h"
 #include "engine/core/engine_context.h"
 
 #include <memory>
@@ -73,6 +74,9 @@ public:
     Input&      input()      { return *m_input; }
     FileSystem& filesystem() { return *m_filesystem; }
 
+    // Access gamepad manager
+    GamepadManager& gamepad() { return *m_gamepad; }
+
     // Access audio (may not be initialized if config disables it)
     AudioManager& audio() { return *m_audio; }
 
@@ -107,11 +111,12 @@ private:
 
     EngineConfig m_config;
 
-    std::unique_ptr<Window>     m_window;
-    std::unique_ptr<Input>      m_input;
-    std::unique_ptr<FileSystem> m_filesystem;
-    std::unique_ptr<AudioManager> m_audio;
-    std::unique_ptr<AssetManager> m_assets;
+    std::unique_ptr<Window>        m_window;
+    std::unique_ptr<Input>         m_input;
+    std::unique_ptr<FileSystem>    m_filesystem;
+    std::unique_ptr<AudioManager>  m_audio;
+    std::unique_ptr<AssetManager>  m_assets;
+    std::unique_ptr<GamepadManager> m_gamepad;
 
     TimerManager  m_timers;
     EngineStats   m_stats;

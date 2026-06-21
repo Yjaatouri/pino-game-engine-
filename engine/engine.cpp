@@ -4,6 +4,10 @@
 #include "engine/renderer/gl_es3.h"
 #include "engine/audio/audio_manager.h"
 
+#if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
+#include "engine/platform/sdl2/sdl2_input.h"
+#endif
+
 #include <filesystem>
 #include <thread>
 #include <system_error>
@@ -170,6 +174,14 @@ bool Engine::init(const EngineConfig& config) {
     m_input = create_input();
     Input::set_instance(m_input.get());
 
+    m_gamepad.reset(new GamepadManager);
+#if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
+    // Wire Sdl2Input to forward gamepad events to the authoritative manager
+    if (auto* sdl = dynamic_cast<Sdl2Input*>(m_input.get())) {
+        sdl->set_gamepad_manager(m_gamepad.get());
+    }
+#endif
+
 #if defined(__ANDROID__)
     m_filesystem = create_android_file_system(effective.asset_manager);
     m_last_tick  = monotonic_now();
@@ -226,6 +238,7 @@ void Engine::shutdown() {
 void Engine::begin_frame() {
     m_audio->tick();
     m_input->begin_frame();
+    m_gamepad->begin_frame();
 
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
     SDL_Event event;

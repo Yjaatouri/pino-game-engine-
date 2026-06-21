@@ -18,6 +18,7 @@ public:
 
     bool is_mouse_pressed(MouseButton b)       const override;
     bool is_mouse_just_pressed(MouseButton b)  const override;
+    bool is_mouse_just_released(MouseButton b) const override;
 
     i32  mouse_x()   const override { return m_mouse_x; }
     i32  mouse_y()   const override { return m_mouse_y; }

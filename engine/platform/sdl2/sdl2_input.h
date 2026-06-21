@@ -4,6 +4,8 @@
 
 namespace pino {
 
+class GamepadManager;
+
 class Sdl2Input final : public Input {
 public:
     Sdl2Input();
@@ -21,6 +23,7 @@ public:
     // Mouse
     bool is_mouse_pressed(MouseButton b)       const override;
     bool is_mouse_just_pressed(MouseButton b)  const override;
+    bool is_mouse_just_released(MouseButton b) const override;
     i32  mouse_x()   const override { return m_state.mouse_x; }
     i32  mouse_y()   const override { return m_state.mouse_y; }
     i32  mouse_dx()  const override { return m_state.mouse_dx; }
@@ -46,8 +49,12 @@ public:
     void apply_state(const InputState& state) override;
     void capture_state(InputState& out_state) const override;
 
+    // Wire up the authoritative gamepad manager.
+    void set_gamepad_manager(GamepadManager* mgr);
+
 private:
     static constexpr u32 MAX_TOUCH = 10;
+    static constexpr i32 MAX_GAMEPADS = 4;
 
     struct TouchPt {
         bool  active      = false;
@@ -63,8 +70,21 @@ private:
         TouchPt pt;
     };
 
+    // SDL gamepad handles (platform-owned, no state).
+    struct SdlGamepad {
+        void* controller = nullptr; // SDL_GameController*
+        i32   instance_id = -1;
+        i32   slot = -1;
+    };
+    SdlGamepad m_sdl_gamepads[MAX_GAMEPADS];
+
     i32 find_touch_slot(i64 id) const;
     void finish_touch(u32 idx);
+    i32 sdl_find_by_instance(i32 id) const;
+    i32 sdl_find_free_slot() const;
+
+    void open_gamepad(i32 device_index);
+    void close_gamepad(i32 instance_id);
 
     InputState m_state;
     InputState m_prev;
@@ -84,35 +104,7 @@ private:
     f32  m_pinch_delta  = 0;
     bool m_tap          = false;
 
-    // Gamepad
-    static constexpr i32 MAX_GAMEPADS = 4;
-    static constexpr i32 MAX_GAMEPAD_BUTTONS = 15;  // matches SDL_CONTROLLER_BUTTON_MAX
-
-    void open_gamepad(i32 device_index);
-    void close_gamepad(i32 instance_id);
-
-    struct GamepadState {
-        void* controller = nullptr;  // SDL_GameController*
-        i32 instance_id = -1;
-        bool attached = false;
-
-        // Axis states (normalized -1..1 with deadzone)
-        float left_stick_x  = 0;
-        float left_stick_y  = 0;
-        float right_stick_x = 0;
-        float right_stick_y = 0;
-        float left_trigger  = 0;
-        float right_trigger = 0;
-
-        // Button states
-        bool buttons[MAX_GAMEPAD_BUTTONS] = {};
-        bool buttons_prev[MAX_GAMEPAD_BUTTONS] = {};
-    };
-
-    GamepadState m_gamepads[MAX_GAMEPADS];
-    i32          m_gamepad_count = 0;
-
-    float apply_deadzone(float value, float deadzone = 0.15f) const;
+    GamepadManager* m_gamepad_mgr = nullptr;
 };
 
 } // namespace pino

@@ -347,6 +347,12 @@ bool AndroidInput::is_mouse_just_pressed(MouseButton b) const {
     return m_state.mouse_buttons[i] && !m_prev.mouse_buttons[i];
 }
 
+bool AndroidInput::is_mouse_just_released(MouseButton b) const {
+    usize i = static_cast<usize>(b);
+    if (i >= static_cast<usize>(MouseButton::COUNT)) return false;
+    return !m_state.mouse_buttons[i] && m_prev.mouse_buttons[i];
+}
+
 } // namespace pino
 
 #endif // __ANDROID__

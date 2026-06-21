@@ -101,6 +101,7 @@ public:
     // ---- Mouse ----
     virtual bool is_mouse_pressed(MouseButton b)       const = 0;
     virtual bool is_mouse_just_pressed(MouseButton b)  const = 0;
+    virtual bool is_mouse_just_released(MouseButton b) const = 0;
 
     virtual i32 mouse_x()   const = 0;
     virtual i32 mouse_y()   const = 0;
@@ -110,8 +111,9 @@ public:
     virtual i32 scroll_dy() const = 0;
 
     // ---- Mouse (backward-compat wrappers) ----
-    bool mouse_down(MouseButton b)    const { return is_mouse_pressed(b); }
-    bool mouse_pressed(MouseButton b) const { return is_mouse_just_pressed(b); }
+    bool mouse_down(MouseButton b)       const { return is_mouse_pressed(b); }
+    bool mouse_pressed(MouseButton b)    const { return is_mouse_just_pressed(b); }
+    bool mouse_released(MouseButton b)   const { return is_mouse_just_released(b); }
 
     // ---- Cursor control ----
     virtual void set_cursor_visible(bool visible) = 0;

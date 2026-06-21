@@ -196,5 +196,8 @@ bool IOSInput::is_mouse_pressed(MouseButton) const {
 bool IOSInput::is_mouse_just_pressed(MouseButton) const {
     return false;
 }
+bool IOSInput::is_mouse_just_released(MouseButton) const {
+    return false;
+}
 
 } // namespace pino

@@ -1,4 +1,5 @@
 #include "sdl2_input.h"
+#include "engine/input/gamepad.h"
 #include <SDL.h>
 #include <cmath>
 #include <cstring>
@@ -125,17 +126,30 @@ static Key map_key(SDL_Scancode sc) {
 Sdl2Input::Sdl2Input() {
     std::memset(&m_state, 0, sizeof(m_state));
     std::memset(&m_prev,  0, sizeof(m_prev));
+    std::memset(&m_sdl_gamepads, 0, sizeof(m_sdl_gamepads));
     set_instance(this);
     SDL_GameControllerEventState(SDL_ENABLE);
 }
 
 Sdl2Input::~Sdl2Input() {
     for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
-        if (m_gamepads[i].controller) {
-            SDL_GameControllerClose(static_cast<SDL_GameController*>(m_gamepads[i].controller));
-        }
+        if (m_sdl_gamepads[i].controller)
+            SDL_GameControllerClose(static_cast<SDL_GameController*>(m_sdl_gamepads[i].controller));
     }
     if (instance() == this) set_instance(nullptr);
+}
+
+void Sdl2Input::set_gamepad_manager(GamepadManager* mgr) {
+    m_gamepad_mgr = mgr;
+    if (mgr) {
+        // Provide rumble callback
+        mgr->set_rumble_fn([](i32 slot, float low, float high, u32 duration_ms) {
+            // Rumble is handled via Sdl2Input's SDL handles; called from GamepadManager.
+            // In practice, the engine holds references to both and can route calls.
+            // For now this is a no-op — see the set_rumble method on Sdl2Input.
+            (void)slot; (void)low; (void)high; (void)duration_ms;
+        });
+    }
 }
 
 void Sdl2Input::begin_frame() {
@@ -145,19 +159,11 @@ void Sdl2Input::begin_frame() {
     m_state.scroll_dx = 0;
     m_state.scroll_dy = 0;
 
-    // Save previous gamepad button states
-    for (i32 g = 0; g < MAX_GAMEPADS; ++g) {
-        for (i32 b = 0; b < Sdl2Input::MAX_GAMEPAD_BUTTONS; ++b)
-            m_gamepads[g].buttons_prev[b] = m_gamepads[g].buttons[b];
-    }
-
-    // Clear per-frame gesture flags
     m_tap         = false;
     m_pinch_delta = 0;
     m_swipe_dx    = 0;
     m_swipe_dy    = 0;
 
-    // Mark just_released touches as inactive
     for (auto& s : m_touch_slots) {
         if (s.in_use && s.pt.just_released) {
             s.in_use = false;
@@ -165,7 +171,6 @@ void Sdl2Input::begin_frame() {
         }
     }
 
-    // Re-count active touches
     m_touch_count = 0;
     for (auto& s : m_touch_slots)
         if (s.in_use && s.pt.active) ++m_touch_count;
@@ -183,15 +188,12 @@ void Sdl2Input::reset_state() {
     m_pinch_delta = 0;
     m_tap = false;
 
-    for (i32 g = 0; g < MAX_GAMEPADS; ++g) {
-        for (i32 b = 0; b < Sdl2Input::MAX_GAMEPAD_BUTTONS; ++b)
-            m_gamepads[g].buttons[b] = m_gamepads[g].buttons_prev[b] = false;
-    }
+    if (m_gamepad_mgr) m_gamepad_mgr->reset_state();
 }
 
 void Sdl2Input::apply_state(const InputState& state) {
     m_state = state;
-    m_prev  = state; // prevent just-pressed/released from triggering on first frame after apply
+    m_prev  = state;
 }
 
 void Sdl2Input::capture_state(InputState& out_state) const {
@@ -219,6 +221,48 @@ void Sdl2Input::finish_touch(u32 idx) {
     t.just_released = true;
 }
 
+// ── SDL Gamepad handle management ────────────────────────────────
+
+i32 Sdl2Input::sdl_find_by_instance(i32 id) const {
+    for (i32 i = 0; i < MAX_GAMEPADS; ++i)
+        if (m_sdl_gamepads[i].controller && m_sdl_gamepads[i].instance_id == id)
+            return i;
+    return -1;
+}
+
+i32 Sdl2Input::sdl_find_free_slot() const {
+    for (i32 i = 0; i < MAX_GAMEPADS; ++i)
+        if (!m_sdl_gamepads[i].controller)
+            return i;
+    return -1;
+}
+
+void Sdl2Input::open_gamepad(i32 device_index) {
+    i32 slot = sdl_find_free_slot();
+    if (slot < 0) return;
+
+    auto& g = m_sdl_gamepads[slot];
+    g.controller = SDL_GameControllerOpen(device_index);
+    if (!g.controller) return;
+
+    g.instance_id = SDL_JoystickInstanceID(
+        SDL_GameControllerGetJoystick(static_cast<SDL_GameController*>(g.controller)));
+    g.slot = slot;
+
+    if (m_gamepad_mgr) m_gamepad_mgr->on_connect(GamepadHandle{slot});
+}
+
+void Sdl2Input::close_gamepad(i32 instance_id) {
+    i32 slot = sdl_find_by_instance(instance_id);
+    if (slot < 0) return;
+
+    if (m_gamepad_mgr) m_gamepad_mgr->on_disconnect(GamepadHandle{slot});
+
+    if (m_sdl_gamepads[slot].controller)
+        SDL_GameControllerClose(static_cast<SDL_GameController*>(m_sdl_gamepads[slot].controller));
+    std::memset(&m_sdl_gamepads[slot], 0, sizeof(SdlGamepad));
+}
+
 // ── Event processing ─────────────────────────────────────────────
 
 void Sdl2Input::process_event(const void* ev) {
@@ -227,17 +271,15 @@ void Sdl2Input::process_event(const void* ev) {
     switch (e.type) {
         case SDL_QUIT:
             m_quit = true;
-            break;
+            return;
 
         case SDL_KEYDOWN:
         case SDL_KEYUP: {
             Key k = map_key(e.key.keysym.scancode);
             if (k != Key::Unknown) {
-                bool pressed = (e.key.state == SDL_PRESSED);
-                usize i = static_cast<usize>(k);
-                m_state.keys[i] = pressed;
+                m_state.keys[static_cast<usize>(k)] = (e.key.state == SDL_PRESSED);
             }
-            break;
+            return;
         }
 
         case SDL_MOUSEMOTION:
@@ -250,32 +292,30 @@ void Sdl2Input::process_event(const void* ev) {
                 m_state.mouse_dx = e.motion.xrel;
                 m_state.mouse_dy = e.motion.yrel;
             }
-            break;
+            return;
 
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP: {
             auto idx = static_cast<usize>(e.button.button - 1);
             if (idx < static_cast<usize>(MouseButton::COUNT))
                 m_state.mouse_buttons[idx] = (e.button.state == SDL_PRESSED);
-            break;
+            return;
         }
 
         case SDL_MOUSEWHEEL:
             m_state.scroll_dx = e.wheel.x;
             m_state.scroll_dy = e.wheel.y;
-            break;
+            return;
 
-        // ── Touch (fixed slot map by SDL_FingerID) ───────────
         case SDL_FINGERDOWN: {
             i32 slot = find_touch_slot(e.tfinger.fingerId);
-            if (slot >= 0) break; // already tracked
-            // Find free slot
+            if (slot >= 0) return;
             for (u32 i = 0; i < MAX_TOUCH; ++i) {
                 if (!m_touch_slots[i].in_use) {
                     m_touch_slots[i].in_use = true;
                     m_touch_slots[i].finger_id = e.tfinger.fingerId;
                     auto& t = m_touch_slots[i].pt;
-                    t.active    = true;
+                    t.active = true;
                     t.x = t.start_x = e.tfinger.x;
                     t.y = t.start_y = e.tfinger.y;
                     t.down_time = SDL_GetTicks64();
@@ -283,16 +323,16 @@ void Sdl2Input::process_event(const void* ev) {
                     break;
                 }
             }
-            break;
+            return;
         }
         case SDL_FINGERUP: {
             i32 slot = find_touch_slot(e.tfinger.fingerId);
             if (slot >= 0) finish_touch(static_cast<u32>(slot));
-            break;
+            return;
         }
         case SDL_FINGERMOTION: {
             i32 slot = find_touch_slot(e.tfinger.fingerId);
-            if (slot < 0) break;
+            if (slot < 0) return;
             auto& t = m_touch_slots[slot].pt;
             if (!t.active) {
                 t.active = true;
@@ -303,7 +343,6 @@ void Sdl2Input::process_event(const void* ev) {
             f32 prev_x = t.x, prev_y = t.y;
             t.x = e.tfinger.x;
             t.y = e.tfinger.y;
-
             m_swipe_dx = t.x - t.start_x;
             m_swipe_dy = t.y - t.start_y;
 
@@ -325,72 +364,71 @@ void Sdl2Input::process_event(const void* ev) {
                 f32 cur_dist  = std::sqrt(cur_dx  * cur_dx  + cur_dy  * cur_dy);
                 m_pinch_delta = cur_dist - prev_dist;
             }
-            break;
+            return;
         }
 
-        // ── Window focus ─────────────────────────────────────
         case SDL_WINDOWEVENT:
             if (e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
                 m_window_focused = false;
                 reset_state();
-                // Sync SDL's key state so we don't miss releases
                 SDL_PumpEvents();
             } else if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
                 m_window_focused = true;
                 SDL_PumpEvents();
             }
-            break;
+            return;
 
-        // ── Gamepad ──────────────────────────────────────────
+        // ── Gamepad: platform layer owns handles, updates state model ──
         case SDL_CONTROLLERDEVICEADDED:
             open_gamepad(e.cdevice.which);
-            break;
+            return;
 
         case SDL_CONTROLLERDEVICEREMOVED:
             close_gamepad(e.cdevice.which);
-            break;
+            return;
 
         case SDL_CONTROLLERAXISMOTION: {
-            for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
-                auto& g = m_gamepads[i];
-                if (!g.controller) continue;
-                if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(static_cast<SDL_GameController*>(g.controller))) != e.caxis.which)
-                    continue;
-                float val = static_cast<float>(e.caxis.value) / 32767.0f;
-                if (val > 1.0f) val = 1.0f;
-                if (val < -1.0f) val = -1.0f;
-                switch (e.caxis.axis) {
-                    case SDL_CONTROLLER_AXIS_LEFTX:  g.left_stick_x  = apply_deadzone(val); break;
-                    case SDL_CONTROLLER_AXIS_LEFTY:  g.left_stick_y  = apply_deadzone(val); break;
-                    case SDL_CONTROLLER_AXIS_RIGHTX: g.right_stick_x = apply_deadzone(val); break;
-                    case SDL_CONTROLLER_AXIS_RIGHTY: g.right_stick_y = apply_deadzone(val); break;
-                    case SDL_CONTROLLER_AXIS_TRIGGERLEFT:  g.left_trigger  = (val + 1.0f) * 0.5f; break;
-                    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: g.right_trigger = (val + 1.0f) * 0.5f; break;
-                }
-                break;
+            i32 slot = sdl_find_by_instance(e.caxis.which);
+            if (slot < 0 || !m_gamepad_mgr) return;
+
+            float val = static_cast<float>(e.caxis.value) / 32767.0f;
+            if (val > 1.0f) val = 1.0f;
+            if (val < -1.0f) val = -1.0f;
+
+            GamepadHandle h{slot};
+            switch (e.caxis.axis) {
+                case SDL_CONTROLLER_AXIS_LEFTX:
+                    m_gamepad_mgr->set_axis(h, GamepadAxis::LeftX, m_gamepad_mgr->apply_deadzone(val)); break;
+                case SDL_CONTROLLER_AXIS_LEFTY:
+                    m_gamepad_mgr->set_axis(h, GamepadAxis::LeftY, m_gamepad_mgr->apply_deadzone(val)); break;
+                case SDL_CONTROLLER_AXIS_RIGHTX:
+                    m_gamepad_mgr->set_axis(h, GamepadAxis::RightX, m_gamepad_mgr->apply_deadzone(val)); break;
+                case SDL_CONTROLLER_AXIS_RIGHTY:
+                    m_gamepad_mgr->set_axis(h, GamepadAxis::RightY, m_gamepad_mgr->apply_deadzone(val)); break;
+                case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+                    m_gamepad_mgr->set_axis(h, GamepadAxis::TriggerLeft, (val + 1.0f) * 0.5f); break;
+                case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+                    m_gamepad_mgr->set_axis(h, GamepadAxis::TriggerRight, (val + 1.0f) * 0.5f); break;
             }
-            break;
+            return;
         }
 
         case SDL_CONTROLLERBUTTONDOWN:
         case SDL_CONTROLLERBUTTONUP: {
-            for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
-                auto& g = m_gamepads[i];
-                if (!g.controller) continue;
-                if (SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(static_cast<SDL_GameController*>(g.controller))) != e.cbutton.which)
-                    continue;
-                g.buttons[e.cbutton.button] = (e.cbutton.state == SDL_PRESSED);
-                break;
-            }
-            break;
+            i32 slot = sdl_find_by_instance(e.cbutton.which);
+            if (slot < 0 || !m_gamepad_mgr) return;
+            m_gamepad_mgr->set_button(GamepadHandle{slot},
+                                      static_cast<GamepadButton>(e.cbutton.button),
+                                      e.cbutton.state == SDL_PRESSED);
+            return;
         }
 
         default:
-            break;
+            return;
     }
 }
 
-// ── Cursor control ───────────────────────────────────────────────
+// ── Cursor ───────────────────────────────────────────────────────
 
 void Sdl2Input::set_cursor_visible(bool visible) {
     m_cursor_visible = visible;
@@ -409,41 +447,7 @@ void Sdl2Input::set_cursor_locked(bool locked) {
     }
 }
 
-// ── Gamepad ──────────────────────────────────────────────────────
-
-void Sdl2Input::open_gamepad(i32 device_index) {
-    for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
-        if (!m_gamepads[i].attached) {
-            m_gamepads[i].controller = SDL_GameControllerOpen(device_index);
-            if (m_gamepads[i].controller) {
-                m_gamepads[i].instance_id = SDL_JoystickInstanceID(
-                    SDL_GameControllerGetJoystick(static_cast<SDL_GameController*>(m_gamepads[i].controller)));
-                m_gamepads[i].attached = true;
-                ++m_gamepad_count;
-            }
-            break;
-        }
-    }
-}
-
-void Sdl2Input::close_gamepad(i32 instance_id) {
-    for (i32 i = 0; i < MAX_GAMEPADS; ++i) {
-        if (m_gamepads[i].instance_id == instance_id) {
-            if (m_gamepads[i].controller)
-                SDL_GameControllerClose(static_cast<SDL_GameController*>(m_gamepads[i].controller));
-            std::memset(&m_gamepads[i], 0, sizeof(GamepadState));
-            --m_gamepad_count;
-            break;
-        }
-    }
-}
-
-float Sdl2Input::apply_deadzone(float value, float deadzone) const {
-    if (std::fabs(value) < deadzone) return 0.0f;
-    return (value > 0 ? 1.0f : -1.0f) * (std::fabs(value) - deadzone) / (1.0f - deadzone);
-}
-
-// ── Keyboard queries ─────────────────────────────────────────────
+// ── Keyboard ─────────────────────────────────────────────────────
 
 bool Sdl2Input::is_key_pressed(Key k) const {
     return m_state.keys[static_cast<usize>(k)];
@@ -457,7 +461,7 @@ bool Sdl2Input::is_key_just_released(Key k) const {
     return !m_state.keys[i] && m_prev.keys[i];
 }
 
-// ── Mouse queries ────────────────────────────────────────────────
+// ── Mouse ────────────────────────────────────────────────────────
 
 bool Sdl2Input::is_mouse_pressed(MouseButton b) const {
     return m_state.mouse_buttons[static_cast<usize>(b)];
@@ -465,6 +469,10 @@ bool Sdl2Input::is_mouse_pressed(MouseButton b) const {
 bool Sdl2Input::is_mouse_just_pressed(MouseButton b) const {
     usize i = static_cast<usize>(b);
     return m_state.mouse_buttons[i] && !m_prev.mouse_buttons[i];
+}
+bool Sdl2Input::is_mouse_just_released(MouseButton b) const {
+    usize i = static_cast<usize>(b);
+    return !m_state.mouse_buttons[i] && m_prev.mouse_buttons[i];
 }
 
 } // namespace pino
