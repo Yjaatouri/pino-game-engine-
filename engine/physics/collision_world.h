@@ -2,6 +2,9 @@
 #include "engine/physics/aabb.h"
 #include "engine/physics/collider_component.h"
 #include "engine/physics/uniform_grid.h"
+#include "engine/physics/loose_uniform_grid.h"
+#include "engine/physics/sweep_and_prune.h"
+#include "engine/physics/collision_stats.h"
 #include "engine/scene/entity.h"
 #include "engine/core/event_bus.h"
 #include "engine/core/math_utils.h"
@@ -10,8 +13,10 @@
 namespace pino {
 
 enum class BroadPhaseMode {
-    BruteForce,   // O(n²) — used for comparison
-    UniformGrid   // default
+    BruteForce,     // O(n²) baseline
+    UniformGrid,    // default sparse uniform grid
+    LooseGrid,      // uniform grid with larger cells (3x)
+    SweepAndPrune   // sort + sweep along X axis
 };
 
 struct RaycastResult {
@@ -59,14 +64,21 @@ public:
     bool show_debug = false;
     const std::vector<AABB>& debug_aabbs() const { return m_debug_aabbs; }
 
-    // Benchmark helpers
+    // Auto-size the uniform grid based on average collider extent.
+    // Call once after registering all colliders (or when distribution changes).
+    void auto_size_grid(f32 multiplier = 2.0f);
+
+    // Profiling
+    CollisionStats stats;
+
     u32 collider_count() const { return static_cast<u32>(m_colliders.size()); }
 
 private:
-    struct ColliderEntry {
-        Entity*          entity = nullptr;
-        ColliderComponent component;
-    };
+struct ColliderEntry {
+    Entity*           entity = nullptr;
+    ColliderComponent component;
+    bool              moved = true;  // true when AABB needs refresh
+};
 
     // Emit both Enter and Exit events (Stay is emitted separately)
     void emit_enter(Entity& a, Entity& b) const;
@@ -75,12 +87,17 @@ private:
     // Test a single pair for overlap (layer/mask + AABB)
     static bool test_pair(const ColliderEntry& a, const ColliderEntry& b);
 
+    // Collect grid diagnostics into stats
+    void collect_grid_diagnostics();
+
     std::vector<ColliderEntry> m_colliders;
     std::vector<AABB>          m_debug_aabbs;
     EventBus::HandlerId        m_destroy_handle = 0;
 
-    BroadPhaseMode m_broad_phase = BroadPhaseMode::UniformGrid;
-    UniformGrid    m_grid;
+    BroadPhaseMode   m_broad_phase = BroadPhaseMode::UniformGrid;
+    UniformGrid      m_grid;
+    LooseUniformGrid m_loose_grid;
+    SweepAndPrune    m_sap;
 
     // Pair state for enter/stay/exit — kept sorted and uniqued
     std::vector<u64> m_current_pairs;  // this frame's overlapping pair IDs

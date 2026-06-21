@@ -16,10 +16,36 @@ public:
     explicit UniformGrid(f32 cell_size = 2.0f)
         : m_cell_size(cell_size) {}
 
+    void set_cell_size(f32 s) { m_cell_size = s; }
+
+    // Auto-size cells based on average AABB extent across a range.
+    // cell_size = extent * multiplier  (extent = average max-extent of all AABBs).
+    // Returns the chosen cell size.
+    f32 auto_size(const std::vector<AABB>& aabbs, f32 multiplier = 2.0f) {
+        if (aabbs.empty()) return m_cell_size;
+        f32 sum = 0.0f;
+        u32 count = 0;
+        for (const auto& aabb : aabbs) {
+            glm::vec3 ext = aabb.max - aabb.min;
+            sum += (std::max)({ext.x, ext.y, ext.z});
+            ++count;
+        }
+        m_cell_size = (sum / static_cast<f32>(count)) * multiplier;
+        if (m_cell_size < 0.1f) m_cell_size = 0.1f;
+        return m_cell_size;
+    }
+
+    // Total number of (index, cell) insertions since last clear.
+    u64 total_insertions() const { return m_total_insertions; }
+
+    // Read-only access to cell map (for diagnostics).
+    const std::unordered_map<u64, std::vector<u32>>& cells() const { return m_cells; }
+
     // Clear all cells (preserves vector capacities).
     void clear() {
         for (auto& kv : m_cells)
             kv.second.clear();
+        m_total_insertions = 0;
     }
 
     // Insert index idx into every cell its AABB covers.
@@ -36,6 +62,7 @@ public:
                 for (i32 x = min_x; x <= max_x; ++x) {
                     u64 key = cell_key(x, y, z);
                     m_cells[key].push_back(idx);
+                    ++m_total_insertions;
                 }
             }
         }
@@ -73,6 +100,7 @@ private:
     }
 
     f32 m_cell_size;
+    u64 m_total_insertions = 0;
     std::unordered_map<u64, std::vector<u32>> m_cells;
 };
 
