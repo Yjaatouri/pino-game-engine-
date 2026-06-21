@@ -88,12 +88,12 @@ public:
 
     // Submit all renderable entities to a RenderQueue.
     // Requires RenderQueue header to be included by the caller.
-    template <typename RenderQueue>
-    void update_render(RenderQueue& rq) {
+    template <typename RQ>
+    void update_render(RQ& rq) {
         m_render_components.each([&](EntityId e, RenderComponent& rc) {
             if (!m_scene_graph.has(e)) return;
             glm::mat4 world = m_scene_graph.world_matrix(e);
-            typename RenderQueue::RenderCommand cmd;
+            RenderCommand cmd;
             cmd.mesh          = rc.mesh;
             cmd.material      = rc.material;
             cmd.model         = world;
