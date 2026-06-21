@@ -16,6 +16,7 @@ add_pino_example(clear)
 add_pino_example(cube)
 add_pino_example(fps_camera)
 add_pino_example(scene_graph)
+add_pino_example(entity_test)
 
 # ─── Asset-using examples ─────────────────────────────────────
 add_pino_example_assets(asset_demo)
