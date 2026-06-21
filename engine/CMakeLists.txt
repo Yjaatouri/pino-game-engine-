@@ -70,6 +70,7 @@ if(PINO_ENABLE_PHYSICS)
     list(APPEND PINO_ENGINE_SOURCES
         physics/collision_world.cpp
         physics/debug_draw.cpp
+        physics/physics_debug_draw.cpp
     )
 endif()
 

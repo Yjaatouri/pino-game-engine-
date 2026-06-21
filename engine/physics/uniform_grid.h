@@ -86,17 +86,48 @@ public:
 
     f32 cell_size() const { return m_cell_size; }
 
+    // ── Debug visualization ─────────────────────────────────────
+    // Decode a cell key back to cell coordinates.
+    static void decode_cell_key(u64 key, i32& x, i32& y, i32& z) {
+        x = static_cast<i32>(static_cast<u32>(key & 0x1FFFFF));
+        y = static_cast<i32>(static_cast<u32>((key >> 21) & 0x1FFFFF));
+        z = static_cast<i32>(static_cast<u32>((key >> 42) & 0x1FFFFF));
+        if (x & 0x100000) x |= ~0x1FFFFF;
+        if (y & 0x100000) y |= ~0x1FFFFF;
+        if (z & 0x100000) z |= ~0x1FFFFF;
+    }
+
+    // Compute the AABB for a cell given its key and the grid's cell size.
+    static AABB cell_aabb(u64 key, f32 cell_size) {
+        i32 cx, cy, cz;
+        decode_cell_key(key, cx, cy, cz);
+        glm::vec3 min(static_cast<f32>(cx) * cell_size,
+                      static_cast<f32>(cy) * cell_size,
+                      static_cast<f32>(cz) * cell_size);
+        return AABB(min, min + glm::vec3(cell_size));
+    }
+
+    AABB cell_aabb(u64 key) const { return cell_aabb(key, m_cell_size); }
+
+    // Collect AABBs for all active cells (for debug rendering).
+    void collect_cell_aabbs(std::vector<AABB>& out) const {
+        out.clear();
+        out.reserve(m_cells.size());
+        for (const auto& kv : m_cells) {
+            out.push_back(cell_aabb(kv.first, m_cell_size));
+        }
+    }
+
 private:
     i32 cell_idx(f32 coord) const {
         return static_cast<i32>(std::floor(coord / m_cell_size));
     }
 
     static u64 cell_key(i32 x, i32 y, i32 z) {
-        // Simple hash: XOR with large primes
-        u64 h = static_cast<u64>(static_cast<u32>(x));
-        h ^= static_cast<u64>(static_cast<u32>(y)) * 73856093ull;
-        h ^= static_cast<u64>(static_cast<u32>(z)) * 19349663ull;
-        return h;
+        // Pack 21-bit signed coords into 64 bits (reversible).
+        return (static_cast<u64>(static_cast<u32>(x) & 0x1FFFFF)) |
+               ((static_cast<u64>(static_cast<u32>(y) & 0x1FFFFF)) << 21) |
+               ((static_cast<u64>(static_cast<u32>(z) & 0x1FFFFF)) << 42);
     }
 
     f32 m_cell_size;

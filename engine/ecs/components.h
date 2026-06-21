@@ -35,6 +35,7 @@ struct PhysicsComponent {
     bool      enabled         = true;
     u32       collision_layer = 1;
     u32       collision_mask  = 1;
+    glm::vec3 velocity        = {0.0f, 0.0f, 0.0f};
 };
 
 // ── AudioComponent ──────────────────────────────────────────────

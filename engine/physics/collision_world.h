@@ -73,6 +73,36 @@ public:
 
     u32 collider_count() const { return static_cast<u32>(m_colliders.size()); }
 
+    // ── Debug visualization accessors ───────────────────────────
+    // Active overlapping pair IDs (encoded as (a_idx << 32) | b_idx).
+    const std::vector<u64>& overlapping_pairs() const { return m_prev_pairs; }
+
+    // Get the AABB of a collider by its index in the internal array.
+    const AABB& collider_aabb(u32 idx) const {
+        return m_colliders[idx].component.world_aabb;
+    }
+
+    // Get the entity pointer for a collider by index.
+    Entity* collider_entity(u32 idx) const {
+        return m_colliders[idx].entity;
+    }
+
+    // Collect AABBs for all active grid cells (UniformGrid only).
+    void collect_grid_cells(std::vector<AABB>& out_cells) const {
+        if (m_broad_phase == BroadPhaseMode::UniformGrid)
+            m_grid.collect_cell_aabbs(out_cells);
+    }
+
+    // Get world-space AABB for each active collider (for debug rendering).
+    void collect_collider_aabbs(std::vector<AABB>& out_aabbs) const {
+        out_aabbs.clear();
+        out_aabbs.reserve(m_colliders.size());
+        for (const auto& e : m_colliders) {
+            if (e.component.enabled && e.entity->is_active())
+                out_aabbs.push_back(e.component.world_aabb);
+        }
+    }
+
 private:
 struct ColliderEntry {
     Entity*           entity = nullptr;
