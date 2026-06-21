@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/core/types.h"
+#include "engine/core/asset_handle.h"
 #include "engine/platform/file_system.h"
 #include "engine/renderer/shader.h"
 #include "engine/renderer/mesh.h"
@@ -12,28 +13,6 @@
 #include <functional>
 
 namespace pino {
-
-// ── AssetHandle<T> — safe wrapper around shared asset pointers ──
-template <typename T>
-class AssetHandle {
-public:
-    AssetHandle() = default;
-    explicit AssetHandle(std::shared_ptr<T> ptr) : m_ptr(std::move(ptr)) {}
-
-    bool is_loaded() const { return m_ptr != nullptr; }
-    T*   get()       const { return m_ptr.get(); }
-    T*   operator->() const { return m_ptr.get(); }
-    T&   operator*()  const { return *m_ptr; }
-    explicit operator bool() const { return is_loaded(); }
-
-    // Fallback: returns a default-constructed value if not loaded
-    const T& value_or(const T& fallback) const {
-        return m_ptr ? *m_ptr : fallback;
-    }
-
-private:
-    std::shared_ptr<T> m_ptr;
-};
 
 // ── Progress callback type ──────────────────────────────────────
 using AssetProgressCallback = std::function<void(u32 loaded, u32 total, const char* current)>;

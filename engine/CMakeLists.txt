@@ -60,6 +60,7 @@ set(PINO_ENGINE_SOURCES
     scene/scene.cpp
     input/gamepad.cpp
     audio/audio_manager.cpp
+    ecs/prefab.cpp
     engine.cpp
 )
 

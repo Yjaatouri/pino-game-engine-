@@ -1,22 +1,22 @@
 #pragma once
 
 #include "engine/core/types.h"
+#include "engine/core/asset_handle.h"
 #include "engine/physics/collider_component.h"
 #include <string>
 #include <glm/glm.hpp>
 
 namespace pino {
 
-// Forward declarations for pointers (user controls lifetime externally).
 class Mesh;
 class Material;
 
 // ── RenderComponent ─────────────────────────────────────────────
 // Attach a visible mesh + material to an entity.
 struct RenderComponent {
-    const Mesh*     mesh       = nullptr;
-    const Material* material   = nullptr;
-    bool            transparent = false;
+    AssetHandle<Mesh> mesh;
+    const Material*   material   = nullptr;
+    bool              transparent = false;
 
     // Optional local-space AABB for frustum culling in RenderQueue.
     bool      has_bounds = false;

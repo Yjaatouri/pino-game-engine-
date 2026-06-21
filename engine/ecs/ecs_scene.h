@@ -92,9 +92,11 @@ public:
     void update_render(RQ& rq) {
         m_render_components.each([&](EntityId e, RenderComponent& rc) {
             if (!m_scene_graph.has(e)) return;
+            const Mesh* mesh = rc.mesh.get();
+            if (!mesh) return;
             glm::mat4 world = m_scene_graph.world_matrix(e);
             RenderCommand cmd;
-            cmd.mesh          = rc.mesh;
+            cmd.mesh          = mesh;
             cmd.material      = rc.material;
             cmd.model         = world;
             cmd.normal_matrix = glm::mat3(glm::transpose(glm::inverse(world)));
