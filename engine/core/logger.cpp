@@ -1,6 +1,7 @@
 #include "logger.h"
 
 #include <cstdarg>
+#include <cstdio>
 #include <ctime>
 
 #if defined(__ANDROID__)
@@ -94,6 +95,13 @@ void Logger::write(LogLevel level, const char* file, int line, const char* fmt, 
 
 // ─── Internal ──────────────────────────────────────────────────
 
+void Logger::set_callback(LogCallback cb, void* user_data) {
+    auto& self = inst();
+    std::lock_guard<std::mutex> lock(self.m_mutex);
+    self.m_callback = cb;
+    self.m_callback_data = user_data;
+}
+
 void Logger::write_impl(LogLevel level, const char* file, int line, const char* fmt, va_list args) {
 #if defined(__ANDROID__)
     va_list args_copy;
@@ -101,31 +109,31 @@ void Logger::write_impl(LogLevel level, const char* file, int line, const char* 
     __android_log_vprint(to_android(level), "PinoEngine", fmt, args_copy);
     va_end(args_copy);
 #else
+    // Format message
+    char msg[4096];
+    std::vsnprintf(msg, sizeof(msg), fmt, args);
+
     std::time_t now = std::time(nullptr);
     char ts[32] = {};
     std::strftime(ts, sizeof(ts), "%H:%M:%S", std::localtime(&now));
 
     // Console output
-    std::fprintf(stderr, "[%s] %s %s:%d | ", ts, level_label(level), file, line);
-    std::vfprintf(stderr, fmt, args);
-    std::fprintf(stderr, "\n");
+    std::fprintf(stderr, "[%s] %s %s:%d | %s\n", ts, level_label(level), file, line, msg);
 
     // File output
     if (m_file) {
-        std::fprintf(m_file, "[%s] %s %s:%d | ", ts, level_label(level), file, line);
-
-        va_list args_file;
-        va_copy(args_file, args);
-        std::vfprintf(m_file, fmt, args_file);
-        va_end(args_file);
-
-        std::fprintf(m_file, "\n");
+        std::fprintf(m_file, "[%s] %s %s:%d | %s\n", ts, level_label(level), file, line, msg);
     }
 
     // Auto-flush on ERROR
     if (level == LogLevel::Error) {
         std::fflush(stderr);
         if (m_file) std::fflush(m_file);
+    }
+
+    // Callback for debug console / tools
+    if (m_callback) {
+        m_callback(level, msg, m_callback_data);
     }
 #endif
 }

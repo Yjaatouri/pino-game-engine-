@@ -24,6 +24,8 @@ add_pino_example(prefab_test)
 add_pino_example(debug_overlay_test)
 add_pino_example(ecs_inspector_test)
 add_pino_example(prefab_debug_viewer_test)
+add_pino_example(debug_console_test)
+add_pino_example(profiler_test)
 
 # ─── Asset-using examples ─────────────────────────────────────
 add_pino_example_assets(asset_demo)

@@ -236,7 +236,9 @@ void Engine::shutdown() {
 }
 
 void Engine::begin_frame() {
-    m_audio->tick();
+    {   ScopedProfileZone _prof_audio(m_profiler, ProfilerZone_Audio);
+        m_audio->tick();
+    }
     m_input->begin_frame();
     m_gamepad->begin_frame();
 
@@ -267,6 +269,7 @@ void Engine::begin_frame() {
     m_dt = static_cast<f32>(static_cast<f64>(now - m_last_tick) / static_cast<f64>(freq));
     if (m_dt > 0.1f) m_dt = 0.1f;
     if (m_dt < 0.0001f) m_dt = 0.0001f;
+    m_dt *= m_time_scale;
     m_elapsed  += m_dt;
     m_last_tick = now;
 }
@@ -282,7 +285,11 @@ void Engine::step_game(IGame& game) {
         m_paused = !m_paused;
     }
 
+    m_profiler.begin(ProfilerZone_TotalFrame);
+
+    m_profiler.begin(ProfilerZone_BeginFrame);
     begin_frame();
+    m_profiler.end(ProfilerZone_BeginFrame);
 
     f32 update_dur = 0.0f;
     f32 render_dur = 0.0f;
@@ -298,7 +305,9 @@ void Engine::step_game(IGame& game) {
 #else
             u64 update_start = monotonic_now();
 #endif
+            m_profiler.begin(ProfilerZone_EcsUpdate);
             game.update(FIXED_DT);
+            m_profiler.end(ProfilerZone_EcsUpdate);
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
             u64 update_end = SDL_GetPerformanceCounter();
             update_dur += static_cast<f32>(static_cast<f64>(update_end - update_start) /
@@ -319,7 +328,9 @@ void Engine::step_game(IGame& game) {
 #else
     u64 render_start = monotonic_now();
 #endif
+    m_profiler.begin(ProfilerZone_Render);
     game.render(m_dt);
+    m_profiler.end(ProfilerZone_Render);
 #if !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS)
     u64 render_end = SDL_GetPerformanceCounter();
     render_dur = static_cast<f32>(static_cast<f64>(render_end - render_start) /
@@ -330,6 +341,10 @@ void Engine::step_game(IGame& game) {
 #endif
 
     m_stats.tick(m_dt, update_dur, render_dur);
+
+    m_profiler.end(ProfilerZone_TotalFrame);
+    m_profiler.end_frame();
+
     end_frame();
 }
 

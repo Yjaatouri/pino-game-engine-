@@ -12,6 +12,7 @@
 #include "engine/assets/asset_manager.h"
 #include "engine/input/gamepad.h"
 #include "engine/core/engine_context.h"
+#include "engine/debug/profiler_overlay.h"
 
 #include <memory>
 
@@ -94,6 +95,10 @@ public:
     f32 delta_time()  const { return m_dt; }
     f32 elapsed_time() const { return m_elapsed; }
 
+    // Time scale (multiplier on delta_time, default 1.0)
+    void set_time_scale(f32 s) { m_time_scale = s; }
+    f32  time_scale() const { return m_time_scale; }
+
     // Stats (rolling averages, updated every frame)
     const EngineStats& stats() const { return m_stats; }
 
@@ -102,6 +107,9 @@ public:
 
     // Request graceful quit (checked at next begin_frame)
     void request_quit() { m_quit_requested = true; }
+
+    // Profiler overlay (performance debugging)
+    ProfilerOverlay& profiler() { return m_profiler; }
 
 private:
     bool m_running = false;
@@ -121,9 +129,12 @@ private:
     TimerManager  m_timers;
     EngineStats   m_stats;
 
+    ProfilerOverlay m_profiler;
+
     f32  m_dt          = 0.016667f;
     f32  m_elapsed     = 0.0f;
     f32  m_accumulator = 0.0f;
+    f32  m_time_scale  = 1.0f;
     u64  m_last_tick   = 0;
 };
 

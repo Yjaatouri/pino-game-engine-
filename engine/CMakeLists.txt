@@ -64,6 +64,8 @@ set(PINO_ENGINE_SOURCES
     ecs/prefab_debug_viewer.cpp
     ecs/ecs_inspector.cpp
     renderer/debug_overlay.cpp
+    debug/debug_console.cpp
+    debug/profiler_overlay.cpp
     engine.cpp
 )
 

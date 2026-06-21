@@ -23,6 +23,10 @@ public:
 
     static void write(LogLevel level, const char* file, int line, const char* fmt, ...);
 
+    // ── Log capture callback (for debug console, etc.) ─────────
+    using LogCallback = void(*)(LogLevel level, const char* message, void* user_data);
+    static void set_callback(LogCallback cb, void* user_data = nullptr);
+
 private:
     Logger();
     ~Logger();
@@ -38,6 +42,8 @@ private:
     LogLevel   m_level = LogLevel::Debug;
     FILE*      m_file  = nullptr;
     bool       m_owned = false;
+    LogCallback m_callback = nullptr;
+    void*      m_callback_data = nullptr;
 };
 
 } // namespace pino
