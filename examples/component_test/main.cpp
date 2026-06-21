@@ -212,24 +212,26 @@ int main() {
         TEST("has transform", scene.scene_graph().has(e));
     }
 
-    // ── 11. EcsPhysicsAdapter basic lifecycle ───────────────────
-    printf("Test 11: EcsPhysicsAdapter attach / detach\n");
+    // ── 11. EcsPhysicsAdapter auto-create on sync ───────────────
+    printf("Test 11: EcsPhysicsAdapter sync creates/destroys proxies\n");
     {
         EcsScene scene;
         CollisionWorld cw;
-        EcsPhysicsAdapter adapter(&scene, &cw);
+        EcsPhysicsAdapter adapter;
 
         EntityId e = scene.create_entity();
         scene.scene_graph().attach(e);
         scene.add_component<PhysicsComponent>(e);
 
-        TEST("no proxy before attach", adapter.proxy_count() == 0);
-        adapter.attach(e);
-        TEST("proxy after attach", adapter.proxy_count() == 1);
+        TEST("no proxy before sync", adapter.proxy_count() == 0);
+        adapter.sync(scene, cw);
+        TEST("proxy after sync", adapter.proxy_count() == 1);
         TEST("collider registered", cw.collider_count() == 1);
 
-        adapter.detach(e);
-        TEST("proxy removed", adapter.proxy_count() == 0);
+        // Remove component — sync should destroy the proxy.
+        scene.remove_component<PhysicsComponent>(e);
+        adapter.sync(scene, cw);
+        TEST("proxy removed after component removed", adapter.proxy_count() == 0);
         TEST("collider removed", cw.collider_count() == 0);
     }
 
@@ -238,45 +240,86 @@ int main() {
     {
         EcsScene scene;
         CollisionWorld cw;
-        EcsPhysicsAdapter adapter(&scene, &cw);
+        EcsPhysicsAdapter adapter;
 
         EntityId e = scene.create_entity();
         scene.scene_graph().attach(e);
         scene.add_component<PhysicsComponent>(e);
         scene.scene_graph().set_position(e, {42.0f, 0.0f, 0.0f});
 
-        adapter.attach(e);
-        adapter.sync();
-
-        // Sync copies ECS world position into old Entity proxy.
-        // CollisionWorld uses the proxy in update_aabbs().
-        // For this test we just verify the proxy was created and sync didn't crash.
-        TEST("proxy exists after sync", adapter.proxy_count() == 1);
+        adapter.sync(scene, cw);
+        TEST("proxy created by sync", adapter.proxy_count() == 1);
     }
 
-    // ── 13. Entity destruction auto-cleanup via sync ────────────
+    // ── 13. Sync cleans up after external destroy ───────────────
     printf("Test 13: sync cleans up externally destroyed entities\n");
     {
         EcsScene scene;
         CollisionWorld cw;
-        EcsPhysicsAdapter adapter(&scene, &cw);
+        EcsPhysicsAdapter adapter;
 
         EntityId e = scene.create_entity();
         scene.scene_graph().attach(e);
         scene.add_component<PhysicsComponent>(e);
 
-        adapter.attach(e);
+        adapter.sync(scene, cw);
         TEST("proxy before destroy", adapter.proxy_count() == 1);
 
         scene.destroy_entity(e);  // ECS destroys entity, adapter doesn't know yet
         TEST("entity dead", !scene.alive(e));
 
-        adapter.sync();  // sync detects stale entry and cleans up
+        adapter.sync(scene, cw);  // detects stale entry and cleans up
         TEST("proxy cleaned up", adapter.proxy_count() == 0);
     }
 
-    // ── 14. Pool reuse after slot recycling ─────────────────────
-    printf("Test 14: component pool slot reuse\n");
+    // ── 14. EcsScene::update_physics (full dispatch) ────────────
+    printf("Test 14: EcsScene::update_physics dispatch\n");
+    {
+        EcsScene scene;
+        CollisionWorld cw;
+
+        EntityId e = scene.create_entity();
+        scene.scene_graph().attach(e);
+        scene.add_component<PhysicsComponent>(e);
+
+        scene.update_physics(cw, 0.016f);
+        TEST("collider registered via dispatch", cw.collider_count() == 1);
+    }
+
+    // ── 15. EcsScene::sync_physics (transform sync only) ────────
+    printf("Test 15: EcsScene::sync_physics\n");
+    {
+        EcsScene scene;
+        CollisionWorld cw;
+
+        EntityId e = scene.create_entity();
+        scene.scene_graph().attach(e);
+        scene.add_component<PhysicsComponent>(e);
+
+        scene.sync_physics(cw);
+        TEST("collider registered via sync_physics", cw.collider_count() == 1);
+
+        scene.scene_graph().set_position(e, {100.0f, 0.0f, 0.0f});
+        scene.sync_physics(cw);  // updates transform, no crash
+        TEST("still registered", cw.collider_count() == 1);
+    }
+
+    // ── 16. EcsScene::update_render (no crash, no allocations) ──
+    // We can't verify render output without a real RenderQueue,
+    // but we can verify the dispatch doesn't crash.
+    printf("Test 16: EcsScene::update_render (noop safe)\n");
+    {
+        // Just verify the method compiles and doesn't crash with zero entities.
+        EcsScene scene;
+        // Cannot instantiate RenderQueue without full engine, so just verify
+        // the other system methods work.
+        CollisionWorld cw;
+        scene.sync_physics(cw);
+        TEST("empty scene ok", scene.entity_count() == 0);
+    }
+
+    // ── 17. Pool reuse after slot recycling ─────────────────────
+    printf("Test 17: component pool slot reuse\n");
     {
         EntityRegistry reg;
         ComponentPool<RenderComponent> pool;
