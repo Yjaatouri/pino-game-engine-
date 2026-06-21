@@ -18,6 +18,7 @@ add_pino_example(fps_camera)
 add_pino_example(scene_graph)
 add_pino_example(entity_test)
 add_pino_example(scene_graph_test)
+add_pino_example(component_test)
 
 # ─── Asset-using examples ─────────────────────────────────────
 add_pino_example_assets(asset_demo)
