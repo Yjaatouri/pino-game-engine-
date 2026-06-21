@@ -17,6 +17,7 @@ struct RenderComponent {
     AssetHandle<Mesh> mesh;
     const Material*   material   = nullptr;
     bool              transparent = false;
+    bool              enabled    = true;
 
     // Optional local-space AABB for frustum culling in RenderQueue.
     bool      has_bounds = false;

@@ -91,6 +91,7 @@ public:
     template <typename RQ>
     void update_render(RQ& rq) {
         m_render_components.each([&](EntityId e, RenderComponent& rc) {
+            if (!rc.enabled) return;
             if (!m_scene_graph.has(e)) return;
             const Mesh* mesh = rc.mesh.get();
             if (!mesh) return;
