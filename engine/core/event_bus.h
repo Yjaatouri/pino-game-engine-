@@ -10,10 +10,23 @@
 namespace pino {
 
 // ── Event types ─────────────────────────────────────────────────
-struct CollisionEvent {
+struct CollisionEnterEvent {
     class Entity* a = nullptr;
     class Entity* b = nullptr;
 };
+
+struct CollisionStayEvent {
+    class Entity* a = nullptr;
+    class Entity* b = nullptr;
+};
+
+struct CollisionExitEvent {
+    class Entity* a = nullptr;
+    class Entity* b = nullptr;
+};
+
+// Backward-compatible alias
+using CollisionEvent = CollisionStayEvent;
 
 struct InputEvent {
     i32 key = 0;
