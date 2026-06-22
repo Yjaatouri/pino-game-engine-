@@ -25,8 +25,6 @@ void PrefabSerializer::registerVersions(VersionRegistry& versions) {
 }
 
 void PrefabSerializer::serialize(Serializer& s, const Prefab& prefab) {
-    s.beginChunk(kPrefabChunkType, kPrefabVersion);
-
     s.beginChunk(kTransformChunkType, kPrefabVersion);
     s.writeBool(prefab.has_transform());
     if (prefab.has_transform()) {
@@ -56,8 +54,6 @@ void PrefabSerializer::serialize(Serializer& s, const Prefab& prefab) {
     uint32_t sound_idx = m_strings.addString(prefab.sound_path());
     s.writeUInt32(mesh_idx);
     s.writeUInt32(sound_idx);
-    s.endChunk();
-
     s.endChunk();
 }
 

@@ -85,16 +85,9 @@ void SaveGameSerializer::writeEntity(Serializer& s, EntityId id, EcsScene& scene
 }
 
 void SaveGameSerializer::serialize(Serializer& s, EcsScene& scene) {
-    s.beginChunk(kSceneChunkType, kSceneVersion);
-
-    uint32_t entity_count = scene.entity_count();
-    s.writeUInt32(entity_count);
-
     scene.registry().each([&](EntityId id) {
         writeEntity(s, id, scene);
     });
-
-    s.endChunk();
 }
 
 EntityId SaveGameSerializer::readEntity(const SaveEntityData& data, EcsScene& scene, AssetManager* assets) {
@@ -158,10 +151,7 @@ void SaveGameSerializer::deserialize(Deserializer& d, EcsScene& scene, AssetMana
             m_versions.dispatch(type_id, version, d);
         }
 
-        if (type_id == kSceneChunkType) {
-            uint32_t entity_count = d.readUInt32();
-            (void)entity_count;
-        } else if (type_id == kEntityChunkType) {
+        if (type_id == kEntityChunkType) {
             SaveEntityData data{};
             data.index = d.readUInt32();
             data.generation = d.readUInt32();

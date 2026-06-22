@@ -123,6 +123,11 @@ BinaryChunkReader::BinaryChunkReader(const uint8_t* data, size_t size)
 }
 
 bool BinaryChunkReader::nextChunk() {
+    if (m_has_chunk) {
+        m_cursor = m_payload_end;
+        m_has_chunk = false;
+    }
+
     if (m_cursor >= m_total_size) {
         m_has_chunk = false;
         return false;
