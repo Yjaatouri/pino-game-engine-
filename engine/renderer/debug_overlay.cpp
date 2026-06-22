@@ -29,6 +29,10 @@ void DebugOverlay::set_render_stats(u32 draw_calls, u32 triangles) {
     m_triangles = triangles;
 }
 
+void DebugOverlay::set_uniform_stats(u32 uniform_calls) {
+    m_uniform_calls = uniform_calls;
+}
+
 void DebugOverlay::set_entity_count(u32 count) {
     m_entity_count = count;
 }
@@ -68,7 +72,7 @@ void DebugOverlay::render(TextRenderer& tr, Font& font, i32 window_w, i32 window
     tr.draw_text(font, buf, x, y, scale, 0.7f, 0.7f, 0.7f, 1.0f);
     y += line_h;
 
-    std::snprintf(buf, sizeof(buf), "Draw: %u  Tris: %u", m_draw_calls, m_triangles);
+    std::snprintf(buf, sizeof(buf), "Draw: %u  Tris: %u  Uniforms: %u", m_draw_calls, m_triangles, m_uniform_calls);
     tr.draw_text(font, buf, x, y, scale, 0.9f, 0.9f, 0.9f, 1.0f);
     y += line_h;
 

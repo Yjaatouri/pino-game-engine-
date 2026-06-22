@@ -21,6 +21,7 @@ public:
 
     void set_frame_stats(f32 fps, f32 frame_ms, f32 update_ms, f32 render_ms);
     void set_render_stats(u32 draw_calls, u32 triangles);
+    void set_uniform_stats(u32 uniform_calls);
     void set_entity_count(u32 count);
     void set_asset_counts(u32 meshes, u32 textures, u32 shaders);
     void set_physics_stats(u32 colliders, u64 broad_pairs, u64 overlaps);
@@ -36,6 +37,7 @@ private:
     f32 m_render_ms = 0;
     u32 m_draw_calls = 0;
     u32 m_triangles = 0;
+    u32 m_uniform_calls = 0;
     u32 m_entity_count = 0;
     u32 m_meshes = 0;
     u32 m_textures = 0;

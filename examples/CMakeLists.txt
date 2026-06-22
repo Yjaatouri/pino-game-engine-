@@ -31,6 +31,7 @@ add_pino_example(physics_sync_test)
 add_pino_example(physics_mapping_test)
 add_pino_example(destroy_stress_test)
 add_pino_example(serialization_stall_test)
+add_pino_example(batch_render_test)
 
 # serialization_stall_test uses std::thread (part of C++17, no extra libs needed)
 

@@ -106,26 +106,32 @@ GLint Shader::uniform_location(const char* name) {
 }
 
 void Shader::set_int(const char* name, i32 v) {
+    RenderStats::instance().add_uniform_call();
     glUniform1i(uniform_location(name), v);
 }
 
 void Shader::set_float(const char* name, f32 v) {
+    RenderStats::instance().add_uniform_call();
     glUniform1f(uniform_location(name), v);
 }
 
 void Shader::set_vec3(const char* name, const glm::vec3& v) {
+    RenderStats::instance().add_uniform_call();
     glUniform3fv(uniform_location(name), 1, glm::value_ptr(v));
 }
 
 void Shader::set_vec4(const char* name, const glm::vec4& v) {
+    RenderStats::instance().add_uniform_call();
     glUniform4fv(uniform_location(name), 1, glm::value_ptr(v));
 }
 
 void Shader::set_mat3(const char* name, const glm::mat3& m) {
+    RenderStats::instance().add_uniform_call();
     glUniformMatrix3fv(uniform_location(name), 1, GL_FALSE, glm::value_ptr(m));
 }
 
 void Shader::set_mat4(const char* name, const glm::mat4& m) {
+    RenderStats::instance().add_uniform_call();
     glUniformMatrix4fv(uniform_location(name), 1, GL_FALSE, glm::value_ptr(m));
 }
 

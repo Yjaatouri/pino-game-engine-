@@ -15,11 +15,13 @@ public:
     void add_triangles(u32 n)  { triangles += n; }
     void add_shader_switch()   { ++shader_switches; }
     void add_state_change()    { ++state_changes; }
+    void add_uniform_call()    { ++uniform_calls; }
 
     u32 draw_calls      = 0;
     u32 triangles       = 0;
     u32 shader_switches = 0;
     u32 state_changes   = 0;
+    u32 uniform_calls   = 0;
 
 private:
     RenderStats() = default;

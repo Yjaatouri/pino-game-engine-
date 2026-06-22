@@ -37,6 +37,7 @@ public:
 
 private:
     std::vector<RenderCommand> m_commands;
+    std::vector<glm::mat4> m_instance_scratch;
 };
 
 } // namespace pino
