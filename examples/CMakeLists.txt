@@ -28,6 +28,7 @@ add_pino_example(debug_console_test)
 add_pino_example(profiler_test)
 add_pino_example(stage3_validation_test)
 add_pino_example(physics_sync_test)
+add_pino_example(physics_mapping_test)
 
 # ─── Asset-using examples ─────────────────────────────────────
 add_pino_example_assets(asset_demo)

@@ -88,6 +88,40 @@ public:
         m_physics_adapter.sync(*this, cw);
     }
 
+    // ── ECS-aware physics queries ─────────────────────────────
+
+    // Raycast and return ECS EntityIds directly.
+    // hit_entities is populated with pairs of (EntityId, hit fraction along ray).
+    void raycast_entities(class CollisionWorld& cw, const Ray& ray,
+                           f32 max_distance, u32 layer_mask,
+                           std::vector<std::pair<EntityId, f32>>& hits) const {
+        hits.clear();
+        auto result = cw.raycast(ray, max_distance, layer_mask);
+        if (result.entity) {
+            EntityId eid = m_physics_adapter.entity_for_proxy(result.entity);
+            if (eid) hits.emplace_back(eid, result.t);
+        }
+    }
+
+    // Overlap AABB and return ECS EntityIds directly.
+    std::vector<EntityId> overlap_entities(class CollisionWorld& cw,
+                                            const AABB& aabb,
+                                            u32 layer_mask) const {
+        std::vector<EntityId> result;
+        auto proxies = cw.overlap_aabb(aabb, layer_mask);
+        for (auto* proxy : proxies) {
+            EntityId eid = m_physics_adapter.entity_for_proxy(proxy);
+            if (eid) result.push_back(eid);
+        }
+        return result;
+    }
+
+    // Convenience: map a raw tree Entity* (from collision events, raycast, etc.)
+    // to its ECS EntityId. Returns NullEntity if not a proxy.
+    EntityId entity_for_physics_entity(const Entity* e) const {
+        return m_physics_adapter.entity_for_proxy(e);
+    }
+
     // Submit all renderable entities to a RenderQueue.
     // Requires RenderQueue header to be included by the caller.
     template <typename RQ>
@@ -167,6 +201,7 @@ inline void EcsPhysicsAdapter::sync_back(EcsScene& scene) {
         PhysicsComponent* pc = scene.get_component<PhysicsComponent>(eid);
         if (!pc || pc->is_static) continue;
         sg.set_position(eid, entry.proxy->local_transform().position);
+        m_reverse[entry.proxy.get()] = eid;
     }
 }
 
@@ -184,6 +219,7 @@ inline void EcsPhysicsAdapter::sync(EcsScene& scene, CollisionWorld& cw) {
         if (it != m_proxies.end() && it->second.generation == e.generation) {
             glm::mat4 world = sg.world_matrix(e);
             sync_proxy_transform(it->second.proxy.get(), world);
+            m_reverse[it->second.proxy.get()] = e;
             return;
         }
 
@@ -194,6 +230,7 @@ inline void EcsPhysicsAdapter::sync(EcsScene& scene, CollisionWorld& cw) {
         }
 
         auto proxy = std::make_unique<Entity>("phys_proxy");
+        proxy->set_user_data((static_cast<uint64_t>(e.index) << 32) | e.generation);
         ColliderComponent cc;
         cc.local_min       = pc.local_min;
         cc.local_max       = pc.local_max;
@@ -204,6 +241,7 @@ inline void EcsPhysicsAdapter::sync(EcsScene& scene, CollisionWorld& cw) {
         cw.register_collider(*proxy, cc);
 
         sync_proxy_transform(proxy.get(), sg.world_matrix(e));
+        m_reverse[proxy.get()] = e;
         m_proxies[e.index] = {std::move(proxy), e.generation};
     });
 
@@ -215,6 +253,7 @@ inline void EcsPhysicsAdapter::sync(EcsScene& scene, CollisionWorld& cw) {
                  && sg.has(e);
         if (!keep) {
             cw.unregister_collider(*it->second.proxy);
+            m_reverse.erase(it->second.proxy.get());
             it = m_proxies.erase(it);
         } else {
             ++it;

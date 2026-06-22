@@ -77,6 +77,10 @@ public:
     using DestroyCallback = std::function<void(Entity&)>;
     void on_destroy(DestroyCallback cb) { m_destroy_cb = std::move(cb); }
 
+    // Opaque user-data (e.g. packed ECS EntityId for physics proxy mapping)
+    void  set_user_data(uint64_t data) { m_user_data = data; }
+    uint64_t user_data() const { return m_user_data; }
+
     // Number of direct children
     u32 child_count() const { return static_cast<u32>(m_children.size()); }
 
@@ -134,6 +138,7 @@ private:
     Entity* m_parent = nullptr;
     std::vector<std::unique_ptr<Entity>> m_children;
     DestroyCallback m_destroy_cb;
+    uint64_t m_user_data = 0;
 };
 
 } // namespace pino

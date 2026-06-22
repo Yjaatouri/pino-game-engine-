@@ -41,6 +41,13 @@ public:
     void clear() { m_proxies.clear(); }
     u32 proxy_count() const { return static_cast<u32>(m_proxies.size()); }
 
+    // Map a physics proxy Entity* back to its ECS EntityId.
+    // Returns NullEntity if the pointer is not a known proxy.
+    EntityId entity_for_proxy(const Entity* proxy) const {
+        auto it = m_reverse.find(proxy);
+        return it != m_reverse.end() ? it->second : NullEntity;
+    }
+
 private:
     struct ProxyEntry {
         std::unique_ptr<Entity> proxy;
@@ -48,6 +55,7 @@ private:
     };
     static void sync_proxy_transform(Entity* proxy, const glm::mat4& world);
     std::unordered_map<u32, ProxyEntry> m_proxies;
+    std::unordered_map<const Entity*, EntityId> m_reverse;
 };
 
 inline void EcsPhysicsAdapter::sync_proxy_transform(Entity* proxy, const glm::mat4& world) {
