@@ -32,6 +32,7 @@ set(PINO_ENGINE_SOURCES
     core/config_loader.cpp
     core/transform.cpp
     core/math_utils.cpp
+    core/binary_chunk.cpp
     core/engine_context.cpp
     renderer/gl_es3.cpp
     renderer/shader.cpp
