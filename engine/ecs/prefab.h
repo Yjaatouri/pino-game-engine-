@@ -9,7 +9,8 @@
 
 namespace pino {
 
-class EcsWorld; // forward decl (break circular dep with ecs_world.h)
+class EcsWorld;
+class PrefabSerializer;
 
 // Compile-time FNV-1a hash for component type identification.
 namespace detail {
@@ -37,6 +38,7 @@ static constexpr u32 kAudioComponentHash   = detail::fnv1a("AudioComponent");
 //   player.load("prefabs/player.prefab");
 //   EntityId e = player.instantiate(scene, assets);
 class Prefab {
+    friend class PrefabSerializer;
 public:
     Prefab() = default;
 

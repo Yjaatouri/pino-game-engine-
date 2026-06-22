@@ -68,6 +68,9 @@ set(PINO_ENGINE_SOURCES
     ecs/prefab.cpp
     ecs/prefab_debug_viewer.cpp
     ecs/ecs_inspector.cpp
+    serialization/prefab_serializer.cpp
+    serialization/asset_serializer.cpp
+    serialization/save_game_serializer.cpp
     renderer/debug_overlay.cpp
     debug/debug_console.cpp
     debug/profiler_overlay.cpp
