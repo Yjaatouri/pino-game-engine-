@@ -9,6 +9,9 @@ namespace pino {
 
 class StringTable {
 public:
+    static constexpr uint32_t kChunkType = 50;
+    static constexpr uint32_t kChunkVersion = 1;
+
     uint32_t addString(const std::string& str);
     const std::string& getString(uint32_t index) const;
 

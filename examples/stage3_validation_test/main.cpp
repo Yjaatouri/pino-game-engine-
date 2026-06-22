@@ -686,6 +686,147 @@ static int test_savegame_roundtrip() {
     return 0;
 }
 
+// ─── Scenario 12: Empty StringTable round-trip ────────────────────
+
+static int test_empty_stringtable() {
+    printf("\n=== Scenario 12: Empty StringTable Round-Trip ===\n");
+
+    StringTable table;
+    TEST("empty initially", table.size() == 0);
+
+    BinaryChunkWriter writer;
+    table.write(writer);
+    printf("  Serialized empty table: %zu bytes\n", writer.getBuffer().size());
+
+    StringTable loaded;
+    BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+    loaded.read(reader);
+
+    TEST("still empty after round-trip", loaded.size() == 0);
+    TEST("!exists after round-trip", !loaded.exists("anything"));
+
+    return 0;
+}
+
+// ─── Scenario 13: Single string StringTable ──────────────────────
+
+static int test_single_string_stringtable() {
+    printf("\n=== Scenario 13: Single String StringTable ===\n");
+
+    StringTable table;
+    uint32_t idx = table.addString("only_one");
+    TEST("index 0", idx == 0);
+
+    BinaryChunkWriter writer;
+    table.write(writer);
+
+    StringTable loaded;
+    BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+    loaded.read(reader);
+
+    TEST("one entry", loaded.size() == 1);
+    TEST("string preserved", loaded.getString(0) == "only_one");
+
+    return 0;
+}
+
+// ─── Scenario 14: StringTable chunk header validation ───────────
+
+static int test_stringtable_chunk_header() {
+    printf("\n=== Scenario 14: StringTable Chunk Header Validation ===\n");
+
+    StringTable st;
+    st.addString("hello");
+    st.addString("world");
+
+    BinaryChunkWriter st_writer;
+    st.write(st_writer);
+
+    BinaryChunkReader st_reader(st_writer.getBuffer().data(), st_writer.getBuffer().size());
+    TEST("string table chunk available", st_reader.nextChunk());
+    TEST("correct chunk type", st_reader.getHeader().type_id == StringTable::kChunkType);
+    TEST("correct version", st_reader.getHeader().version == StringTable::kChunkVersion);
+    printf("  StringTable chunk: type=%u version=%u size=%u\n",
+           st_reader.getHeader().type_id, st_reader.getHeader().version, st_reader.getHeader().size);
+
+    uint32_t count = st_reader.readUInt32();
+    TEST("count is 2", count == 2);
+    uint32_t len0 = st_reader.readUInt32();
+    TEST("first string len", len0 == 5);
+
+    return 0;
+}
+
+// ─── Scenario 15: Invalid chunk type ─────────────────────────────
+
+static int test_stringtable_invalid_chunk_type() {
+    printf("\n=== Scenario 15: StringTable Invalid Chunk Type ===\n");
+
+    // Write a non-StringTable chunk to a buffer, then try to read it as StringTable
+    BinaryChunkWriter writer;
+    writer.beginChunk(999, 1);
+    writer.writeUInt32(0);
+    writer.endChunk();
+
+    StringTable loaded;
+    BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+    loaded.read(reader);
+
+    TEST("table empty after wrong type", loaded.size() == 0);
+
+    return 0;
+}
+
+// ─── Scenario 16: Missing chunk (empty buffer) ───────────────────
+
+static int test_stringtable_missing_chunk() {
+    printf("\n=== Scenario 16: StringTable Missing Chunk ===\n");
+
+    // Empty buffer
+    {
+        StringTable loaded;
+        uint8_t empty[4] = {0, 0, 0, 0};
+        BinaryChunkReader reader(empty, 4);
+        loaded.read(reader);
+        TEST("empty buffer -> empty table", loaded.size() == 0);
+    }
+
+    // Buffer too small for header
+    {
+        StringTable loaded;
+        uint8_t tiny[4] = {'P','I','N','O'};
+        BinaryChunkReader reader(tiny, 4);
+        loaded.read(reader);
+        TEST("truncated header -> empty table", loaded.size() == 0);
+    }
+
+    return 0;
+}
+
+// ─── Scenario 17: Truncated StringTable payload ──────────────────
+
+static int test_stringtable_truncated_payload() {
+    printf("\n=== Scenario 17: StringTable Truncated Payload ===\n");
+
+    StringTable table;
+    table.addString("this_is_a_long_test_string_for_truncation_check");
+    BinaryChunkWriter writer;
+    table.write(writer);
+
+    std::vector<uint8_t> full = writer.getBuffer();
+
+    // Truncate in the middle of the payload (after reading some bytes)
+    std::vector<uint8_t> truncated(full.begin(), full.begin() + 24);
+    StringTable loaded;
+    BinaryChunkReader reader(truncated.data(), (uint32_t)truncated.size());
+    loaded.read(reader);
+
+    // Should not crash; table should be empty due to corrupt data
+    printf("  Truncated to %zu bytes, loaded size=%zu\n", truncated.size(), loaded.size());
+
+    return 0;
+}
+
 // ─── Main ────────────────────────────────────────────────────────
 
 int main() {
@@ -704,6 +845,12 @@ int main() {
     CHECK(test_determinism() == 0);
     CHECK(test_mixed_stream() == 0);
     CHECK(test_savegame_roundtrip() == 0);
+    CHECK(test_empty_stringtable() == 0);
+    CHECK(test_single_string_stringtable() == 0);
+    CHECK(test_stringtable_chunk_header() == 0);
+    CHECK(test_stringtable_invalid_chunk_type() == 0);
+    CHECK(test_stringtable_missing_chunk() == 0);
+    CHECK(test_stringtable_truncated_payload() == 0);
 
     printf("\n============================================\n");
     printf("  Results: %d passed, %d failed out of %d\n",

@@ -34,6 +34,7 @@ bool StringTable::exists(const std::string& str) const {
 }
 
 void StringTable::write(BinaryChunkWriter& writer) const {
+    writer.beginChunk(kChunkType, kChunkVersion);
     uint32_t count = static_cast<uint32_t>(m_index_to_string.size());
     writer.writeUInt32(count);
     for (const auto& s : m_index_to_string) {
@@ -43,11 +44,25 @@ void StringTable::write(BinaryChunkWriter& writer) const {
             writer.writeBytes(s.data(), len);
         }
     }
+    writer.endChunk();
 }
 
 void StringTable::read(BinaryChunkReader& reader) {
     clear();
+    if (!reader.nextChunk()) {
+        return;
+    }
+    const ChunkHeader& hdr = reader.getHeader();
+    if (hdr.type_id != kChunkType) {
+        reader.skipChunk();
+        return;
+    }
     uint32_t count = reader.readUInt32();
+    if (count * 4 > hdr.size) {
+        clear();
+        reader.skipChunk();
+        return;
+    }
     m_index_to_string.reserve(count);
     for (uint32_t i = 0; i < count; ++i) {
         uint32_t len = reader.readUInt32();
