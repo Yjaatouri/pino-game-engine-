@@ -36,6 +36,7 @@ set(PINO_ENGINE_SOURCES
     core/serializer.cpp
     core/type_registry.cpp
     core/string_table.cpp
+    core/version_registry.cpp
     core/engine_context.cpp
     renderer/gl_es3.cpp
     renderer/shader.cpp
