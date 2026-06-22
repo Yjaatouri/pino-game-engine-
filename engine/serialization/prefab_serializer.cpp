@@ -16,12 +16,22 @@ void PrefabSerializer::registerTypes(TypeRegistry& types) {
     types.registerType("PrefabAssets");
 }
 
-static void loadPrefabV1(Deserializer& d) {
+static void loadTransformV1(Deserializer& d) {
+    (void)d;
+}
+
+static void loadComponentsV1(Deserializer& d) {
+    (void)d;
+}
+
+static void loadAssetsV1(Deserializer& d) {
     (void)d;
 }
 
 void PrefabSerializer::registerVersions(VersionRegistry& versions) {
-    versions.registerVersion(kPrefabChunkType, kPrefabVersion, loadPrefabV1);
+    versions.registerVersion(kTransformChunkType, kPrefabVersion, loadTransformV1);
+    versions.registerVersion(kComponentsChunkType, kPrefabVersion, loadComponentsV1);
+    versions.registerVersion(kAssetsChunkType, kPrefabVersion, loadAssetsV1);
 }
 
 void PrefabSerializer::serialize(Serializer& s, const Prefab& prefab) {
@@ -66,7 +76,7 @@ void PrefabSerializer::deserialize(Deserializer& d, Prefab& prefab) {
             m_versions.dispatch(type_id, version, d);
         }
 
-        if (type_id == kTransformChunkType) {
+        if (type_id == kTransformChunkType && version == kPrefabVersion) {
             bool has_transform = d.readBool();
             if (has_transform) {
                 glm::vec3 pos = d.readVec3();
@@ -76,7 +86,7 @@ void PrefabSerializer::deserialize(Deserializer& d, Prefab& prefab) {
                 glm::quat rot = glm::angleAxis(angle, axis);
                 prefab.set_transform(pos, rot, scl);
             }
-        } else if (type_id == kComponentsChunkType) {
+        } else if (type_id == kComponentsChunkType && version == kPrefabVersion) {
             uint32_t count = d.readUInt32();
             for (uint32_t i = 0; i < count; ++i) {
                 uint32_t type_hash = d.readUInt32();
@@ -89,7 +99,7 @@ void PrefabSerializer::deserialize(Deserializer& d, Prefab& prefab) {
                 }
                 prefab.m_components.push_back(std::move(entry));
             }
-        } else if (type_id == kAssetsChunkType) {
+        } else if (type_id == kAssetsChunkType && version == kPrefabVersion) {
             uint32_t mesh_idx = d.readUInt32();
             uint32_t sound_idx = d.readUInt32();
             prefab.m_mesh_path = m_strings.getString(mesh_idx);

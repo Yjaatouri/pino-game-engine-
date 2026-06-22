@@ -2,7 +2,6 @@
 
 #include "engine/core/serializer.h"
 #include <cstdint>
-#include <functional>
 #include <unordered_map>
 
 namespace pino {

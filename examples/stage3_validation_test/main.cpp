@@ -969,6 +969,108 @@ static int test_stringtable_near_limits() {
     return 0;
 }
 
+// ─── Scenario 23: Parent restoration after savegame round-trip ───
+
+static int test_parent_restoration() {
+    printf("\n=== Scenario 23: Parent Restoration After SaveGame Round-Trip ===\n");
+
+    TypeRegistry types;
+    StringTable strings;
+    VersionRegistry versions;
+    SaveGameSerializer::registerTypes(types);
+    SaveGameSerializer::registerVersions(versions);
+
+    EcsScene scene;
+    EntityId parent = scene.create_entity();
+    scene.scene_graph().attach(parent);
+    scene.scene_graph().set_position(parent, {0.0f, 0.0f, 0.0f});
+
+    EntityId child = scene.create_entity();
+    scene.scene_graph().attach(child);
+    scene.scene_graph().set_position(child, {10.0f, 0.0f, 0.0f});
+    scene.scene_graph().set_parent(child, parent);
+
+    TEST("child has parent before serialization", scene.scene_graph().parent(child) == parent);
+    printf("  Parent before: index=%u gen=%u | Child: index=%u gen=%u\n",
+           parent.index, parent.generation, child.index, child.generation);
+
+    BinaryChunkWriter writer;
+    Serializer ser(writer);
+    SaveGameSerializer save_ser(types, versions, strings);
+    save_ser.serialize(ser, scene);
+
+    BinaryChunkWriter st_writer;
+    strings.write(st_writer);
+    StringTable loaded_strings;
+    BinaryChunkReader st_reader(st_writer.getBuffer().data(), st_writer.getBuffer().size());
+    loaded_strings.read(st_reader);
+
+    TypeRegistry types2;
+    VersionRegistry versions2;
+    SaveGameSerializer::registerTypes(types2);
+    SaveGameSerializer::registerVersions(versions2);
+
+    EcsScene scene2;
+    BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+    Deserializer deser(reader);
+    SaveGameSerializer save_deser(types2, versions2, loaded_strings);
+    save_deser.deserialize(deser, scene2);
+
+    TEST("2 entities loaded", scene2.entity_count() == 2);
+
+    // Check parent relationships
+    int parent_count = 0;
+    int child_count = 0;
+    scene2.registry().each([&](EntityId id) {
+        if (scene2.scene_graph().has(id)) {
+            EntityId p = scene2.scene_graph().parent(id);
+            if (p != NullEntity) {
+                parent_count++;
+                printf("  Entity index=%u has parent index=%u\n", id.index, p.index);
+            } else {
+                child_count++;
+                printf("  Entity index=%u has no parent (root)\n", id.index);
+            }
+        }
+    });
+
+    TEST("one entity has a parent", parent_count == 1);
+    TEST("one entity is root", child_count == 1);
+
+    return 0;
+}
+
+// ─── Scenario 24: Version dispatch path verification ────────────
+
+static int test_adapter_version_registration() {
+    printf("\n=== Scenario 24: Adapter Version Registration ===\n");
+
+    // Verify that after registering all adapters, the version registry
+    // supports every chunk type that the serializers produce.
+
+    VersionRegistry versions;
+
+    PrefabSerializer::registerVersions(versions);
+    TEST("Prefab transform chunk registered", versions.supports(101, 1));
+    TEST("Prefab components chunk registered", versions.supports(102, 1));
+    TEST("Prefab assets chunk registered", versions.supports(103, 1));
+
+    VersionRegistry versions2;
+    AssetSerializer::registerVersions(versions2);
+    TEST("Asset chunk registered", versions2.supports(200, 1));
+
+    VersionRegistry versions3;
+    SaveGameSerializer::registerVersions(versions3);
+    TEST("Entity chunk registered", versions3.supports(301, 1));
+
+    // Verify unknown chunk types are NOT registered
+    TEST("unknown chunk not registered", !versions.supports(999, 1));
+
+    printf("  All adapter chunk types have valid version registrations\n");
+
+    return 0;
+}
+
 // ─── Main ────────────────────────────────────────────────────────
 
 int main() {
@@ -998,6 +1100,8 @@ int main() {
     CHECK(test_stringtable_oversized_len() == 0);
     CHECK(test_stringtable_truncated_data() == 0);
     CHECK(test_stringtable_near_limits() == 0);
+    CHECK(test_parent_restoration() == 0);
+    CHECK(test_adapter_version_registration() == 0);
 
     printf("\n============================================\n");
     printf("  Results: %d passed, %d failed out of %d\n",

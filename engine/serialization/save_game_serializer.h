@@ -12,7 +12,6 @@ class AssetManager;
 
 struct SaveEntityData {
     uint32_t index;
-    uint32_t generation;
     uint32_t parent_index;
 
     bool has_transform;
@@ -52,7 +51,6 @@ public:
     void serialize(Serializer& s, EcsScene& scene);
     void deserialize(Deserializer& d, EcsScene& scene, AssetManager* assets = nullptr);
 
-    static constexpr uint32_t kSceneChunkType = 300;
     static constexpr uint32_t kEntityChunkType = 301;
     static constexpr uint32_t kSceneVersion    = 1;
 

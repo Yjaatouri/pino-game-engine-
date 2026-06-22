@@ -18,7 +18,6 @@ public:
     void serialize(Serializer& s, const Prefab& prefab);
     void deserialize(Deserializer& d, Prefab& prefab);
 
-    static constexpr uint32_t kPrefabChunkType   = 100;
     static constexpr uint32_t kPrefabVersion      = 1;
     static constexpr uint32_t kTransformChunkType = 101;
     static constexpr uint32_t kComponentsChunkType = 102;

@@ -48,7 +48,7 @@ void AssetSerializer::deserialize(Deserializer& d, AssetMeta& asset) {
             m_versions.dispatch(type_id, version, d);
         }
 
-        if (type_id == kAssetChunkType) {
+        if (type_id == kAssetChunkType && version == kAssetVersion) {
             uint32_t path_idx = d.readUInt32();
             asset.path = m_strings.getString(path_idx);
             asset.type = static_cast<AssetType>(d.readUInt32());

@@ -17,19 +17,18 @@ void SaveGameSerializer::registerTypes(TypeRegistry& types) {
     types.registerType("SaveEntity");
 }
 
-static void loadSceneV1(Deserializer& d) {
+static void loadEntityV1(Deserializer& d) {
     (void)d;
 }
 
 void SaveGameSerializer::registerVersions(VersionRegistry& versions) {
-    versions.registerVersion(kSceneChunkType, kSceneVersion, loadSceneV1);
+    versions.registerVersion(kEntityChunkType, kSceneVersion, loadEntityV1);
 }
 
 void SaveGameSerializer::writeEntity(Serializer& s, EntityId id, EcsScene& scene) {
     s.beginChunk(kEntityChunkType, kSceneVersion);
 
     s.writeUInt32(id.index);
-    s.writeUInt32(id.generation);
 
     bool has_transform = scene.scene_graph().has(id);
     s.writeBool(has_transform);
@@ -142,6 +141,7 @@ void SaveGameSerializer::deserialize(Deserializer& d, EcsScene& scene, AssetMana
     scene.clear();
 
     std::unordered_map<uint32_t, EntityId> index_map;
+    std::vector<std::pair<EntityId, uint32_t>> pending_parents;
 
     while (d.nextChunk()) {
         uint32_t type_id = d.getHeader().type_id;
@@ -151,10 +151,9 @@ void SaveGameSerializer::deserialize(Deserializer& d, EcsScene& scene, AssetMana
             m_versions.dispatch(type_id, version, d);
         }
 
-        if (type_id == kEntityChunkType) {
+        if (type_id == kEntityChunkType && version == kSceneVersion) {
             SaveEntityData data{};
             data.index = d.readUInt32();
-            data.generation = d.readUInt32();
 
             data.has_transform = d.readBool();
             if (data.has_transform) {
@@ -197,20 +196,20 @@ void SaveGameSerializer::deserialize(Deserializer& d, EcsScene& scene, AssetMana
 
             EntityId new_id = readEntity(data, scene, assets);
             index_map[data.index] = new_id;
+            if (data.has_transform) {
+                pending_parents.push_back({new_id, data.parent_index});
+            }
         } else {
             d.skipChunk();
         }
     }
 
-    scene.registry().each([&](EntityId id) {
-        if (scene.scene_graph().has(id)) {
-            EntityId parent = scene.scene_graph().parent(id);
-            if (parent != NullEntity && index_map.find(parent.index) != index_map.end()) {
-                EntityId new_parent = index_map[parent.index];
-                scene.scene_graph().set_parent(id, new_parent);
-            }
+    for (auto& [child_id, pidx] : pending_parents) {
+        auto it = index_map.find(pidx);
+        if (it != index_map.end()) {
+            scene.scene_graph().set_parent(child_id, it->second);
         }
-    });
+    }
 }
 
 } // namespace pino
