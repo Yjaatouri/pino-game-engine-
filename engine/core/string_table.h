@@ -12,6 +12,9 @@ public:
     static constexpr uint32_t kChunkType = 50;
     static constexpr uint32_t kChunkVersion = 1;
 
+    static constexpr uint32_t kMaxStringCount  = 65536;
+    static constexpr uint32_t kMaxStringLength = 65536;
+
     uint32_t addString(const std::string& str);
     const std::string& getString(uint32_t index) const;
 

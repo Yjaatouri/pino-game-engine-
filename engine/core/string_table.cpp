@@ -54,22 +54,38 @@ void StringTable::read(BinaryChunkReader& reader) {
     }
     const ChunkHeader& hdr = reader.getHeader();
     if (hdr.type_id != kChunkType) {
-        reader.skipChunk();
+        return;
+    }
+    if (hdr.size < 4) {
         return;
     }
     uint32_t count = reader.readUInt32();
-    if (count * 4 > hdr.size) {
-        clear();
-        reader.skipChunk();
+    uint32_t remaining = hdr.size - 4;
+
+    if (count > kMaxStringCount) {
+        return;
+    }
+    if (count > remaining / 4) {
         return;
     }
     m_index_to_string.reserve(count);
     for (uint32_t i = 0; i < count; ++i) {
+        if (remaining < 4) {
+            clear();
+            return;
+        }
         uint32_t len = reader.readUInt32();
+        remaining -= 4;
+
+        if (len > kMaxStringLength || remaining < len) {
+            clear();
+            return;
+        }
         std::string str;
         if (len > 0) {
             str.resize(len);
             reader.readBytes(&str[0], len);
+            remaining -= len;
         }
         m_string_to_index[str] = i;
         m_index_to_string.push_back(std::move(str));

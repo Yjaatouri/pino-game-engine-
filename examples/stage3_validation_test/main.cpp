@@ -827,6 +827,148 @@ static int test_stringtable_truncated_payload() {
     return 0;
 }
 
+// ─── Helper: build raw chunk with arbitrary payload ──────────────
+
+static std::vector<uint8_t> make_raw_chunk(uint32_t type_id, uint32_t version,
+                                            const uint8_t* payload, uint32_t payload_size) {
+    std::vector<uint8_t> data;
+    auto put32 = [&](uint32_t v) {
+        data.push_back(static_cast<uint8_t>(v & 0xFFu));
+        data.push_back(static_cast<uint8_t>((v >> 8) & 0xFFu));
+        data.push_back(static_cast<uint8_t>((v >> 16) & 0xFFu));
+        data.push_back(static_cast<uint8_t>((v >> 24) & 0xFFu));
+    };
+    put32(0x50494E4Fu); // magic
+    put32(type_id);
+    put32(version);
+    put32(payload_size);
+    if (payload_size > 0) {
+        data.insert(data.end(), payload, payload + payload_size);
+    }
+    return data;
+}
+
+// ─── Scenario 18: Corrupted count = 0xFFFFFFFF ───────────────────
+
+static int test_stringtable_count_maxuint() {
+    printf("\n=== Scenario 18: StringTable count = 0xFFFFFFFF ===\n");
+
+    uint8_t raw_count[4];
+    raw_count[0] = 0xFF; raw_count[1] = 0xFF;
+    raw_count[2] = 0xFF; raw_count[3] = 0xFF;
+    auto data = make_raw_chunk(StringTable::kChunkType, 1, raw_count, 4);
+
+    StringTable loaded;
+    BinaryChunkReader reader(data.data(), data.size());
+    loaded.read(reader);
+
+    TEST("table empty after corrupted count", loaded.size() == 0);
+    printf("  count=0xFFFFFFFF correctly rejected\n");
+
+    return 0;
+}
+
+// ─── Scenario 19: count larger than payload permits ──────────────
+
+static int test_stringtable_count_too_large() {
+    printf("\n=== Scenario 19: StringTable count exceeds payload ===\n");
+
+    // Payload with count=100 but only 8 bytes total
+    uint8_t raw_payload[8];
+    raw_payload[0] = 100; raw_payload[1] = 0;
+    raw_payload[2] = 0;   raw_payload[3] = 0;
+    // Only one string len=4 + 4 bytes of data
+    raw_payload[4] = 4; raw_payload[5] = 0;
+    raw_payload[6] = 0; raw_payload[7] = 0;
+    // No actual string data follows
+
+    auto data = make_raw_chunk(StringTable::kChunkType, 1, raw_payload, 8);
+
+    StringTable loaded;
+    BinaryChunkReader reader(data.data(), data.size());
+    loaded.read(reader);
+
+    TEST("table empty after oversized count", loaded.size() == 0);
+
+    return 0;
+}
+
+// ─── Scenario 20: Oversized string length ───────────────────────
+
+static int test_stringtable_oversized_len() {
+    printf("\n=== Scenario 20: StringTable oversized string length ===\n");
+
+    // Payload with count=1 and len > kMaxStringLength
+    uint8_t raw_payload[8];
+    raw_payload[0] = 1; raw_payload[1] = 0;
+    raw_payload[2] = 0; raw_payload[3] = 0;
+    raw_payload[4] = 0xFF; raw_payload[5] = 0xFF;
+    raw_payload[6] = 0xFF; raw_payload[7] = 0xFF; // len = 0xFFFFFFFF
+
+    auto data = make_raw_chunk(StringTable::kChunkType, 1, raw_payload, 8);
+
+    StringTable loaded;
+    BinaryChunkReader reader(data.data(), data.size());
+    loaded.read(reader);
+
+    TEST("table empty after oversized len", loaded.size() == 0);
+
+    return 0;
+}
+
+// ─── Scenario 21: Truncated string data (count/len valid, no data) ─
+
+static int test_stringtable_truncated_data() {
+    printf("\n=== Scenario 21: StringTable truncated string data ===\n");
+
+    // Payload with count=1, len=10, but only 0 bytes of string data
+    uint8_t raw_payload[8];
+    raw_payload[0] = 1; raw_payload[1] = 0;
+    raw_payload[2] = 0; raw_payload[3] = 0;
+    raw_payload[4] = 10; raw_payload[5] = 0;
+    raw_payload[6] = 0;  raw_payload[7] = 0; // len = 10, but no data follows
+
+    auto data = make_raw_chunk(StringTable::kChunkType, 1, raw_payload, 8);
+
+    StringTable loaded;
+    BinaryChunkReader reader(data.data(), data.size());
+    loaded.read(reader);
+
+    TEST("table empty after truncated string data", loaded.size() == 0);
+
+    return 0;
+}
+
+// ─── Scenario 22: Large valid StringTable near limits ────────────
+
+static int test_stringtable_near_limits() {
+    printf("\n=== Scenario 22: StringTable near limits ===\n");
+
+    StringTable table;
+    // 1000 strings, each 500 chars — well within limits
+    for (int i = 0; i < 1000; ++i) {
+        char buf[512];
+        std::snprintf(buf, sizeof(buf), "string_%d_%s", i,
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
+        table.addString(buf);
+    }
+    TEST("1000 strings added", table.size() == 1000);
+
+    BinaryChunkWriter writer;
+    table.write(writer);
+    printf("  Serialized %zu strings: %zu bytes\n", table.size(), writer.getBuffer().size());
+
+    StringTable loaded;
+    BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+    loaded.read(reader);
+
+    TEST("1000 strings loaded", loaded.size() == 1000);
+    TEST("first string matches", loaded.getString(0) == table.getString(0));
+    TEST("last string matches", loaded.getString(999) == table.getString(999));
+
+    return 0;
+}
+
 // ─── Main ────────────────────────────────────────────────────────
 
 int main() {
@@ -851,6 +993,11 @@ int main() {
     CHECK(test_stringtable_invalid_chunk_type() == 0);
     CHECK(test_stringtable_missing_chunk() == 0);
     CHECK(test_stringtable_truncated_payload() == 0);
+    CHECK(test_stringtable_count_maxuint() == 0);
+    CHECK(test_stringtable_count_too_large() == 0);
+    CHECK(test_stringtable_oversized_len() == 0);
+    CHECK(test_stringtable_truncated_data() == 0);
+    CHECK(test_stringtable_near_limits() == 0);
 
     printf("\n============================================\n");
     printf("  Results: %d passed, %d failed out of %d\n",
