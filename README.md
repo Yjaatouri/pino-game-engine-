@@ -1,20 +1,10 @@
 # Pino Game Engine
 
-## Pino Game Engine v0.1.0
+Lightweight C++17 3D game engine with OpenGL ES 3.0 rendering, targeting Windows/macOS/Linux (SDL2), Android (NativeActivity + EGL), and iOS (EAGL).
 
-Engine Core Foundation Stable.
+## Status
 
-- **Stable engine foundation** — cleaned engine initialization, deterministic platform branching, removed dead code paths.
-- **Deterministic asset system** — runtime asset root discovery via `find_asset_root()`; no fragile CMake path dependency.
-- **Safe GL loader** — critical OpenGL ES 3.0 function validation; `gl::init()` returns `false` on missing entry points.
-- **Unified logging system** — project-prefixed `PINO_*` macros only; legacy `LOG_*` macros removed.
-- **Clean SDL integration** — SDL headers fully decoupled from project headers (`sdl2_input.h`, `sdl2_window.h`, `gamepad.h` use portable types only).
-- **Simplified EngineConfig system** — platform-safe data flow; fixed latent iOS compile error; no redundant field assignments.
-- **Lean CMake configuration** — removed 4 dead user-facing options; 3 live options remain.
-
-This release focuses on engine stability and internal architecture cleanup. It is not a feature-complete engine, but a stable base for future systems such as Audio, UI, and advanced rendering.
-
-Lightweight C++17 3D game engine with OpenGL ES 3.0 rendering.
+Engine core foundation is stable. ECS system, renderer, and platform layer are functional. Higher-level systems (audio, physics, animation, editor, scripting) are in various stages of completion — see [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md) for full details.
 
 ## Platforms
 
@@ -101,14 +91,32 @@ gradle wrapper --gradle-version 8.4
 
 ```
 engine/
-├── core/          # Math, transforms, logging, config, timers
-├── platform/      # Window, Input, FileSystem (SDL2 / Android / iOS)
-├── renderer/      # GL loader, shaders, meshes, textures, lights, shadowmap, skybox
-├── assets/        # AssetManager, asset packer, stb_image
-├── scene/         # Entity/Scene graph, EventBus, SceneManager
-├── input/         # InputMap, GamepadManager, InputRecorder
-└── physics/       # AABB collision, CollisionWorld
+├── core/          # Types, math, transforms, logging, config, timers, event bus, engine context
+├── platform/      # Abstract Window/Input/FileSystem + SDL2 / Android / iOS backends
+├── renderer/      # GL ES 3.0 loader, shaders, meshes, textures, cameras, lights,
+│                  # materials, shadow map, skybox, framebuffers, debug renderer,
+│                  # text renderer, render queue, frustum, LOD, FPS controller
+├── scene/         # Entity hierarchy (old tree-based), scene manager, IScene
+├── input/         # InputMap (action bindings), InputRecorder, GamepadManager
+├── physics/       # AABB collision, broad-phase (grid/SAP/brute-force), debug draw
+├── audio/         # AudioManager (miniaudio): spatial audio, zones, buses, priorities
+├── assets/        # AssetManager, asset pack, stb_image
+├── ecs/           # Entity registry, component pools, scene graph, EcsWorld,
+│                  # prefabs, ECS inspector, physics adapter
+└── debug/         # Debug console, profiler overlay
 ```
+
+## Dependencies
+
+| Library | Version | Use |
+|---------|---------|-----|
+| **SDL2** | 2.26.5 | Desktop window, GL context, input, file base path |
+| **GLM** | 0.9.9.8 | All math: vectors, matrices, quaternions, transforms |
+| **tinyobjloader** | v2.0.0rc10 | OBJ mesh loading |
+| **stb_image** | 2024-05-31 | Texture image loading (PNG, JPG, BMP, TGA) |
+| **miniaudio** | 0.11.25 | Audio playback (desktop only) |
+
+All fetched via CMake `FetchContent` (SDL2 can use system install via `PINO_USE_SYSTEM_SDL2`).
 
 ## License
 
