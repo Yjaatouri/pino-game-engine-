@@ -48,15 +48,15 @@ struct AABB {
         if (axis == 0) {
             f32 right = max.x - other.min.x;
             f32 left  = other.max.x - min.x;
-            result.x = (right < left - epsilon) ? right : -left;
+            result.x = (right < left - epsilon) ? -right : left;
         } else if (axis == 1) {
             f32 up   = max.y - other.min.y;
             f32 down = other.max.y - min.y;
-            result.y = (up < down - epsilon) ? up : -down;
+            result.y = (up < down - epsilon) ? -up : down;
         } else {
             f32 forward = max.z - other.min.z;
             f32 back    = other.max.z - min.z;
-            result.z = (forward < back - epsilon) ? forward : -back;
+            result.z = (forward < back - epsilon) ? -forward : back;
         }
         return result;
     }

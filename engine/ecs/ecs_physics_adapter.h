@@ -35,6 +35,9 @@ public:
     // Safe to call every frame — no allocations on steady state.
     void sync(EcsScene& scene, CollisionWorld& cw);
 
+    // Write corrected proxy positions back to ECS SceneGraph transforms.
+    // Call AFTER CollisionWorld::update() to capture collision resolution.
+    void sync_back(EcsScene& scene);   // implemented in ecs_scene.h
     void clear() { m_proxies.clear(); }
     u32 proxy_count() const { return static_cast<u32>(m_proxies.size()); }
 

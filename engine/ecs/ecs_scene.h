@@ -73,11 +73,13 @@ public:
 
     // ── System dispatch (coordination layer) ────────────────────
 
-    // Full physics step: sync all physics proxies, then run CollisionWorld.
+    // Full physics step: sync all physics proxies, run CollisionWorld,
+    // then write corrected positions back to ECS SceneGraph transforms.
     // Requires the caller to include collision_world.h.
     void update_physics(class CollisionWorld& cw, f32 dt) {
         m_physics_adapter.sync(*this, cw);
         cw.update(dt);
+        m_physics_adapter.sync_back(*this);
     }
 
     // Sync physics proxies only (without running detection/response).
@@ -157,6 +159,18 @@ private:
 };
 
 // ── EcsPhysicsAdapter::sync implementation (needs full EcsScene) ──
+inline void EcsPhysicsAdapter::sync_back(EcsScene& scene) {
+    auto& sg = scene.scene_graph();
+    for (auto& [index, entry] : m_proxies) {
+        EntityId eid{index, entry.generation};
+        if (!scene.alive(eid) || !sg.has(eid)) continue;
+        PhysicsComponent* pc = scene.get_component<PhysicsComponent>(eid);
+        if (!pc || pc->is_static) continue;
+        sg.set_position(eid, entry.proxy->local_transform().position);
+    }
+}
+
+
 inline void EcsPhysicsAdapter::sync(EcsScene& scene, CollisionWorld& cw) {
     auto& sg = scene.scene_graph();
 
