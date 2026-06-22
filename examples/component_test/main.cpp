@@ -111,6 +111,7 @@ int main() {
         TEST("has render", scene.has_component<RenderComponent>(e));
 
         scene.destroy_entity(e);
+        scene.flush_destroyed_entities();
         TEST("entity dead", !scene.alive(e));
         TEST("component gone", !scene.has_component<RenderComponent>(e));
     }
@@ -191,6 +192,7 @@ int main() {
         TEST("volume", acp->volume == 0.5f);
 
         scene.destroy_entity(e);
+        scene.flush_destroyed_entities();
         TEST("audio removed on destroy", !scene.has_component<AudioComponent>(e));
     }
 
@@ -265,6 +267,7 @@ int main() {
         TEST("proxy before destroy", adapter.proxy_count() == 1);
 
         scene.destroy_entity(e);  // ECS destroys entity, adapter doesn't know yet
+        scene.flush_destroyed_entities();
         TEST("entity dead", !scene.alive(e));
 
         adapter.sync(scene, cw);  // detects stale entry and cleans up

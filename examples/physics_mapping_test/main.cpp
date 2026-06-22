@@ -181,6 +181,7 @@ int main() {
         TEST("temp entity has proxy", temp_proxy != nullptr);
 
         scene.destroy_entity(temp);
+        scene.flush_destroyed_entities();
         scene.update_physics(cw, 0.016f);
 
         // After destroy + sync, the proxy should be unregistered

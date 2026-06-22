@@ -5,7 +5,6 @@
 #include "engine/renderer/render_queue.h"
 #include "engine/audio/audio_manager.h"
 #include <functional>
-#include <vector>
 
 namespace pino {
 
@@ -15,18 +14,18 @@ namespace pino {
 //   load() → update() per frame → destroy()
 //
 // Update order (each frame):
-//   1. flush deferred destroys
+//   1. flush deferred destroys (from previous frame)
 //   2. user callback (game logic)
 //   3. physics (CollisionWorld)
 //   4. render preparation (RenderQueue)
 //   5. audio (AudioManager spatial sync)
 //
 // Entity destruction is deferred to avoid invalidating component-pool
-// iteration during the update callback. destroyed entities are collected
+// iteration during the update callback.  destroyed entities are collected
 // and flushed at the start of the next frame's update.
 //
 // All external systems are bound via setters (optional — null systems are
-// safely skipped). Future serialization support can inspect
+// safely skipped).  Future serialization support can inspect
 // registry().each() + pool access.
 class EcsWorld {
 public:
@@ -40,14 +39,14 @@ public:
 
     // ── Lifecycle ────────────────────────────────────────────────
 
-    // One-time setup. Create entities and components here.
+    // One-time setup.  Create entities and components here.
     void load();
 
-    // Per-frame update. Safe to call destroy_entity() from the callback
+    // Per-frame update.  Safe to call destroy_entity() from the callback
     // — destruction is deferred until the start of the next update.
     void update(f32 dt);
 
-    // Teardown. Destroys all entities and releases resources.
+    // Teardown.  Destroys all entities and releases resources.
     void destroy();
 
     // ── Entity lifecycle (deferred destruction) ──────────────────
@@ -56,10 +55,10 @@ public:
 
     // Deferred — safe to call from any context (including update iteration).
     // The entity stays alive until the next flush (start of update).
-    void destroy_entity(EntityId entity) { m_pending_destroy.push_back(entity); }
+    void destroy_entity(EntityId entity) { m_scene.destroy_entity(entity); }
 
     // Immediate variant — not safe during the update callback.
-    void destroy_entity_immediate(EntityId entity) { m_scene.destroy_entity(entity); }
+    void destroy_entity_immediate(EntityId entity) { m_scene.destroy_entity_immediate(entity); }
 
     bool alive(EntityId entity) const { return m_scene.alive(entity); }
     u32 entity_count() const { return m_scene.entity_count(); }
@@ -94,17 +93,16 @@ public:
 
     // ── Serialization support (future) ───────────────────────────
     // Use registry().each() + component pools for full entity/component
-    // enumeration. Create via create_entity() + add_component<T>().
+    // enumeration.  Create via create_entity() + add_component<T>().
     // For stable IDs across serialization rounds, extend EntityRegistry
     // with a create(EntityId) overload.
 
 private:
-    EcsScene m_scene;
-    CollisionWorld* m_collision_world = nullptr;
-    RenderQueue*    m_render_queue    = nullptr;
-    AudioManager*   m_audio_manager   = nullptr;
-    UpdateCallback  m_update_callback;
-    std::vector<EntityId> m_pending_destroy;
+    EcsScene              m_scene;
+    CollisionWorld*       m_collision_world = nullptr;
+    RenderQueue*          m_render_queue    = nullptr;
+    AudioManager*         m_audio_manager   = nullptr;
+    UpdateCallback        m_update_callback;
 };
 
 // ── Inline implementations ───────────────────────────────────────
@@ -114,7 +112,7 @@ inline void EcsWorld::load() {
 }
 
 inline void EcsWorld::update(f32 dt) {
-    flush_destroyed();
+    m_scene.flush_destroyed_entities();
 
     if (m_update_callback) {
         m_update_callback(*this, dt);
@@ -134,25 +132,17 @@ inline void EcsWorld::update(f32 dt) {
 }
 
 inline void EcsWorld::destroy() {
-    flush_destroyed();
+    m_scene.flush_destroyed_entities();
     m_scene.clear();
-    m_pending_destroy.clear();
     m_update_callback = nullptr;
 }
 
 inline void EcsWorld::clear() {
-    m_pending_destroy.clear();
     m_scene.clear();
 }
 
 inline void EcsWorld::flush_destroyed() {
-    if (m_pending_destroy.empty()) return;
-    for (auto e : m_pending_destroy) {
-        if (m_scene.alive(e)) {
-            m_scene.destroy_entity(e);
-        }
-    }
-    m_pending_destroy.clear();
+    m_scene.flush_destroyed_entities();
 }
 
 } // namespace pino

@@ -37,7 +37,17 @@ public:
 
     EntityId create_entity() { return m_registry.create(); }
 
+    // Deferred destruction — entity is queued and released during the
+    // next flush_destroyed_entities() call.  Safe to call during component
+    // pool iteration.  Duplicates are handled (alive check in flush).
     void destroy_entity(EntityId entity) {
+        m_destroy_queue.push_back(entity);
+    }
+
+    // Immediate destruction — bypasses the queue.  NOT safe during
+    // component pool iteration (may invalidate the each() cursor).
+    void destroy_entity_immediate(EntityId entity) {
+        if (!alive(entity)) return;
         m_render_components.remove(entity);
         m_physics_components.remove(entity);
         m_audio_components.remove(entity);
@@ -45,8 +55,19 @@ public:
         m_registry.destroy(entity);
     }
 
+    // Process all deferred destroys.  Call once per frame at a predictable
+    // point (e.g. before physics, after the game-logic callback) to amortize
+    // destruction cost.  Idempotent: duplicate entries are safely skipped.
+    void flush_destroyed_entities() {
+        for (auto e : m_destroy_queue) {
+            destroy_entity_immediate(e);
+        }
+        m_destroy_queue.clear();
+    }
+
     bool alive(EntityId entity) const { return m_registry.alive(entity); }
     u32 entity_count() const { return m_registry.count(); }
+    u32 pending_destroy_count() const { return static_cast<u32>(m_destroy_queue.size()); }
 
     // ── Sub-object access ───────────────────────────────────────
 
@@ -161,6 +182,7 @@ public:
     // ── Clear all ───────────────────────────────────────────────
 
     void clear() {
+        m_destroy_queue.clear();
         m_render_components.clear();
         m_physics_components.clear();
         m_audio_components.clear();
@@ -190,6 +212,7 @@ private:
     ComponentPool<PhysicsComponent>  m_physics_components;
     ComponentPool<AudioComponent>    m_audio_components;
     EcsPhysicsAdapter              m_physics_adapter;
+    std::vector<EntityId>          m_destroy_queue;
 };
 
 // ── EcsPhysicsAdapter::sync implementation (needs full EcsScene) ──

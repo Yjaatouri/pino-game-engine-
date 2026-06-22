@@ -343,6 +343,7 @@ int main(int, char**) {
 
         // ── Physics ────────────────────────────────────────────
         profiler.begin(prof_zone_phys);
+        scene.flush_destroyed_entities();
         scene.update_physics(cw, engine.delta_time());
         profiler.end(prof_zone_phys);
 

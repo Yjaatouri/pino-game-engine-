@@ -284,6 +284,7 @@ int main() {
         for (auto e : entities) {
             scene.destroy_entity(e);
         }
+        scene.flush_destroyed_entities();
         TEST("1000 entities created/destroyed", scene.entity_count() == 0);
     }
 
