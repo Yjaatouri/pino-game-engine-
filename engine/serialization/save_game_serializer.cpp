@@ -89,6 +89,16 @@ void SaveGameSerializer::serialize(Serializer& s, EcsScene& scene) {
     });
 }
 
+void SaveGameSerializer::serialize(Serializer& s, EcsScene& scene, ProgressCallback cb) {
+    uint32_t total = scene.entity_count();
+    uint32_t count = 0;
+    scene.registry().each([&](EntityId id) {
+        writeEntity(s, id, scene);
+        ++count;
+        if (cb) cb(count, total);
+    });
+}
+
 EntityId SaveGameSerializer::readEntity(const SaveEntityData& data, EcsScene& scene, AssetManager* assets) {
     EntityId id = scene.create_entity();
 

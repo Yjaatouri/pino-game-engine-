@@ -5,6 +5,7 @@
 #include "engine/core/version_registry.h"
 #include "engine/core/string_table.h"
 #include "engine/ecs/ecs_scene.h"
+#include <functional>
 
 namespace pino {
 
@@ -43,12 +44,16 @@ struct SaveEntityData {
 
 class SaveGameSerializer {
 public:
+    // Progress callback: receives (entities_serialized_so_far, total_entities).
+    using ProgressCallback = std::function<void(uint32_t current, uint32_t total)>;
+
     SaveGameSerializer(TypeRegistry& types, VersionRegistry& versions, StringTable& strings);
 
     static void registerTypes(TypeRegistry& types);
     static void registerVersions(VersionRegistry& versions);
 
     void serialize(Serializer& s, EcsScene& scene);
+    void serialize(Serializer& s, EcsScene& scene, ProgressCallback cb);
     void deserialize(Deserializer& d, EcsScene& scene, AssetManager* assets = nullptr);
 
     static constexpr uint32_t kEntityChunkType = 301;
