@@ -42,6 +42,17 @@ void write_cooked_mesh_payload(Serializer& s, const CookedMeshData& mesh) {
     s.writeUInt32(mesh.index_count);
     s.writeUInt32(mesh.vertex_stride);
 
+    // Vertex layout metadata (v4+) — before vertex_data so consumers can interpret it
+    s.writeUInt32(mesh.position_attrib.byte_offset);
+    s.writeUInt32(mesh.position_attrib.byte_size);
+    s.writeUInt32(mesh.position_attrib.component_count);
+    s.writeUInt32(mesh.normal_attrib.byte_offset);
+    s.writeUInt32(mesh.normal_attrib.byte_size);
+    s.writeUInt32(mesh.normal_attrib.component_count);
+    s.writeUInt32(mesh.uv_attrib.byte_offset);
+    s.writeUInt32(mesh.uv_attrib.byte_size);
+    s.writeUInt32(mesh.uv_attrib.component_count);
+
     u32 vert_bytes = mesh.vertex_count * mesh.vertex_stride;
     if (vert_bytes > 0)
         s.writeBytes(mesh.vertex_data.data(), vert_bytes);
@@ -49,13 +60,22 @@ void write_cooked_mesh_payload(Serializer& s, const CookedMeshData& mesh) {
     if (mesh.index_count > 0)
         s.writeBytes(mesh.indices.data(), mesh.index_count * sizeof(u32));
 
-    // Tangent/bitangent (optional)
-    bool has_tangents = !mesh.tangent_data.empty() && !mesh.bitangent_data.empty();
-    s.writeBool(has_tangents);
-    if (has_tangents) {
+    // Explicit attribute presence flags (v3+)
+    s.writeBool(mesh.has_positions);
+    s.writeBool(mesh.has_normals);
+    s.writeBool(mesh.has_uvs);
+    s.writeBool(mesh.has_tangents);
+    s.writeBool(mesh.has_bitangents);
+
+    // Per-vertex sizes for optional attributes (v4+)
+    s.writeUInt32(mesh.tangent_per_vertex);
+    s.writeUInt32(mesh.bitangent_per_vertex);
+
+    // Tangent/bitangent data (present only when flags are set)
+    if (mesh.has_tangents && !mesh.tangent_data.empty())
         s.writeBytes(mesh.tangent_data.data(), static_cast<u32>(mesh.tangent_data.size()));
+    if (mesh.has_bitangents && !mesh.bitangent_data.empty())
         s.writeBytes(mesh.bitangent_data.data(), static_cast<u32>(mesh.bitangent_data.size()));
-    }
 
     s.writeVec3(mesh.bounds_min);
     s.writeVec3(mesh.bounds_max);
@@ -68,6 +88,17 @@ void read_cooked_mesh_payload(Deserializer& d, CookedMeshData& mesh) {
     mesh.index_count    = d.readUInt32();
     mesh.vertex_stride  = d.readUInt32();
 
+    // Vertex layout metadata (v4+)
+    mesh.position_attrib.byte_offset     = d.readUInt32();
+    mesh.position_attrib.byte_size       = d.readUInt32();
+    mesh.position_attrib.component_count = d.readUInt32();
+    mesh.normal_attrib.byte_offset       = d.readUInt32();
+    mesh.normal_attrib.byte_size         = d.readUInt32();
+    mesh.normal_attrib.component_count   = d.readUInt32();
+    mesh.uv_attrib.byte_offset           = d.readUInt32();
+    mesh.uv_attrib.byte_size             = d.readUInt32();
+    mesh.uv_attrib.component_count       = d.readUInt32();
+
     u32 vert_bytes = mesh.vertex_count * mesh.vertex_stride;
     mesh.vertex_data.resize(vert_bytes);
     if (vert_bytes > 0)
@@ -77,14 +108,29 @@ void read_cooked_mesh_payload(Deserializer& d, CookedMeshData& mesh) {
     if (mesh.index_count > 0)
         d.readBytes(mesh.indices.data(), mesh.index_count * sizeof(u32));
 
-    // Tangent/bitangent (v2+)
-    bool has_tangents = d.readBool();
-    if (has_tangents) {
-        u32 tangent_bytes = mesh.vertex_count * sizeof(glm::vec3);
+    // Read explicit attribute flags (v3+)
+    mesh.has_positions   = d.readBool();
+    mesh.has_normals     = d.readBool();
+    mesh.has_uvs         = d.readBool();
+    mesh.has_tangents    = d.readBool();
+    mesh.has_bitangents  = d.readBool();
+
+    // Per-vertex sizes for optional attributes (v4+)
+    mesh.tangent_per_vertex   = d.readUInt32();
+    mesh.bitangent_per_vertex = d.readUInt32();
+
+    // Tangent/bitangent data (sized using explicit per-vertex sizes)
+    if (mesh.has_tangents) {
+        u32 tangent_bytes = mesh.vertex_count * mesh.tangent_per_vertex;
         mesh.tangent_data.resize(tangent_bytes);
-        mesh.bitangent_data.resize(tangent_bytes);
-        d.readBytes(mesh.tangent_data.data(), tangent_bytes);
-        d.readBytes(mesh.bitangent_data.data(), tangent_bytes);
+        if (tangent_bytes > 0)
+            d.readBytes(mesh.tangent_data.data(), tangent_bytes);
+    }
+    if (mesh.has_bitangents) {
+        u32 bitangent_bytes = mesh.vertex_count * mesh.bitangent_per_vertex;
+        mesh.bitangent_data.resize(bitangent_bytes);
+        if (bitangent_bytes > 0)
+            d.readBytes(mesh.bitangent_data.data(), bitangent_bytes);
     }
 
     mesh.bounds_min    = d.readVec3();

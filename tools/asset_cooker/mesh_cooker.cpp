@@ -244,6 +244,21 @@ public:
         mesh.index_count   = static_cast<u32>(opt_indices.size());
         mesh.vertex_stride = sizeof(Vertex);
 
+        // Explicit vertex layout metadata — fully self-descriptive
+        mesh.position_attrib   = { 0, 12, 3 };  // offset=0,  sizeof(vec3), 3 floats
+        mesh.normal_attrib     = { 12, 12, 3 }; // offset=12, sizeof(vec3), 3 floats
+        mesh.uv_attrib         = { 24, 8, 2 };  // offset=24, sizeof(vec2), 2 floats
+
+        // Explicit attribute presence — no implicit assumptions at runtime
+        mesh.has_positions   = true;
+        mesh.has_normals     = true;
+        mesh.has_uvs         = true;
+        mesh.has_tangents    = !tangents.empty();
+        mesh.has_bitangents  = !bitangents.empty();
+
+        mesh.tangent_per_vertex   = sizeof(glm::vec3);
+        mesh.bitangent_per_vertex = sizeof(glm::vec3);
+
         mesh.vertex_data.resize(unique_verts.size() * sizeof(Vertex));
         std::memcpy(mesh.vertex_data.data(), unique_verts.data(), mesh.vertex_data.size());
 

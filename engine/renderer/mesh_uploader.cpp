@@ -7,12 +7,15 @@
 
 namespace pino {
 
-// ── Layout inference ─────────────────────────────────────────────
+// ── Layout inference — copies explicit metadata, NO fallback assumptions ──
 MeshUploadLayout MeshUploader::infer_layout(const CookedMeshData& data) {
     MeshUploadLayout layout;
-    layout.vertex_stride = data.vertex_stride > 0 ? data.vertex_stride : sizeof(Vertex);
-    layout.has_tangents   = !data.tangent_data.empty();
-    layout.has_bitangents = !data.bitangent_data.empty();
+    layout.vertex_stride    = data.vertex_stride;
+    layout.has_positions    = data.has_positions;
+    layout.has_normals      = data.has_normals;
+    layout.has_uvs          = data.has_uvs;
+    layout.has_tangents     = data.has_tangents;
+    layout.has_bitangents   = data.has_bitangents;
     return layout;
 }
 
@@ -31,27 +34,33 @@ bool MeshUploader::upload_vertex_data(Mesh& mesh, const CookedMeshData& data,
                  data.vertex_data.data(),
                  GL_STATIC_DRAW);
 
-    // Position (location 0)
+    // Position (location 0) — use explicit layout metadata from CookedMeshData
     if (layout.has_positions) {
-        glVertexAttribPointer(layout.position_location, 3, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(layout.position_location,
+                              static_cast<GLint>(data.position_attrib.component_count),
+                              GL_FLOAT, GL_FALSE,
                               static_cast<GLsizei>(layout.vertex_stride),
-                              reinterpret_cast<const void*>(offsetof(Vertex, position)));
+                              reinterpret_cast<const void*>(static_cast<size_t>(data.position_attrib.byte_offset)));
         glEnableVertexAttribArray(layout.position_location);
     }
 
     // Normal (location 1)
     if (layout.has_normals) {
-        glVertexAttribPointer(layout.normal_location, 3, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(layout.normal_location,
+                              static_cast<GLint>(data.normal_attrib.component_count),
+                              GL_FLOAT, GL_FALSE,
                               static_cast<GLsizei>(layout.vertex_stride),
-                              reinterpret_cast<const void*>(offsetof(Vertex, normal)));
+                              reinterpret_cast<const void*>(static_cast<size_t>(data.normal_attrib.byte_offset)));
         glEnableVertexAttribArray(layout.normal_location);
     }
 
     // UV (location 2)
     if (layout.has_uvs) {
-        glVertexAttribPointer(layout.uv_location, 2, GL_FLOAT, GL_FALSE,
+        glVertexAttribPointer(layout.uv_location,
+                              static_cast<GLint>(data.uv_attrib.component_count),
+                              GL_FLOAT, GL_FALSE,
                               static_cast<GLsizei>(layout.vertex_stride),
-                              reinterpret_cast<const void*>(offsetof(Vertex, uv)));
+                              reinterpret_cast<const void*>(static_cast<size_t>(data.uv_attrib.byte_offset)));
         glEnableVertexAttribArray(layout.uv_location);
     }
 
@@ -78,41 +87,43 @@ void MeshUploader::upload_optional_attribs(Mesh& mesh, const CookedMeshData& dat
         return;
 
     u32 count = data.vertex_count;
-    u32 attrib_size = static_cast<u32>(sizeof(glm::vec3));
 
-    // Tangent VBO (location 3)
+    // Tangent VBO (location 3) — use explicit per-vertex size
     glGenBuffers(1, &mesh.m_tangent_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, mesh.m_tangent_vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(count * attrib_size),
+                 static_cast<GLsizeiptr>(count * data.tangent_per_vertex),
                  data.tangent_data.data(),
                  GL_STATIC_DRAW);
     glVertexAttribPointer(layout.tangent_location, 3, GL_FLOAT, GL_FALSE,
-                          static_cast<GLsizei>(attrib_size), nullptr);
+                          static_cast<GLsizei>(data.tangent_per_vertex), nullptr);
     glEnableVertexAttribArray(layout.tangent_location);
 
-    // Bitangent VBO (location 4)
+    // Bitangent VBO (location 4) — use explicit per-vertex size
     glGenBuffers(1, &mesh.m_bitangent_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, mesh.m_bitangent_vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(count * attrib_size),
+                 static_cast<GLsizeiptr>(count * data.bitangent_per_vertex),
                  data.bitangent_data.data(),
                  GL_STATIC_DRAW);
     glVertexAttribPointer(layout.bitangent_location, 3, GL_FLOAT, GL_FALSE,
-                          static_cast<GLsizei>(attrib_size), nullptr);
+                          static_cast<GLsizei>(data.bitangent_per_vertex), nullptr);
     glEnableVertexAttribArray(layout.bitangent_location);
 }
 
-// ── Bounds computation ───────────────────────────────────────────
+// ── Bounds computation — uses explicit position offset/stride from metadata ──
 void MeshUploader::compute_bounds(Mesh& mesh, const CookedMeshData& data) {
-    if (data.vertex_count == 0 || data.vertex_data.empty())
+    if (data.vertex_count == 0 || data.vertex_data.empty() || !data.has_positions)
         return;
-    const Vertex* verts = reinterpret_cast<const Vertex*>(data.vertex_data.data());
+    u32 stride = data.vertex_stride;
+    u32 pos_off = data.position_attrib.byte_offset;
+    const u8* base = data.vertex_data.data();
     mesh.m_local_min = { FLT_MAX, FLT_MAX, FLT_MAX };
     mesh.m_local_max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
     for (u32 i = 0; i < data.vertex_count; ++i) {
-        mesh.m_local_min = glm::min(mesh.m_local_min, verts[i].position);
-        mesh.m_local_max = glm::max(mesh.m_local_max, verts[i].position);
+        const glm::vec3* pos = reinterpret_cast<const glm::vec3*>(base + pos_off + i * stride);
+        mesh.m_local_min = glm::min(mesh.m_local_min, *pos);
+        mesh.m_local_max = glm::max(mesh.m_local_max, *pos);
     }
 }
 

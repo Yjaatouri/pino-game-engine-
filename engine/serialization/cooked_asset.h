@@ -27,7 +27,7 @@ namespace CookedType {
 
 // ── Version constants ────────────────────────────────────────────
 namespace CookedVersion {
-    static constexpr u32 Mesh     = 2;
+    static constexpr u32 Mesh     = 4;
     static constexpr u32 Texture  = 1;
     static constexpr u32 Shader   = 1;
     static constexpr u32 Material  = 1;
@@ -72,6 +72,15 @@ struct CookedAssetHeader {
     u32    flags;
 };
 
+// ── Vertex attribute layout descriptor ───────────────────────────
+// Fully describes one attribute within the interleaved vertex data.
+// Runtime MUST use these values — never assume struct layout.
+struct VertexAttribDesc {
+    u32 byte_offset     = 0;  // byte offset within vertex stride
+    u32 byte_size       = 0;  // byte size for one vertex (e.g. 12 for vec3)
+    u32 component_count = 0;  // 1, 2, 3, or 4 (always float components)
+};
+
 // ── CookedMesh ───────────────────────────────────────────────────
 struct CookedMeshData {
     u32             vertex_count  = 0;
@@ -79,8 +88,27 @@ struct CookedMeshData {
     u32             vertex_stride = 0;
     std::vector<u8> vertex_data;
     std::vector<u32> indices;
-    std::vector<u8> tangent_data;     // vertex_count * 12 bytes (vec3), empty if not generated
-    std::vector<u8> bitangent_data;   // vertex_count * 12 bytes (vec3), empty if not generated
+
+    // ── Vertex layout metadata (fully describes interleaved format) ──
+    // Runtime MUST read these instead of assuming a fixed struct layout.
+    VertexAttribDesc position_attrib;   // offset=0,  byte_size=12, component_count=3
+    VertexAttribDesc normal_attrib;     // offset=12, byte_size=12, component_count=3
+    VertexAttribDesc uv_attrib;         // offset=24, byte_size=8,  component_count=2
+
+    // ── Explicit attribute presence flags — runtime NEVER infers layout ──
+    bool            has_positions   = true;
+    bool            has_normals     = true;
+    bool            has_uvs         = true;
+    bool            has_tangents    = false;
+    bool            has_bitangents  = false;
+
+    // ── Per-vertex byte size for optional attributes (v4+) ──
+    u32             tangent_per_vertex   = 12;  // sizeof(vec3)
+    u32             bitangent_per_vertex = 12;  // sizeof(vec3)
+
+    std::vector<u8> tangent_data;
+    std::vector<u8> bitangent_data;
+
     glm::vec3       bounds_min    = glm::vec3(0.0f);
     glm::vec3       bounds_max    = glm::vec3(0.0f);
     glm::vec3       bounds_center = glm::vec3(0.0f);
