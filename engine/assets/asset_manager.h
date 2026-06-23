@@ -71,6 +71,15 @@ public:
     // Access the asset registry (for tools / debugging)
     const AssetRegistry* registry() const { return &m_registry; }
 
+    // ---- Debug API ----
+    // Prints the source (cooked/raw/cached) for a given asset key.
+    void print_loaded_asset_source(const char* path) const;
+    void print_loaded_asset_source(const char* vert_path, const char* frag_path) const;
+
+    // Prints the full resolution chain: normalize → cache → manifest → source → hash.
+    void dump_asset_resolution_chain(const char* path) const;
+    void dump_asset_resolution_chain(const char* vert_path, const char* frag_path) const;
+
 private:
     Mesh*    load_mesh(const char* path);
     Texture* load_texture(const char* path);

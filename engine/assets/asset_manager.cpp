@@ -631,4 +631,132 @@ void AssetManager::invalidate_all() {
     PINO_INFO("All GPU resources invalidated (context loss)");
 }
 
+// ═══════════════════════════════════════════════════════════════════
+//  Debug API
+// ═══════════════════════════════════════════════════════════════════
+
+void AssetManager::print_loaded_asset_source(const char* path) const {
+    std::string key = normalize_asset_path(path);
+
+    // Check caches
+    if (m_mesh_cache.count(key))
+        { PINO_INFO("[debug] mesh '%s' → CACHED", key.c_str()); return; }
+    if (m_tex_cache.count(key))
+        { PINO_INFO("[debug] texture '%s' → CACHED", key.c_str()); return; }
+
+    // Not cached — check source
+    if (m_cooked_source) {
+        std::string resolved = m_registry.resolve(key.c_str());
+        if (!resolved.empty()) {
+            if (m_cooked_source->exists(resolved.c_str()))
+                { PINO_INFO("[debug] '%s' → not cached, source: COOKED", key.c_str()); return; }
+            else
+                { PINO_INFO("[debug] '%s' → not cached, source: RAW (cooked file missing)", key.c_str()); return; }
+        }
+    }
+    // Fallthrough: raw source
+    PINO_INFO("[debug] '%s' → not cached, source: RAW", key.c_str());
+}
+
+void AssetManager::print_loaded_asset_source(const char* vert_path, const char* frag_path) const {
+    std::string key = shader_key(vert_path, frag_path);
+
+    if (m_shader_cache.count(key))
+        { PINO_INFO("[debug] shader '%s|%s' → CACHED", normalize_asset_path(vert_path).c_str(), normalize_asset_path(frag_path).c_str()); return; }
+
+    std::string vert_norm = normalize_asset_path(vert_path);
+    if (m_cooked_source) {
+        std::string resolved = m_registry.resolve(vert_norm.c_str());
+        if (!resolved.empty()) {
+            if (m_cooked_source->exists(resolved.c_str()))
+                { PINO_INFO("[debug] shader '%s|%s' → not cached, source: COOKED",
+                            vert_norm.c_str(), normalize_asset_path(frag_path).c_str()); return; }
+        }
+    }
+    PINO_INFO("[debug] shader '%s|%s' → not cached, source: RAW",
+              vert_norm.c_str(), normalize_asset_path(frag_path).c_str());
+}
+
+void AssetManager::dump_asset_resolution_chain(const char* path) const {
+    std::string key = normalize_asset_path(path);
+    PINO_INFO("── Resolution chain: '%s' ──", path);
+    PINO_INFO("  1. Normalize → '%s'", key.c_str());
+
+    // Step 2: cache check
+    bool in_mesh_cache = m_mesh_cache.count(key) > 0;
+    bool in_tex_cache  = m_tex_cache.count(key) > 0;
+    if (in_mesh_cache)
+        { PINO_INFO("  2. Cache → HIT (mesh cache)"); return; }
+    if (in_tex_cache)
+        { PINO_INFO("  2. Cache → HIT (texture cache)"); return; }
+    PINO_INFO("  2. Cache → MISS");
+
+    // Step 3: manifest resolve
+    std::string resolved;
+    bool in_manifest = false;
+    if (m_cooked_source) {
+        resolved = m_registry.resolve(key.c_str());
+        in_manifest = !resolved.empty();
+        if (in_manifest)
+            PINO_INFO("  3. Manifest → FOUND (canonical key: '%s')", resolved.c_str());
+        else
+            PINO_INFO("  3. Manifest → NOT FOUND");
+    } else {
+        PINO_INFO("  3. Manifest → no manifest loaded (cooked mode inactive)");
+    }
+
+    // Step 4: source query
+    if (in_manifest) {
+        bool cooked_exists = m_cooked_source->exists(resolved.c_str());
+        if (cooked_exists)
+            PINO_INFO("  4. Cooked source → EXISTS ('%s')", resolved.c_str());
+        else
+            PINO_INFO("  4. Cooked source → MISSING ('%s')", resolved.c_str());
+
+        PINO_INFO("  5. Raw source → EXISTS ('%s') (will fall back if cooked fails)", key.c_str());
+    } else {
+        bool raw_exists = m_raw_source->exists(key.c_str());
+        if (raw_exists)
+            PINO_INFO("  4. Raw source → EXISTS ('%s')", key.c_str());
+        else
+            PINO_INFO("  4. Raw source → MISSING ('%s')", key.c_str());
+    }
+    PINO_INFO("── End resolution chain ──");
+}
+
+void AssetManager::dump_asset_resolution_chain(const char* vert_path, const char* frag_path) const {
+    std::string vert_norm = normalize_asset_path(vert_path);
+    std::string frag_norm = normalize_asset_path(frag_path);
+    std::string key = shader_key(vert_path, frag_path);
+    PINO_INFO("── Resolution chain: shader '%s | %s' ──", vert_norm.c_str(), frag_norm.c_str());
+    PINO_INFO("  1. Normalize → '%s', '%s'", vert_norm.c_str(), frag_norm.c_str());
+
+    if (m_shader_cache.count(key))
+        { PINO_INFO("  2. Cache → HIT (shader cache)"); return; }
+    PINO_INFO("  2. Cache → MISS");
+
+    if (m_cooked_source) {
+        std::string resolved = m_registry.resolve(vert_norm.c_str());
+        bool in_manifest = !resolved.empty();
+        if (in_manifest) {
+            PINO_INFO("  3. Manifest → FOUND (canonical key: '%s')", resolved.c_str());
+            bool cooked_exists = m_cooked_source->exists(resolved.c_str());
+            if (cooked_exists)
+                PINO_INFO("  4. Cooked source → EXISTS ('%s')", resolved.c_str());
+            else
+                PINO_INFO("  4. Cooked source → MISSING ('%s')", resolved.c_str());
+            PINO_INFO("  5. Resolution → will try COOKED, fall back to RAW");
+        } else {
+            PINO_INFO("  3. Manifest → NOT FOUND");
+            PINO_INFO("  4. Resolution → will use RAW (vert='%s', frag='%s')",
+                      vert_norm.c_str(), frag_norm.c_str());
+        }
+    } else {
+        PINO_INFO("  3. Manifest → no manifest loaded");
+        PINO_INFO("  4. Resolution → will use RAW (vert='%s', frag='%s')",
+                  vert_norm.c_str(), frag_norm.c_str());
+    }
+    PINO_INFO("── End resolution chain ──");
+}
+
 } // namespace pino
