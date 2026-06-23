@@ -2,6 +2,8 @@
 #include "engine/core/log.h"
 #include "engine/core/math_utils.h"
 #include "engine/serialization/cooked_asset.h"
+#include "engine/assets/cooked_file_source.h"
+#include "engine/assets/raw_file_source.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -49,6 +51,7 @@ std::string normalize_asset_path(const char* path) {
 
 // ── AssetManager ────────────────────────────────────────────────
 AssetManager::AssetManager(FileSystem& fs) : m_fs(fs) {
+    m_raw_source = std::make_unique<RawFileSource>(fs);
     init_fallback_assets();
 }
 
@@ -58,75 +61,45 @@ std::string AssetManager::shader_key(const char* vert_path, const char* frag_pat
     return normalize_asset_path(vert_path) + "|" + normalize_asset_path(frag_path);
 }
 
+std::string AssetManager::strip_extension(const std::string& path) {
+    auto dot = path.rfind('.');
+    if (dot == std::string::npos) return path;
+    return path.substr(0, dot);
+}
+
 // ═══════════════════════════════════════════════════════════════════
 //  Cooked manifest support
 // ═══════════════════════════════════════════════════════════════════
 
 bool AssetManager::load_cooked_manifest(const char* manifest_path, const char* cooked_dir) {
-    m_cooked_dir = cooked_dir;
-    for (auto& ch : m_cooked_dir) if (ch == '\\') ch = '/';
-    if (!m_cooked_dir.empty() && m_cooked_dir.back() != '/')
-        m_cooked_dir.push_back('/');
-
     if (!m_registry.load_from_path(manifest_path)) {
         PINO_ERROR("AssetManager: failed to load cooked manifest: %s", manifest_path);
-        m_cooked_manifest_loaded = false;
         return false;
     }
 
-    m_cooked_manifest_loaded = true;
+    m_cooked_source = std::make_unique<CookedFileSource>(m_fs, m_registry, cooked_dir);
+
     PINO_INFO("AssetManager: cooked manifest loaded (%u entries, dir: %s)",
-              m_registry.entry_count(), m_cooked_dir.c_str());
+              m_registry.entry_count(), cooked_dir ? cooked_dir : "");
     return true;
 }
 
-std::string AssetManager::asset_key_from_path(const std::string& normalized_path) const {
-    // Strip the last extension: "models/cube.obj" -> "models/cube"
-    auto dot = normalized_path.rfind('.');
-    if (dot == std::string::npos) return normalized_path;
-    return normalized_path.substr(0, dot);
-}
-
-std::string AssetManager::cooked_file_path(const std::string& asset_key) const {
-    // "models/cube" -> "{cooked_dir}models_cube.pino_cooked"
-    std::string filename = asset_key;
-    for (auto& ch : filename) if (ch == '/') ch = '_';
-    return m_cooked_dir + filename + ".pino_cooked";
-}
-
 // ═══════════════════════════════════════════════════════════════════
-//  Cooked mesh loading
+//  Cooked blob deserialization
 // ═══════════════════════════════════════════════════════════════════
 
-bool AssetManager::load_mesh_cooked(const std::string& asset_key,
-                                    Mesh*& out_mesh, std::shared_ptr<Mesh>& out_shared)
+bool AssetManager::load_mesh_from_cooked_blob(const BinaryBlob& blob,
+                                               Mesh*& out_mesh, std::shared_ptr<Mesh>& out_shared)
 {
-    const auto* entry = m_registry.find(asset_key.c_str());
-    if (!entry) return false;
-
-    std::string path = cooked_file_path(asset_key);
-    std::vector<u8> file_data = m_fs.read_binary(path.c_str());
-    if (file_data.empty()) {
-        PINO_WARN("Cooked mesh file missing: %s", path.c_str());
-        return false;
-    }
-
-    // Verify file integrity against manifest hash
-    u64 file_hash = cooked_hash_fnv1a(file_data.data(), static_cast<u32>(file_data.size()));
-    if (file_hash != entry->asset_hash) {
-        PINO_ERROR("Cooked mesh hash mismatch for %s", asset_key.c_str());
-        return false;
-    }
-
     CookedMeshData mesh_data;
-    BinaryChunkReader reader(file_data.data(), static_cast<u32>(file_data.size()));
+    BinaryChunkReader reader(blob.data.data(), static_cast<u32>(blob.data.size()));
     if (!read_cooked_mesh(reader, mesh_data)) {
-        PINO_ERROR("Failed to deserialize cooked mesh: %s", asset_key.c_str());
+        PINO_ERROR("Failed to deserialize cooked mesh: %s", blob.debug_path.c_str());
         return false;
     }
 
     if (mesh_data.vertex_count == 0 || mesh_data.vertex_data.empty()) {
-        PINO_ERROR("Cooked mesh has no vertices: %s", asset_key.c_str());
+        PINO_ERROR("Cooked mesh has no vertices: %s", blob.debug_path.c_str());
         return false;
     }
 
@@ -135,46 +108,26 @@ bool AssetManager::load_mesh_cooked(const std::string& asset_key,
     const u32* idx = mesh_data.indices.data();
     mesh->upload(verts, mesh_data.vertex_count, idx, mesh_data.index_count);
 
-    PINO_INFO("Loaded cooked mesh: %s (%u verts, %u indices)",
-              asset_key.c_str(), mesh_data.vertex_count, mesh_data.index_count);
+    PINO_INFO("Loaded cooked mesh (%u verts, %u indices)",
+              mesh_data.vertex_count, mesh_data.index_count);
 
     out_mesh = mesh.get();
     out_shared = std::move(mesh);
     return true;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  Cooked texture loading
-// ═══════════════════════════════════════════════════════════════════
-
-bool AssetManager::load_texture_cooked(const std::string& asset_key,
-                                       Texture*& out_tex, std::shared_ptr<Texture>& out_shared)
+bool AssetManager::load_texture_from_cooked_blob(const BinaryBlob& blob,
+                                                  Texture*& out_tex, std::shared_ptr<Texture>& out_shared)
 {
-    const auto* entry = m_registry.find(asset_key.c_str());
-    if (!entry) return false;
-
-    std::string path = cooked_file_path(asset_key);
-    std::vector<u8> file_data = m_fs.read_binary(path.c_str());
-    if (file_data.empty()) {
-        PINO_WARN("Cooked texture file missing: %s", path.c_str());
-        return false;
-    }
-
-    u64 file_hash = cooked_hash_fnv1a(file_data.data(), static_cast<u32>(file_data.size()));
-    if (file_hash != entry->asset_hash) {
-        PINO_ERROR("Cooked texture hash mismatch for %s", asset_key.c_str());
-        return false;
-    }
-
     CookedTextureData tex_data;
-    BinaryChunkReader reader(file_data.data(), static_cast<u32>(file_data.size()));
+    BinaryChunkReader reader(blob.data.data(), static_cast<u32>(blob.data.size()));
     if (!read_cooked_texture(reader, tex_data)) {
-        PINO_ERROR("Failed to deserialize cooked texture: %s", asset_key.c_str());
+        PINO_ERROR("Failed to deserialize cooked texture: %s", blob.debug_path.c_str());
         return false;
     }
 
     if (tex_data.width == 0 || tex_data.height == 0 || tex_data.mip_data.empty()) {
-        PINO_ERROR("Cooked texture has no pixels: %s", asset_key.c_str());
+        PINO_ERROR("Cooked texture has no pixels: %s", blob.debug_path.c_str());
         return false;
     }
 
@@ -183,50 +136,28 @@ bool AssetManager::load_texture_cooked(const std::string& asset_key,
                      static_cast<i32>(tex_data.width),
                      static_cast<i32>(tex_data.height));
 
-    PINO_INFO("Loaded cooked texture: %s (%dx%d)",
-              asset_key.c_str(), tex_data.width, tex_data.height);
+    PINO_INFO("Loaded cooked texture (%dx%d)", tex_data.width, tex_data.height);
 
     out_tex = tex.get();
     out_shared = std::move(tex);
     return true;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  Cooked shader loading
-// ═══════════════════════════════════════════════════════════════════
-
-bool AssetManager::load_shader_cooked(const std::string& asset_key,
-                                      Shader*& out_shader, std::shared_ptr<Shader>& out_shared)
+bool AssetManager::load_shader_from_cooked_blob(const BinaryBlob& blob,
+                                                 Shader*& out_shader, std::shared_ptr<Shader>& out_shared)
 {
-    const auto* entry = m_registry.find(asset_key.c_str());
-    if (!entry) return false;
-
-    std::string path = cooked_file_path(asset_key);
-    std::vector<u8> file_data = m_fs.read_binary(path.c_str());
-    if (file_data.empty()) {
-        PINO_WARN("Cooked shader file missing: %s", path.c_str());
-        return false;
-    }
-
-    u64 file_hash = cooked_hash_fnv1a(file_data.data(), static_cast<u32>(file_data.size()));
-    if (file_hash != entry->asset_hash) {
-        PINO_ERROR("Cooked shader hash mismatch for %s", asset_key.c_str());
-        return false;
-    }
-
     CookedShaderData shader_data;
-    BinaryChunkReader reader(file_data.data(), static_cast<u32>(file_data.size()));
+    BinaryChunkReader reader(blob.data.data(), static_cast<u32>(blob.data.size()));
     if (!read_cooked_shader(reader, shader_data)) {
-        PINO_ERROR("Failed to deserialize cooked shader: %s", asset_key.c_str());
+        PINO_ERROR("Failed to deserialize cooked shader: %s", blob.debug_path.c_str());
         return false;
     }
 
     if (shader_data.vert_stage.empty() || shader_data.frag_stage.empty()) {
-        PINO_ERROR("Cooked shader has no source: %s", asset_key.c_str());
+        PINO_ERROR("Cooked shader has no source: %s", blob.debug_path.c_str());
         return false;
     }
 
-    // Ensure null-terminated strings for Shader::load
     auto vec_to_str = [](const std::vector<u8>& vec) -> std::string {
         if (vec.empty()) return {};
         if (vec.back() == '\0') return reinterpret_cast<const char*>(vec.data());
@@ -238,11 +169,149 @@ bool AssetManager::load_shader_cooked(const std::string& asset_key,
 
     auto shader = std::make_shared<Shader>();
     if (!shader->load(vert_src.c_str(), frag_src.c_str())) {
-        PINO_ERROR("Failed to compile cooked shader: %s", asset_key.c_str());
+        PINO_ERROR("Failed to compile cooked shader: %s", blob.debug_path.c_str());
         return false;
     }
 
-    PINO_INFO("Loaded cooked shader: %s", asset_key.c_str());
+    out_shader = shader.get();
+    out_shared = std::move(shader);
+    return true;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  Raw blob parsing
+// ═══════════════════════════════════════════════════════════════════
+
+bool AssetManager::load_mesh_from_raw_blob(const BinaryBlob& blob,
+                                            Mesh*& out_mesh, std::shared_ptr<Mesh>& out_shared)
+{
+    std::string src(reinterpret_cast<const char*>(blob.data.data()), blob.data.size());
+
+    tinyobj::ObjReader reader;
+    tinyobj::ObjReaderConfig cfg;
+    cfg.triangulate = true;
+    cfg.vertex_color = false;
+
+    if (!reader.ParseFromString(src, "", cfg)) {
+        PINO_ERROR("tinyobj error for %s: %s", blob.debug_path.c_str(), reader.Error().c_str());
+        return false;
+    }
+    if (!reader.Warning().empty()) {
+        PINO_WARN("tinyobj warning for %s: %s", blob.debug_path.c_str(), reader.Warning().c_str());
+    }
+
+    const auto& attrib = reader.GetAttrib();
+    const auto& shapes = reader.GetShapes();
+
+    if (shapes.empty()) {
+        PINO_ERROR("No shapes in .obj: %s", blob.debug_path.c_str());
+        return false;
+    }
+
+    std::vector<Vertex> vertices;
+    std::vector<u32>    indices;
+
+    for (const auto& shape : shapes) {
+        u32 index_offset = 0;
+        for (usize f = 0; f < shape.mesh.num_face_vertices.size(); ++f) {
+            u32 fv = shape.mesh.num_face_vertices[f];
+            for (u32 v = 0; v < fv; ++v) {
+                tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
+
+                Vertex vert;
+                vert.position.x = attrib.vertices[3 * idx.vertex_index + 0];
+                vert.position.y = attrib.vertices[3 * idx.vertex_index + 1];
+                vert.position.z = attrib.vertices[3 * idx.vertex_index + 2];
+
+                if (idx.normal_index >= 0) {
+                    vert.normal.x = attrib.normals[3 * idx.normal_index + 0];
+                    vert.normal.y = attrib.normals[3 * idx.normal_index + 1];
+                    vert.normal.z = attrib.normals[3 * idx.normal_index + 2];
+                } else {
+                    vert.normal = {0, 1, 0};
+                }
+
+                if (idx.texcoord_index >= 0) {
+                    vert.uv.x = attrib.texcoords[2 * idx.texcoord_index + 0];
+                    vert.uv.y = 1.0f - attrib.texcoords[2 * idx.texcoord_index + 1];
+                } else {
+                    vert.uv = {0, 0};
+                }
+
+                vertices.push_back(vert);
+                indices.push_back(static_cast<u32>(indices.size()));
+            }
+            index_offset += fv;
+        }
+    }
+
+    if (vertices.empty()) {
+        PINO_ERROR("No vertices from: %s", blob.debug_path.c_str());
+        return false;
+    }
+
+    auto mesh = std::make_shared<Mesh>();
+    mesh->upload(vertices.data(), static_cast<u32>(vertices.size()),
+                 indices.data(),  static_cast<u32>(indices.size()));
+
+    PINO_INFO("Loaded mesh from raw: %s (%u verts, %u indices)",
+              blob.debug_path.c_str(),
+              static_cast<u32>(vertices.size()),
+              static_cast<u32>(indices.size()));
+
+    out_mesh = mesh.get();
+    out_shared = std::move(mesh);
+    return true;
+}
+
+bool AssetManager::load_texture_from_raw_blob(const BinaryBlob& blob,
+                                               Texture*& out_tex, std::shared_ptr<Texture>& out_shared)
+{
+    i32 w = 0, h = 0, channels = 0;
+    stbi_set_flip_vertically_on_load(1);
+
+    unsigned char* pixels = stbi_load_from_memory(
+        blob.data.data(), static_cast<i32>(blob.data.size()),
+        &w, &h, &channels, 4);
+
+    if (!pixels) {
+        PINO_ERROR("stb_image failed to decode: %s", blob.debug_path.c_str());
+        return false;
+    }
+
+    auto tex = std::make_shared<Texture>();
+    tex->upload_rgba(pixels, w, h);
+    stbi_image_free(pixels);
+
+    PINO_INFO("Loaded texture from raw: %s (%dx%d)", blob.debug_path.c_str(), w, h);
+
+    out_tex = tex.get();
+    out_shared = std::move(tex);
+    return true;
+}
+
+bool AssetManager::load_shader_from_raw_blobs(const BinaryBlob& vert_blob,
+                                               const BinaryBlob& frag_blob,
+                                               Shader*& out_shader, std::shared_ptr<Shader>& out_shared)
+{
+    std::string vert_src(reinterpret_cast<const char*>(vert_blob.data.data()), vert_blob.data.size());
+    std::string frag_src(reinterpret_cast<const char*>(frag_blob.data.data()), frag_blob.data.size());
+
+    if (vert_src.empty() || frag_src.empty()) {
+        PINO_ERROR("Failed to read shader files: %s / %s",
+                   vert_blob.debug_path.c_str(), frag_blob.debug_path.c_str());
+        return false;
+    }
+
+    auto shader = std::make_shared<Shader>();
+    if (!shader->load(vert_src.c_str(), frag_src.c_str())) {
+        PINO_ERROR("Failed to compile shader: %s / %s",
+                   vert_blob.debug_path.c_str(), frag_blob.debug_path.c_str());
+        return false;
+    }
+
+    PINO_INFO("Loaded shader from raw: %s + %s",
+              vert_blob.debug_path.c_str(), frag_blob.debug_path.c_str());
 
     out_shader = shader.get();
     out_shared = std::move(shader);
@@ -328,100 +397,34 @@ Mesh* AssetManager::load_mesh(const char* path) {
     auto it = m_mesh_cache.find(key);
     if (it != m_mesh_cache.end()) return it->second.get();
 
-    // Try cooked first if manifest is loaded
-    if (m_cooked_manifest_loaded) {
-        std::string asset_key = asset_key_from_path(key);
-        Mesh* mesh_ptr = nullptr;
-        std::shared_ptr<Mesh> mesh_shared;
-        if (load_mesh_cooked(asset_key, mesh_ptr, mesh_shared)) {
-            m_mesh_cache[key] = std::move(mesh_shared);
-            return mesh_ptr;
+    // Try cooked source first
+    if (m_cooked_source) {
+        std::string asset_key = strip_extension(key);
+        BinaryBlob blob = m_cooked_source->load(asset_key.c_str());
+        if (!blob.data.empty()) {
+            Mesh* mesh_ptr = nullptr;
+            std::shared_ptr<Mesh> mesh_shared;
+            if (load_mesh_from_cooked_blob(blob, mesh_ptr, mesh_shared)) {
+                m_mesh_cache[key] = std::move(mesh_shared);
+                return mesh_ptr;
+            }
         }
         PINO_INFO("Cooked mesh not found for %s, falling back to raw", path);
     }
 
     // Raw OBJ loading
-    std::string src = m_fs.read_text(path);
-    if (src.empty()) {
-        PINO_ERROR("Failed to read .obj: %s  (using fallback mesh)", path);
-        return fallback_mesh();
-    }
-
-    tinyobj::ObjReader reader;
-    tinyobj::ObjReaderConfig cfg;
-    cfg.triangulate = true;
-    cfg.vertex_color = false;
-
-    if (!reader.ParseFromString(src, "", cfg)) {
-        PINO_ERROR("tinyobj error for %s: %s  (using fallback mesh)", path,
-                   reader.Error().c_str());
-        return fallback_mesh();
-    }
-    if (!reader.Warning().empty()) {
-        PINO_WARN("tinyobj warning for %s: %s", path, reader.Warning().c_str());
-    }
-
-    const auto& attrib = reader.GetAttrib();
-    const auto& shapes = reader.GetShapes();
-
-    if (shapes.empty()) {
-        PINO_ERROR("No shapes in .obj: %s  (using fallback mesh)", path);
-        return fallback_mesh();
-    }
-
-    std::vector<Vertex> vertices;
-    std::vector<u32>    indices;
-
-    for (const auto& shape : shapes) {
-        u32 index_offset = 0;
-        for (usize f = 0; f < shape.mesh.num_face_vertices.size(); ++f) {
-            u32 fv = shape.mesh.num_face_vertices[f];
-            for (u32 v = 0; v < fv; ++v) {
-                tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
-
-                Vertex vert;
-                vert.position.x = attrib.vertices[3 * idx.vertex_index + 0];
-                vert.position.y = attrib.vertices[3 * idx.vertex_index + 1];
-                vert.position.z = attrib.vertices[3 * idx.vertex_index + 2];
-
-                if (idx.normal_index >= 0) {
-                    vert.normal.x = attrib.normals[3 * idx.normal_index + 0];
-                    vert.normal.y = attrib.normals[3 * idx.normal_index + 1];
-                    vert.normal.z = attrib.normals[3 * idx.normal_index + 2];
-                } else {
-                    vert.normal = {0, 1, 0};
-                }
-
-                if (idx.texcoord_index >= 0) {
-                    vert.uv.x = attrib.texcoords[2 * idx.texcoord_index + 0];
-                    vert.uv.y = 1.0f - attrib.texcoords[2 * idx.texcoord_index + 1];
-                } else {
-                    vert.uv = {0, 0};
-                }
-
-                vertices.push_back(vert);
-                indices.push_back(static_cast<u32>(indices.size()));
-            }
-            index_offset += fv;
+    BinaryBlob blob = m_raw_source->load(key.c_str());
+    if (!blob.data.empty()) {
+        Mesh* mesh_ptr = nullptr;
+        std::shared_ptr<Mesh> mesh_shared;
+        if (load_mesh_from_raw_blob(blob, mesh_ptr, mesh_shared)) {
+            m_mesh_cache[key] = std::move(mesh_shared);
+            return mesh_ptr;
         }
     }
 
-    if (vertices.empty()) {
-        PINO_ERROR("No vertices from: %s  (using fallback mesh)", path);
-        return fallback_mesh();
-    }
-
-    auto mesh = std::make_shared<Mesh>();
-    mesh->upload(vertices.data(), static_cast<u32>(vertices.size()),
-                 indices.data(),  static_cast<u32>(indices.size()));
-
-    PINO_INFO("Loaded mesh: %s (%u verts, %u indices)", path,
-              static_cast<u32>(vertices.size()),
-              static_cast<u32>(indices.size()));
-
-    Mesh* ptr = mesh.get();
-    m_mesh_cache[key] = std::move(mesh);
-    return ptr;
+    PINO_ERROR("Failed to load mesh: %s  (using fallback mesh)", path);
+    return fallback_mesh();
 }
 
 AssetHandle<Mesh> AssetManager::get_mesh(const char* path) {
@@ -443,44 +446,34 @@ Texture* AssetManager::load_texture(const char* path) {
     auto it = m_tex_cache.find(key);
     if (it != m_tex_cache.end()) return it->second.get();
 
-    if (m_cooked_manifest_loaded) {
-        std::string asset_key = asset_key_from_path(key);
-        Texture* tex_ptr = nullptr;
-        std::shared_ptr<Texture> tex_shared;
-        if (load_texture_cooked(asset_key, tex_ptr, tex_shared)) {
-            m_tex_cache[key] = std::move(tex_shared);
-            return tex_ptr;
+    // Try cooked source first
+    if (m_cooked_source) {
+        std::string asset_key = strip_extension(key);
+        BinaryBlob blob = m_cooked_source->load(asset_key.c_str());
+        if (!blob.data.empty()) {
+            Texture* tex_ptr = nullptr;
+            std::shared_ptr<Texture> tex_shared;
+            if (load_texture_from_cooked_blob(blob, tex_ptr, tex_shared)) {
+                m_tex_cache[key] = std::move(tex_shared);
+                return tex_ptr;
+            }
         }
         PINO_INFO("Cooked texture not found for %s, falling back to raw", path);
     }
 
-    std::vector<u8> file_data = m_fs.read_binary(path);
-    if (file_data.empty()) {
-        PINO_ERROR("Failed to read texture: %s  (using fallback)", path);
-        return fallback_texture();
+    // Raw texture loading
+    BinaryBlob blob = m_raw_source->load(key.c_str());
+    if (!blob.data.empty()) {
+        Texture* tex_ptr = nullptr;
+        std::shared_ptr<Texture> tex_shared;
+        if (load_texture_from_raw_blob(blob, tex_ptr, tex_shared)) {
+            m_tex_cache[key] = std::move(tex_shared);
+            return tex_ptr;
+        }
     }
 
-    i32 w = 0, h = 0, channels = 0;
-    stbi_set_flip_vertically_on_load(1);
-
-    unsigned char* pixels = stbi_load_from_memory(
-        file_data.data(), static_cast<i32>(file_data.size()),
-        &w, &h, &channels, 4);
-
-    if (!pixels) {
-        PINO_ERROR("stb_image failed to decode: %s  (using fallback)", path);
-        return fallback_texture();
-    }
-
-    auto tex = std::make_shared<Texture>();
-    tex->upload_rgba(pixels, w, h);
-    stbi_image_free(pixels);
-
-    PINO_INFO("Loaded texture: %s (%dx%d)", path, w, h);
-
-    Texture* ptr = tex.get();
-    m_tex_cache[key] = std::move(tex);
-    return ptr;
+    PINO_ERROR("Failed to load texture: %s  (using fallback)", path);
+    return fallback_texture();
 }
 
 AssetHandle<Texture> AssetManager::get_texture(const char* path) {
@@ -501,37 +494,38 @@ Shader* AssetManager::load_shader(const char* vert_path, const char* frag_path) 
     auto it = m_shader_cache.find(key);
     if (it != m_shader_cache.end()) return it->second.get();
 
-    if (m_cooked_manifest_loaded) {
-        // Derive shader key from vert path: "shaders/lit.vert" -> "shaders/lit"
+    // Try cooked source first
+    if (m_cooked_source) {
         std::string vert_norm = normalize_asset_path(vert_path);
-        std::string asset_key = asset_key_from_path(vert_norm);
-        Shader* shader_ptr = nullptr;
-        std::shared_ptr<Shader> shader_shared;
-        if (load_shader_cooked(asset_key, shader_ptr, shader_shared)) {
-            m_shader_cache[key] = std::move(shader_shared);
-            return shader_ptr;
+        std::string asset_key = strip_extension(vert_norm);
+        BinaryBlob blob = m_cooked_source->load(asset_key.c_str());
+        if (!blob.data.empty()) {
+            Shader* shader_ptr = nullptr;
+            std::shared_ptr<Shader> shader_shared;
+            if (load_shader_from_cooked_blob(blob, shader_ptr, shader_shared)) {
+                m_shader_cache[key] = std::move(shader_shared);
+                return shader_ptr;
+            }
         }
         PINO_INFO("Cooked shader not found for %s, falling back to raw", asset_key.c_str());
     }
 
-    std::string vert_src = m_fs.read_text(vert_path);
-    std::string frag_src = m_fs.read_text(frag_path);
-    if (vert_src.empty() || frag_src.empty()) {
-        PINO_ERROR("Failed to read shader files: %s / %s  (using fallback)", vert_path, frag_path);
-        return fallback_shader();
+    // Raw shader loading
+    std::string vert_norm = normalize_asset_path(vert_path);
+    std::string frag_norm = normalize_asset_path(frag_path);
+    BinaryBlob vert_blob = m_raw_source->load(vert_norm.c_str());
+    BinaryBlob frag_blob = m_raw_source->load(frag_norm.c_str());
+    if (!vert_blob.data.empty() && !frag_blob.data.empty()) {
+        Shader* shader_ptr = nullptr;
+        std::shared_ptr<Shader> shader_shared;
+        if (load_shader_from_raw_blobs(vert_blob, frag_blob, shader_ptr, shader_shared)) {
+            m_shader_cache[key] = std::move(shader_shared);
+            return shader_ptr;
+        }
     }
 
-    auto shader = std::make_shared<Shader>();
-    if (!shader->load(vert_src.c_str(), frag_src.c_str())) {
-        PINO_ERROR("Failed to compile shader: %s / %s  (using fallback)", vert_path, frag_path);
-        return fallback_shader();
-    }
-
-    PINO_INFO("Loaded shader: %s + %s", vert_path, frag_path);
-
-    Shader* ptr = shader.get();
-    m_shader_cache[key] = std::move(shader);
-    return ptr;
+    PINO_ERROR("Failed to read shader files: %s / %s  (using fallback)", vert_path, frag_path);
+    return fallback_shader();
 }
 
 AssetHandle<Shader> AssetManager::get_shader(const char* vert_path, const char* frag_path) {

@@ -6,6 +6,7 @@
 #include "engine/renderer/shader.h"
 #include "engine/renderer/mesh.h"
 #include "engine/renderer/texture.h"
+#include "engine/assets/asset_source.h"
 #include "engine/assets/asset_registry.h"
 #include <string>
 #include <unordered_map>
@@ -73,7 +74,7 @@ public:
     bool load_cooked_manifest(const char* manifest_path, const char* cooked_dir);
 
     // Check if cooked manifest is loaded
-    bool is_cooked_mode() const { return m_cooked_manifest_loaded; }
+    bool is_cooked_mode() const { return m_cooked_source != nullptr; }
 
     // ---- Cache size queries ----
     u32 mesh_cache_size()    const { return static_cast<u32>(m_mesh_cache.size()); }
@@ -82,12 +83,29 @@ public:
 
     FileSystem& filesystem() const { return m_fs; }
 
+    // Access the asset registry (for tools / debugging)
+    const AssetRegistry* registry() const { return &m_registry; }
+
 private:
     Mesh*    load_mesh(const char* path);
     Texture* load_texture(const char* path);
     Shader*  load_shader(const char* vert_path, const char* frag_path);
 
     void init_fallback_assets();
+
+    // Cooked blob deserialization helpers
+    bool load_mesh_from_cooked_blob(const BinaryBlob& blob, Mesh*& out_mesh, std::shared_ptr<Mesh>& out_shared);
+    bool load_texture_from_cooked_blob(const BinaryBlob& blob, Texture*& out_tex, std::shared_ptr<Texture>& out_shared);
+    bool load_shader_from_cooked_blob(const BinaryBlob& blob, Shader*& out_shader, std::shared_ptr<Shader>& out_shared);
+
+    // Raw blob parsing helpers
+    bool load_mesh_from_raw_blob(const BinaryBlob& blob, Mesh*& out_mesh, std::shared_ptr<Mesh>& out_shared);
+    bool load_texture_from_raw_blob(const BinaryBlob& blob, Texture*& out_tex, std::shared_ptr<Texture>& out_shared);
+    bool load_shader_from_raw_blobs(const BinaryBlob& vert_blob, const BinaryBlob& frag_blob,
+                                    Shader*& out_shader, std::shared_ptr<Shader>& out_shared);
+
+    // Strip file extension: "models/cube.obj" -> "models/cube"
+    static std::string strip_extension(const std::string& path);
 
     FileSystem& m_fs;
 
@@ -102,23 +120,12 @@ private:
 
     std::string shader_key(const char* vert_path, const char* frag_path) const;
 
-    // ── Cooked asset loading helpers ─────────────────────────────
-    // Converts a normalized asset path (e.g. "models/cube.obj") to
-    // an asset key without extension (e.g. "models/cube").
-    std::string asset_key_from_path(const std::string& normalized_path) const;
+    // Asset sources
+    std::unique_ptr<IAssetSource> m_cooked_source; // set when cooked manifest loaded
+    std::unique_ptr<IAssetSource> m_raw_source;     // always valid
 
-    // Derives the cooked file path from an asset key.
-    // e.g. "models/cube" -> "{cooked_dir}/models_cube.pino_cooked"
-    std::string cooked_file_path(const std::string& asset_key) const;
-
-    bool load_mesh_cooked(const std::string& asset_key, Mesh*& out_mesh, std::shared_ptr<Mesh>& out_shared);
-    bool load_texture_cooked(const std::string& asset_key, Texture*& out_tex, std::shared_ptr<Texture>& out_shared);
-    bool load_shader_cooked(const std::string& asset_key, Shader*& out_shader, std::shared_ptr<Shader>& out_shared);
-
-    // Cooked asset support
+    // Cooked asset registry (populated by load_cooked_manifest)
     AssetRegistry m_registry;
-    std::string   m_cooked_dir;
-    bool          m_cooked_manifest_loaded = false;
 };
 
 } // namespace pino

@@ -63,6 +63,8 @@ set(PINO_ENGINE_SOURCES
     assets/asset_pack.cpp
     assets/asset_manifest.cpp
     assets/asset_registry.cpp
+    assets/cooked_file_source.cpp
+    assets/raw_file_source.cpp
     scene/entity.cpp
     scene/scene.cpp
     input/gamepad.cpp
