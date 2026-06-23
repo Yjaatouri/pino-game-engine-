@@ -6,18 +6,19 @@
 
 namespace pino {
 
+// CookedFileSource reads .pino_cooked files from a cooked directory.
+// The caller is responsible for resolving asset keys to canonical form
+// via AssetRegistry::resolve() before calling load/exists.
 class CookedFileSource : public IAssetSource {
 public:
     CookedFileSource(FileSystem& fs, const AssetRegistry& registry, const char* cooked_dir);
 
-    bool       exists(const char* asset_key) const override;
-    BinaryBlob load(const char* asset_key) override;
+    bool       exists(const char* resolved_key) const override;
+    BinaryBlob load(const char* resolved_key) override;
 
     const AssetRegistry& registry() const { return m_registry; }
 
 private:
-    // Strips file extension from a path: "models/cube.obj" -> "models/cube"
-    static std::string strip_extension(const std::string& path);
     std::string cooked_file_path(const std::string& asset_key) const;
 
     FileSystem&          m_fs;

@@ -153,6 +153,30 @@ std::vector<const AssetManifestEntry*> AssetRegistry::get_dependents(const char*
     return result;
 }
 
+std::string AssetRegistry::resolve(const char* key) const {
+    if (!key || !key[0]) return {};
+
+    // Try exact match first
+    const auto* entry = find(key);
+    if (entry) {
+        auto it = m_hash_to_key.find(entry->key_hash);
+        return it != m_hash_to_key.end() ? it->second : key;
+    }
+
+    // Try stripping extension: "models/cube.obj" -> "models/cube"
+    std::string s = key;
+    auto dot = s.rfind('.');
+    if (dot == std::string::npos) return {};
+    s.resize(dot);
+    if (s.empty()) return {};
+
+    entry = find(s.c_str());
+    if (!entry) return {};
+
+    auto it = m_hash_to_key.find(entry->key_hash);
+    return it != m_hash_to_key.end() ? it->second : s;
+}
+
 bool AssetRegistry::verify_integrity(const char* key, const void* payload, u32 payload_size) const {
     auto* entry = find(key);
     if (!entry) {

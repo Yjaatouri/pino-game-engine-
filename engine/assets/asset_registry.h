@@ -59,6 +59,11 @@ public:
     // Check if a specific entry exists
     bool contains(const char* key) const;
 
+    // Resolve an asset key to its canonical form.
+    // Accepts paths with or without extensions (e.g. "models/cube.obj" -> "models/cube").
+    // Returns empty string if not found in the manifest.
+    std::string resolve(const char* key) const;
+
 private:
     void rebuild_index();
 

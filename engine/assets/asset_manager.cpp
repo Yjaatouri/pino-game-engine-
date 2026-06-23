@@ -354,35 +354,56 @@ void main(){ fc=u_color; })";
     PINO_INFO("Fallback assets initialized");
 }
 
-// ── Mesh loading (cooked first, then raw OBJ) ─────────────────
+// ── Mesh loading pipeline ────────────────────────────────────────
+// 1) Resolve asset key via registry (cooked)  2) Query source
+// 3) Load binary blob   4) Validate hash/version
+// 5) Deserialize        6) Upload to GPU       7) Cache result
+// ─────────────────────────────────────────────────────────────────
 Mesh* AssetManager::load_mesh(const char* path) {
     std::string key = normalize_asset_path(path);
     auto it = m_mesh_cache.find(key);
     if (it != m_mesh_cache.end()) return it->second.get();
 
-    // Try cooked source first
-    if (m_cooked_source) {
-        BinaryBlob blob = m_cooked_source->load(key.c_str());
-        if (!blob.data.empty()) {
-            Mesh* mesh_ptr = nullptr;
-            std::shared_ptr<Mesh> mesh_shared;
-            if (load_mesh_from_cooked_blob(blob, mesh_ptr, mesh_shared)) {
-                m_mesh_cache[key] = std::move(mesh_shared);
-                return mesh_ptr;
-            }
+    // ── 1. Resolve asset key via registry (if cooked mode) ────────
+    std::string resolved;
+    if (m_cooked_source)
+        resolved = m_registry.resolve(key.c_str());
+
+    // ── 2–3. Query active source → load blob ─────────────────────
+    BinaryBlob blob;
+    bool is_cooked = false;
+    if (!resolved.empty()) {
+        blob = m_cooked_source->load(resolved.c_str());
+        is_cooked = !blob.data.empty();
+    }
+    if (!is_cooked)
+        blob = m_raw_source->load(key.c_str());
+
+    // ── 4. Validate hash/version ─────────────────────────────────
+    if (is_cooked && !blob.data.empty()) {
+        if (!m_registry.verify_integrity(resolved.c_str(),
+                                         blob.data.data(),
+                                         static_cast<u32>(blob.data.size()))) {
+            PINO_WARN("Cooked mesh hash mismatch for %s, falling back to raw", path);
+            blob = m_raw_source->load(key.c_str());
+            is_cooked = false;
         }
-        PINO_INFO("Cooked mesh not found for %s, falling back to raw", path);
     }
 
-    // Raw OBJ loading
-    BinaryBlob blob = m_raw_source->load(key.c_str());
-    if (!blob.data.empty()) {
-        Mesh* mesh_ptr = nullptr;
-        std::shared_ptr<Mesh> mesh_shared;
-        if (load_mesh_from_raw_blob(blob, mesh_ptr, mesh_shared)) {
-            m_mesh_cache[key] = std::move(mesh_shared);
-            return mesh_ptr;
-        }
+    // ── 5–6. Deserialize → upload to GPU ─────────────────────────
+    Mesh* mesh_ptr = nullptr;
+    std::shared_ptr<Mesh> mesh_shared;
+    bool ok = false;
+    if (is_cooked) {
+        ok = load_mesh_from_cooked_blob(blob, mesh_ptr, mesh_shared);
+    } else if (!blob.data.empty()) {
+        ok = load_mesh_from_raw_blob(blob, mesh_ptr, mesh_shared);
+    }
+
+    // ── 7. Cache result ───────────────────────────────────────────
+    if (ok) {
+        m_mesh_cache[key] = std::move(mesh_shared);
+        return mesh_ptr;
     }
 
     PINO_ERROR("Failed to load mesh: %s  (using fallback mesh)", path);
@@ -402,35 +423,52 @@ AssetHandle<Mesh> AssetManager::get_mesh(const char* path) {
     return AssetHandle<Mesh>();
 }
 
-// ── Texture loading (cooked first, then raw) ───────────────────
+// ── Texture loading pipeline ─────────────────────────────────────
 Texture* AssetManager::load_texture(const char* path) {
     std::string key = normalize_asset_path(path);
     auto it = m_tex_cache.find(key);
     if (it != m_tex_cache.end()) return it->second.get();
 
-    // Try cooked source first
-    if (m_cooked_source) {
-        BinaryBlob blob = m_cooked_source->load(key.c_str());
-        if (!blob.data.empty()) {
-            Texture* tex_ptr = nullptr;
-            std::shared_ptr<Texture> tex_shared;
-            if (load_texture_from_cooked_blob(blob, tex_ptr, tex_shared)) {
-                m_tex_cache[key] = std::move(tex_shared);
-                return tex_ptr;
-            }
+    // 1. Resolve asset key via registry (if cooked)
+    std::string resolved;
+    if (m_cooked_source)
+        resolved = m_registry.resolve(key.c_str());
+
+    // 2–3. Query active source → load blob
+    BinaryBlob blob;
+    bool is_cooked = false;
+    if (!resolved.empty()) {
+        blob = m_cooked_source->load(resolved.c_str());
+        is_cooked = !blob.data.empty();
+    }
+    if (!is_cooked)
+        blob = m_raw_source->load(key.c_str());
+
+    // 4. Validate hash
+    if (is_cooked && !blob.data.empty()) {
+        if (!m_registry.verify_integrity(resolved.c_str(),
+                                         blob.data.data(),
+                                         static_cast<u32>(blob.data.size()))) {
+            PINO_WARN("Cooked texture hash mismatch for %s, falling back to raw", path);
+            blob = m_raw_source->load(key.c_str());
+            is_cooked = false;
         }
-        PINO_INFO("Cooked texture not found for %s, falling back to raw", path);
     }
 
-    // Raw texture loading
-    BinaryBlob blob = m_raw_source->load(key.c_str());
-    if (!blob.data.empty()) {
-        Texture* tex_ptr = nullptr;
-        std::shared_ptr<Texture> tex_shared;
-        if (load_texture_from_raw_blob(blob, tex_ptr, tex_shared)) {
-            m_tex_cache[key] = std::move(tex_shared);
-            return tex_ptr;
-        }
+    // 5–6. Deserialize → upload
+    Texture* tex_ptr = nullptr;
+    std::shared_ptr<Texture> tex_shared;
+    bool ok = false;
+    if (is_cooked) {
+        ok = load_texture_from_cooked_blob(blob, tex_ptr, tex_shared);
+    } else if (!blob.data.empty()) {
+        ok = load_texture_from_raw_blob(blob, tex_ptr, tex_shared);
+    }
+
+    // 7. Cache
+    if (ok) {
+        m_tex_cache[key] = std::move(tex_shared);
+        return tex_ptr;
     }
 
     PINO_ERROR("Failed to load texture: %s  (using fallback)", path);
@@ -449,39 +487,57 @@ AssetHandle<Texture> AssetManager::get_texture(const char* path) {
     return AssetHandle<Texture>();
 }
 
-// ── Shader loading (cooked first, then raw) ─────────────────────
+// ── Shader loading pipeline ──────────────────────────────────────
 Shader* AssetManager::load_shader(const char* vert_path, const char* frag_path) {
     std::string key = shader_key(vert_path, frag_path);
     auto it = m_shader_cache.find(key);
     if (it != m_shader_cache.end()) return it->second.get();
 
-    // Try cooked source first
-    if (m_cooked_source) {
-        std::string vert_norm = normalize_asset_path(vert_path);
-        BinaryBlob blob = m_cooked_source->load(vert_norm.c_str());
-        if (!blob.data.empty()) {
-            Shader* shader_ptr = nullptr;
-            std::shared_ptr<Shader> shader_shared;
-            if (load_shader_from_cooked_blob(blob, shader_ptr, shader_shared)) {
-                m_shader_cache[key] = std::move(shader_shared);
-                return shader_ptr;
-            }
-        }
-        PINO_INFO("Cooked shader not found for %s, falling back to raw", vert_path);
+    std::string vert_norm = normalize_asset_path(vert_path);
+
+    // 1. Resolve asset key via registry (if cooked)
+    std::string resolved;
+    if (m_cooked_source)
+        resolved = m_registry.resolve(vert_norm.c_str());
+
+    // 2–3. Query active source → load blob
+    BinaryBlob blob;
+    bool is_cooked = false;
+    if (!resolved.empty()) {
+        blob = m_cooked_source->load(resolved.c_str());
+        is_cooked = !blob.data.empty();
     }
 
-    // Raw shader loading
-    std::string vert_norm = normalize_asset_path(vert_path);
-    std::string frag_norm = normalize_asset_path(frag_path);
-    BinaryBlob vert_blob = m_raw_source->load(vert_norm.c_str());
-    BinaryBlob frag_blob = m_raw_source->load(frag_norm.c_str());
-    if (!vert_blob.data.empty() && !frag_blob.data.empty()) {
-        Shader* shader_ptr = nullptr;
-        std::shared_ptr<Shader> shader_shared;
-        if (load_shader_from_raw_blobs(vert_blob, frag_blob, shader_ptr, shader_shared)) {
-            m_shader_cache[key] = std::move(shader_shared);
-            return shader_ptr;
+    // 4. Validate hash (cooked)
+    if (is_cooked && !blob.data.empty()) {
+        if (!m_registry.verify_integrity(resolved.c_str(),
+                                         blob.data.data(),
+                                         static_cast<u32>(blob.data.size()))) {
+            PINO_WARN("Cooked shader hash mismatch for %s, falling back to raw", vert_path);
+            is_cooked = false;
+            blob.data.clear();
         }
+    }
+
+    // 5–6. Deserialize → upload
+    Shader* shader_ptr = nullptr;
+    std::shared_ptr<Shader> shader_shared;
+    bool ok = false;
+    if (is_cooked) {
+        ok = load_shader_from_cooked_blob(blob, shader_ptr, shader_shared);
+    } else {
+        // Raw shader loading (needs both vert and frag files)
+        std::string frag_norm = normalize_asset_path(frag_path);
+        BinaryBlob vert_blob = m_raw_source->load(vert_norm.c_str());
+        BinaryBlob frag_blob = m_raw_source->load(frag_norm.c_str());
+        if (!vert_blob.data.empty() && !frag_blob.data.empty())
+            ok = load_shader_from_raw_blobs(vert_blob, frag_blob, shader_ptr, shader_shared);
+    }
+
+    // 7. Cache
+    if (ok) {
+        m_shader_cache[key] = std::move(shader_shared);
+        return shader_ptr;
     }
 
     PINO_ERROR("Failed to read shader files: %s / %s  (using fallback)", vert_path, frag_path);

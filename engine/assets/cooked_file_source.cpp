@@ -1,5 +1,4 @@
 #include "cooked_file_source.h"
-#include "engine/serialization/cooked_asset.h"
 #include "engine/core/log.h"
 
 namespace pino {
@@ -14,35 +13,16 @@ CookedFileSource::CookedFileSource(FileSystem& fs, const AssetRegistry& registry
         m_cooked_dir.push_back('/');
 }
 
-std::string CookedFileSource::strip_extension(const std::string& path) {
-    auto dot = path.rfind('.');
-    if (dot == std::string::npos) return path;
-    return path.substr(0, dot);
+bool CookedFileSource::exists(const char* resolved_key) const {
+    return m_registry.contains(resolved_key);
 }
 
-bool CookedFileSource::exists(const char* asset_key) const {
-    if (m_registry.contains(asset_key))
-        return true;
-    std::string key_stripped = strip_extension(asset_key);
-    return key_stripped != asset_key && m_registry.contains(key_stripped.c_str());
-}
-
-BinaryBlob CookedFileSource::load(const char* asset_key) {
+BinaryBlob CookedFileSource::load(const char* resolved_key) {
     BinaryBlob result;
 
-    // Try the key as-is first, then strip extension
-    const AssetManifestEntry* entry = m_registry.find(asset_key);
-    std::string resolved_key = asset_key;
+    const auto* entry = m_registry.find(resolved_key);
     if (!entry) {
-        std::string stripped = strip_extension(asset_key);
-        if (stripped != asset_key) {
-            entry = m_registry.find(stripped.c_str());
-            resolved_key = stripped;
-        }
-    }
-
-    if (!entry) {
-        PINO_WARN("CookedFileSource: unknown asset '%s'", asset_key);
+        PINO_WARN("CookedFileSource: unknown asset '%s'", resolved_key);
         return result;
     }
 
@@ -52,18 +32,6 @@ BinaryBlob CookedFileSource::load(const char* asset_key) {
     result.data = m_fs.read_binary(path.c_str());
     if (result.data.empty()) {
         PINO_WARN("CookedFileSource: file missing: %s", path.c_str());
-        return result;
-    }
-
-    u64 actual = cooked_hash_fnv1a(result.data.data(), static_cast<u32>(result.data.size()));
-    if (actual != entry->asset_hash) {
-        PINO_ERROR("CookedFileSource: hash mismatch for '%s'"
-                   " (expected 0x%llx, got 0x%llx)",
-                   resolved_key.c_str(),
-                   static_cast<unsigned long long>(entry->asset_hash),
-                   static_cast<unsigned long long>(actual));
-        result.data.clear();
-        return result;
     }
 
     return result;
