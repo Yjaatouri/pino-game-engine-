@@ -10,12 +10,14 @@ Mesh::~Mesh() { destroy(); }
 
 Mesh::Mesh(Mesh&& other) noexcept
     : m_vao(other.m_vao), m_vbo(other.m_vbo), m_ebo(other.m_ebo),
+      m_tangent_vbo(other.m_tangent_vbo), m_bitangent_vbo(other.m_bitangent_vbo),
       m_vertex_count(other.m_vertex_count), m_index_count(other.m_index_count),
       m_instance_vbo(other.m_instance_vbo),
       m_instance_capacity(other.m_instance_capacity),
       m_local_min(other.m_local_min), m_local_max(other.m_local_max)
 {
     other.m_vao = other.m_vbo = other.m_ebo = 0;
+    other.m_tangent_vbo = other.m_bitangent_vbo = 0;
     other.m_vertex_count = other.m_index_count = 0;
 }
 
@@ -25,6 +27,8 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
         m_vao  = other.m_vao;  other.m_vao  = 0;
         m_vbo  = other.m_vbo;  other.m_vbo  = 0;
         m_ebo  = other.m_ebo;  other.m_ebo  = 0;
+        m_tangent_vbo = other.m_tangent_vbo; other.m_tangent_vbo = 0;
+        m_bitangent_vbo = other.m_bitangent_vbo; other.m_bitangent_vbo = 0;
         m_vertex_count = other.m_vertex_count; other.m_vertex_count = 0;
         m_index_count  = other.m_index_count;  other.m_index_count  = 0;
         m_instance_vbo = other.m_instance_vbo; other.m_instance_vbo = 0;
@@ -86,12 +90,38 @@ void Mesh::upload(const Vertex* vertices, u32 vert_count,
     }
 }
 
+void Mesh::upload_tangents(const glm::vec3* tangents, const glm::vec3* bitangents, u32 count) {
+    if (!m_vao || count != m_vertex_count) return;
+
+    glBindVertexArray(m_vao);
+
+    // Tangent VBO (location 3)
+    glGenBuffers(1, &m_tangent_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_tangent_vbo);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(count * sizeof(glm::vec3)),
+                 tangents, GL_STATIC_DRAW);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
+    glEnableVertexAttribArray(3);
+
+    // Bitangent VBO (location 4)
+    glGenBuffers(1, &m_bitangent_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_bitangent_vbo);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(count * sizeof(glm::vec3)),
+                 bitangents, GL_STATIC_DRAW);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
+    glEnableVertexAttribArray(4);
+
+    glBindVertexArray(0);
+}
+
 void Mesh::destroy() {
     if (m_vao) glDeleteVertexArrays(1, &m_vao);
     if (m_vbo) glDeleteBuffers(1, &m_vbo);
     if (m_ebo) glDeleteBuffers(1, &m_ebo);
+    if (m_tangent_vbo) glDeleteBuffers(1, &m_tangent_vbo);
+    if (m_bitangent_vbo) glDeleteBuffers(1, &m_bitangent_vbo);
     if (m_instance_vbo) glDeleteBuffers(1, &m_instance_vbo);
-    m_vao = m_vbo = m_ebo = m_instance_vbo = 0;
+    m_vao = m_vbo = m_ebo = m_tangent_vbo = m_bitangent_vbo = m_instance_vbo = 0;
     m_vertex_count = m_index_count = m_instance_capacity = 0;
 }
 

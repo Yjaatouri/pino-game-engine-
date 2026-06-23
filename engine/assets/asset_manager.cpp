@@ -71,8 +71,16 @@ bool AssetManager::load_mesh_from_cooked_blob(const BinaryBlob& blob,
     const u32* idx = mesh_data.indices.data();
     mesh->upload(verts, mesh_data.vertex_count, idx, mesh_data.index_count);
 
-    PINO_INFO("Loaded cooked mesh (%u verts, %u indices)",
-              mesh_data.vertex_count, mesh_data.index_count);
+    // Upload tangent/bitangent if present
+    if (!mesh_data.tangent_data.empty() && !mesh_data.bitangent_data.empty()) {
+        const glm::vec3* tangents = reinterpret_cast<const glm::vec3*>(mesh_data.tangent_data.data());
+        const glm::vec3* bitangents = reinterpret_cast<const glm::vec3*>(mesh_data.bitangent_data.data());
+        mesh->upload_tangents(tangents, bitangents, mesh_data.vertex_count);
+    }
+
+    PINO_INFO("Loaded cooked mesh (%u verts, %u indices%s)",
+              mesh_data.vertex_count, mesh_data.index_count,
+              mesh_data.tangent_data.empty() ? "" : ", with tangents");
 
     out_mesh = mesh.get();
     out_shared = std::move(mesh);

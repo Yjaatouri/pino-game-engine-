@@ -49,6 +49,14 @@ void write_cooked_mesh_payload(Serializer& s, const CookedMeshData& mesh) {
     if (mesh.index_count > 0)
         s.writeBytes(mesh.indices.data(), mesh.index_count * sizeof(u32));
 
+    // Tangent/bitangent (optional)
+    bool has_tangents = !mesh.tangent_data.empty() && !mesh.bitangent_data.empty();
+    s.writeBool(has_tangents);
+    if (has_tangents) {
+        s.writeBytes(mesh.tangent_data.data(), static_cast<u32>(mesh.tangent_data.size()));
+        s.writeBytes(mesh.bitangent_data.data(), static_cast<u32>(mesh.bitangent_data.size()));
+    }
+
     s.writeVec3(mesh.bounds_min);
     s.writeVec3(mesh.bounds_max);
     s.writeVec3(mesh.bounds_center);
@@ -68,6 +76,16 @@ void read_cooked_mesh_payload(Deserializer& d, CookedMeshData& mesh) {
     mesh.indices.resize(mesh.index_count);
     if (mesh.index_count > 0)
         d.readBytes(mesh.indices.data(), mesh.index_count * sizeof(u32));
+
+    // Tangent/bitangent (v2+)
+    bool has_tangents = d.readBool();
+    if (has_tangents) {
+        u32 tangent_bytes = mesh.vertex_count * sizeof(glm::vec3);
+        mesh.tangent_data.resize(tangent_bytes);
+        mesh.bitangent_data.resize(tangent_bytes);
+        d.readBytes(mesh.tangent_data.data(), tangent_bytes);
+        d.readBytes(mesh.bitangent_data.data(), tangent_bytes);
+    }
 
     mesh.bounds_min    = d.readVec3();
     mesh.bounds_max    = d.readVec3();

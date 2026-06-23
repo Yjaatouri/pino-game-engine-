@@ -27,7 +27,7 @@ namespace CookedType {
 
 // ── Version constants ────────────────────────────────────────────
 namespace CookedVersion {
-    static constexpr u32 Mesh     = 1;
+    static constexpr u32 Mesh     = 2;
     static constexpr u32 Texture  = 1;
     static constexpr u32 Shader   = 1;
     static constexpr u32 Material  = 1;
@@ -79,6 +79,8 @@ struct CookedMeshData {
     u32             vertex_stride = 0;
     std::vector<u8> vertex_data;
     std::vector<u32> indices;
+    std::vector<u8> tangent_data;     // vertex_count * 12 bytes (vec3), empty if not generated
+    std::vector<u8> bitangent_data;   // vertex_count * 12 bytes (vec3), empty if not generated
     glm::vec3       bounds_min    = glm::vec3(0.0f);
     glm::vec3       bounds_max    = glm::vec3(0.0f);
     glm::vec3       bounds_center = glm::vec3(0.0f);

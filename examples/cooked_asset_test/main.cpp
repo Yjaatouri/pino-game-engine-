@@ -37,6 +37,8 @@ static bool roundtrip_mesh(const CookedMeshData& in) {
     if (in.vertex_stride != out.vertex_stride) return false;
     if (in.vertex_data   != out.vertex_data)   return false;
     if (in.indices       != out.indices)       return false;
+    if (in.tangent_data   != out.tangent_data)   return false;
+    if (in.bitangent_data != out.bitangent_data) return false;
     if (in.bounds_min    != out.bounds_min)    return false;
     if (in.bounds_max    != out.bounds_max)    return false;
     if (in.bounds_center != out.bounds_center) return false;
@@ -165,13 +167,23 @@ int main() {
         mesh.vertex_data.resize(24 * sizeof(Vertex));
         mesh.indices.resize(36);
         for (u32 i = 0; i < 36; ++i) mesh.indices[i] = i;
+        // Add tangent/bitangent data
+        mesh.tangent_data.resize(24 * sizeof(glm::vec3), 0xCD);
+        mesh.bitangent_data.resize(24 * sizeof(glm::vec3), 0xDC);
         mesh.bounds_min    = {-1,-1,-1};
         mesh.bounds_max    = { 1, 1, 1};
         mesh.bounds_center = { 0, 0, 0};
         mesh.bounds_radius = 1.732f;
 
-        TEST("empty mesh round-trips", roundtrip_mesh(CookedMeshData{}));
-        TEST("cube mesh round-trips",  roundtrip_mesh(mesh));
+        CookedMeshData no_tan_mesh;
+        no_tan_mesh.vertex_count = 4;
+        no_tan_mesh.vertex_stride = sizeof(Vertex);
+        no_tan_mesh.vertex_data.resize(4 * sizeof(Vertex));
+        no_tan_mesh.bounds_max = {1,1,1};
+
+        TEST("empty mesh round-trips",          roundtrip_mesh(CookedMeshData{}));
+        TEST("cube mesh round-trips",           roundtrip_mesh(mesh));
+        TEST("mesh without tangents round-trips", roundtrip_mesh(no_tan_mesh));
     }
 
     // ── CookedTexture round-trip ──
@@ -238,7 +250,38 @@ int main() {
         printf("\n-- Edge cases --\n");
 
         // Version rejection
-        TEST("invalid version is rejected",  test_version_rejection());
+        TEST("unknown version is rejected",  test_version_rejection());
+
+        // Old v1 format rejected (current is v2)
+        {
+            BinaryChunkWriter writer;
+            CookedMeshData dummy;
+            auto write_v1 = [&](Serializer& s) {
+                // v1 format: no tangent/bitangent bool, just data
+                s.writeUInt32(0); // vertex_count
+                s.writeUInt32(0); // index_count
+                s.writeUInt32(0); // vertex_stride
+            };
+            BinaryChunkWriter tmp;
+            Serializer s_tmp(tmp);
+            write_v1(s_tmp);
+            auto buf = tmp.getBuffer();
+            u64 hash = cooked_hash_fnv1a(buf.data(), static_cast<u32>(buf.size()));
+
+            writer.beginChunk(CookedType::Mesh, 1); // v1
+            {
+                Serializer s_real(writer);
+                CookedAssetHeader h;
+                h.asset_hash = hash; h.platform_tag = 0; h.flags = CAF_None;
+                write_cooked_header(s_real, h);
+                s_real.writeBytes(buf.data(), static_cast<u32>(buf.size()));
+            }
+            writer.endChunk();
+
+            CookedMeshData result;
+            BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+            TEST("old v1 format is rejected", !read_cooked_mesh(reader, result));
+        }
 
         // Corrupted hash
         TEST("corrupted hash is detected",   test_corrupted_hash());

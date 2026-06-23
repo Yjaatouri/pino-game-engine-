@@ -12,6 +12,12 @@ struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 uv;
+
+    bool operator==(const Vertex& other) const {
+        return position == other.position &&
+               normal   == other.normal   &&
+               uv       == other.uv;
+    }
 };
 
 class Mesh {
@@ -27,6 +33,12 @@ public:
 
     void upload(const Vertex* vertices, u32 vert_count,
                 const u32* indices,  u32 index_count);
+
+    // Upload tangent/bitangent data as additional vertex attributes
+    // (location 3 = tangent, location 4 = bitangent).
+    // Must be called AFTER upload().
+    void upload_tangents(const glm::vec3* tangents, const glm::vec3* bitangents, u32 count);
+
     void destroy();
 
     void draw() const;
@@ -54,6 +66,8 @@ private:
     GLuint m_vao  = 0;
     GLuint m_vbo  = 0;
     GLuint m_ebo  = 0;
+    GLuint m_tangent_vbo = 0;   // optional tangent buffer (location 3)
+    GLuint m_bitangent_vbo = 0; // optional bitangent buffer (location 4)
     u32    m_vertex_count = 0;
     u32    m_index_count  = 0;
 
