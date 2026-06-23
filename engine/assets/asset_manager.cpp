@@ -4,6 +4,7 @@
 #include "engine/serialization/cooked_asset.h"
 #include "engine/assets/cooked_file_source.h"
 #include "engine/assets/raw_file_source.h"
+#include "engine/assets/asset_utils.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -17,40 +18,8 @@
 
 namespace pino {
 
-// ── Path normalization ──────────────────────────────────────────
-std::string normalize_asset_path(const char* path) {
-    if (!path || !path[0]) return {};
-
-    std::string p = path;
-    for (auto& ch : p) if (ch == '\\') ch = '/';
-
-    std::vector<std::string> segments;
-    std::istringstream ss(p);
-    std::string seg;
-    while (std::getline(ss, seg, '/')) {
-        if (seg.empty() || seg == ".") continue;
-        if (seg == ".." && !segments.empty()) {
-            segments.pop_back();
-        } else if (seg != "..") {
-            segments.push_back(seg);
-        }
-    }
-
-    std::string result;
-    for (usize i = 0; i < segments.size(); ++i) {
-        if (i > 0) result += '/';
-        result += segments[i];
-    }
-
-#if defined(_WIN32)
-    for (auto& ch : result) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-#endif
-
-    return result;
-}
-
 // ── AssetManager ────────────────────────────────────────────────
-AssetManager::AssetManager(FileSystem& fs) : m_fs(fs) {
+AssetManager::AssetManager(FileSystem& fs) {
     m_raw_source = std::make_unique<RawFileSource>(fs);
     init_fallback_assets();
 }
@@ -61,23 +30,17 @@ std::string AssetManager::shader_key(const char* vert_path, const char* frag_pat
     return normalize_asset_path(vert_path) + "|" + normalize_asset_path(frag_path);
 }
 
-std::string AssetManager::strip_extension(const std::string& path) {
-    auto dot = path.rfind('.');
-    if (dot == std::string::npos) return path;
-    return path.substr(0, dot);
-}
-
 // ═══════════════════════════════════════════════════════════════════
 //  Cooked manifest support
 // ═══════════════════════════════════════════════════════════════════
 
-bool AssetManager::load_cooked_manifest(const char* manifest_path, const char* cooked_dir) {
+bool AssetManager::load_cooked_manifest(const char* manifest_path, const char* cooked_dir, FileSystem& fs) {
     if (!m_registry.load_from_path(manifest_path)) {
         PINO_ERROR("AssetManager: failed to load cooked manifest: %s", manifest_path);
         return false;
     }
 
-    m_cooked_source = std::make_unique<CookedFileSource>(m_fs, m_registry, cooked_dir);
+    m_cooked_source = std::make_unique<CookedFileSource>(fs, m_registry, cooked_dir);
 
     PINO_INFO("AssetManager: cooked manifest loaded (%u entries, dir: %s)",
               m_registry.entry_count(), cooked_dir ? cooked_dir : "");
@@ -399,8 +362,7 @@ Mesh* AssetManager::load_mesh(const char* path) {
 
     // Try cooked source first
     if (m_cooked_source) {
-        std::string asset_key = strip_extension(key);
-        BinaryBlob blob = m_cooked_source->load(asset_key.c_str());
+        BinaryBlob blob = m_cooked_source->load(key.c_str());
         if (!blob.data.empty()) {
             Mesh* mesh_ptr = nullptr;
             std::shared_ptr<Mesh> mesh_shared;
@@ -448,8 +410,7 @@ Texture* AssetManager::load_texture(const char* path) {
 
     // Try cooked source first
     if (m_cooked_source) {
-        std::string asset_key = strip_extension(key);
-        BinaryBlob blob = m_cooked_source->load(asset_key.c_str());
+        BinaryBlob blob = m_cooked_source->load(key.c_str());
         if (!blob.data.empty()) {
             Texture* tex_ptr = nullptr;
             std::shared_ptr<Texture> tex_shared;
@@ -497,8 +458,7 @@ Shader* AssetManager::load_shader(const char* vert_path, const char* frag_path) 
     // Try cooked source first
     if (m_cooked_source) {
         std::string vert_norm = normalize_asset_path(vert_path);
-        std::string asset_key = strip_extension(vert_norm);
-        BinaryBlob blob = m_cooked_source->load(asset_key.c_str());
+        BinaryBlob blob = m_cooked_source->load(vert_norm.c_str());
         if (!blob.data.empty()) {
             Shader* shader_ptr = nullptr;
             std::shared_ptr<Shader> shader_shared;
@@ -507,7 +467,7 @@ Shader* AssetManager::load_shader(const char* vert_path, const char* frag_path) 
                 return shader_ptr;
             }
         }
-        PINO_INFO("Cooked shader not found for %s, falling back to raw", asset_key.c_str());
+        PINO_INFO("Cooked shader not found for %s, falling back to raw", vert_path);
     }
 
     // Raw shader loading
@@ -538,38 +498,6 @@ AssetHandle<Shader> AssetManager::get_shader(const char* vert_path, const char* 
     if (it != m_shader_cache.end())
         return AssetHandle<Shader>(it->second);
     return AssetHandle<Shader>();
-}
-
-// ── Preloading ──────────────────────────────────────────────────
-void AssetManager::preload(const std::vector<std::string>& paths,
-                           AssetProgressCallback progress) {
-    u32 total = static_cast<u32>(paths.size());
-    for (u32 i = 0; i < total; ++i) {
-        const std::string& p = paths[i];
-
-        auto dot = p.rfind('.');
-        std::string ext;
-        if (dot != std::string::npos) {
-            ext = p.substr(dot);
-            for (auto& ch : ext) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-        }
-
-        if (ext == ".obj") {
-            load_mesh(p.c_str());
-        } else if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" ||
-                   ext == ".bmp" || ext == ".tga") {
-            load_texture(p.c_str());
-        } else if (ext == ".vert") {
-            std::string frag = p.substr(0, p.size() - 4) + "frag";
-            load_shader(p.c_str(), frag.c_str());
-        } else {
-            PINO_WARN("preload: unknown asset type: %s", p.c_str());
-        }
-
-        if (progress)
-            progress(i + 1, total, p.c_str());
-    }
-    PINO_INFO("Preload complete: %u/%u assets", total, total);
 }
 
 // ── Unload unused ───────────────────────────────────────────────

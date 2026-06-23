@@ -5,6 +5,7 @@
 #include "engine/renderer/font.h"
 #include "engine/renderer/text_renderer.h"
 #include "engine/platform/input.h"
+#include "engine/platform/file_system.h"
 #include <string>
 #include <vector>
 
@@ -29,6 +30,7 @@ public:
     void unload();
 
     void set_asset_manager(AssetManager* assets) { m_assets = assets; }
+    void set_file_system(FileSystem& fs) { m_fs = &fs; }
 
     void validate();
     bool has_errors() const { return !m_errors.empty(); }
@@ -49,6 +51,7 @@ private:
     bool m_visible = false;
     Prefab m_prefab;
     AssetManager* m_assets = nullptr;
+    FileSystem*   m_fs = nullptr;
     std::vector<Issue> m_errors;
     std::vector<Issue> m_warnings;
     bool m_loaded = false;

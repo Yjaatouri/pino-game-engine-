@@ -14,20 +14,39 @@ CookedFileSource::CookedFileSource(FileSystem& fs, const AssetRegistry& registry
         m_cooked_dir.push_back('/');
 }
 
+std::string CookedFileSource::strip_extension(const std::string& path) {
+    auto dot = path.rfind('.');
+    if (dot == std::string::npos) return path;
+    return path.substr(0, dot);
+}
+
 bool CookedFileSource::exists(const char* asset_key) const {
-    return m_registry.contains(asset_key);
+    if (m_registry.contains(asset_key))
+        return true;
+    std::string key_stripped = strip_extension(asset_key);
+    return key_stripped != asset_key && m_registry.contains(key_stripped.c_str());
 }
 
 BinaryBlob CookedFileSource::load(const char* asset_key) {
     BinaryBlob result;
 
-    const auto* entry = m_registry.find(asset_key);
+    // Try the key as-is first, then strip extension
+    const AssetManifestEntry* entry = m_registry.find(asset_key);
+    std::string resolved_key = asset_key;
+    if (!entry) {
+        std::string stripped = strip_extension(asset_key);
+        if (stripped != asset_key) {
+            entry = m_registry.find(stripped.c_str());
+            resolved_key = stripped;
+        }
+    }
+
     if (!entry) {
         PINO_WARN("CookedFileSource: unknown asset '%s'", asset_key);
         return result;
     }
 
-    std::string path = cooked_file_path(asset_key);
+    std::string path = cooked_file_path(resolved_key);
     result.debug_path = path;
 
     result.data = m_fs.read_binary(path.c_str());
@@ -40,7 +59,7 @@ BinaryBlob CookedFileSource::load(const char* asset_key) {
     if (actual != entry->asset_hash) {
         PINO_ERROR("CookedFileSource: hash mismatch for '%s'"
                    " (expected 0x%llx, got 0x%llx)",
-                   asset_key,
+                   resolved_key.c_str(),
                    static_cast<unsigned long long>(entry->asset_hash),
                    static_cast<unsigned long long>(actual));
         result.data.clear();

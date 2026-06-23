@@ -16,6 +16,8 @@ public:
     const AssetRegistry& registry() const { return m_registry; }
 
 private:
+    // Strips file extension from a path: "models/cube.obj" -> "models/cube"
+    static std::string strip_extension(const std::string& path);
     std::string cooked_file_path(const std::string& asset_key) const;
 
     FileSystem&          m_fs;

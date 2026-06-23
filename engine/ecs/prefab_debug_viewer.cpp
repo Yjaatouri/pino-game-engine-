@@ -118,16 +118,14 @@ void PrefabDebugViewer::validate() {
     if (has_audio && m_prefab.sound_path().empty())
         m_warnings.push_back({false, "AudioComponent present but no sound path set"});
 
-    // Check asset existence via AssetManager
-    if (m_assets && has_render && !m_prefab.mesh_path().empty()) {
-        // Check if the mesh asset exists in the asset manager's cache
-        // We use a simple existence check via raw file lookup
-        if (!m_assets->filesystem().exists(m_prefab.mesh_path().c_str()))
+    // Check asset existence via FileSystem
+    if (m_fs && has_render && !m_prefab.mesh_path().empty()) {
+        if (!m_fs->exists(m_prefab.mesh_path().c_str()))
             m_warnings.push_back({false, "Mesh path not found: " + m_prefab.mesh_path()});
     }
 
-    if (m_assets && has_audio && !m_prefab.sound_path().empty()) {
-        if (!m_assets->filesystem().exists(m_prefab.sound_path().c_str()))
+    if (m_fs && has_audio && !m_prefab.sound_path().empty()) {
+        if (!m_fs->exists(m_prefab.sound_path().c_str()))
             m_warnings.push_back({false, "Sound path not found: " + m_prefab.sound_path()});
     }
 }

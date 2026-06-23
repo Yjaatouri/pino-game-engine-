@@ -8,6 +8,7 @@
 #include "engine/renderer/texture.h"
 #include "engine/assets/asset_source.h"
 #include "engine/assets/asset_registry.h"
+#include "engine/assets/asset_utils.h"
 #include <string>
 #include <unordered_map>
 #include <memory>
@@ -18,13 +19,6 @@ namespace pino {
 
 // ── Progress callback type ──────────────────────────────────────
 using AssetProgressCallback = std::function<void(u32 loaded, u32 total, const char* current)>;
-
-// ── Path normalization ──────────────────────────────────────────
-// Normalizes a file path for use as a consistent cache key:
-//   - converts backslashes to forward slashes
-//   - collapses ".", ".." segments
-//   - lowercases on case-insensitive platforms (Win32)
-std::string normalize_asset_path(const char* path);
 
 // ── AssetManager ─────────────────────────────────────────────────
 class AssetManager {
@@ -49,13 +43,6 @@ public:
     Mesh*    fallback_mesh()    { return m_fallback_mesh.get(); }
     Shader*  fallback_shader()  { return m_fallback_shader.get(); }
 
-    // ---- Preloading ----
-    // Load a batch of assets. Progress callback is invoked after each asset.
-    // Supported extensions: .obj (mesh), .png/.jpg/.bmp/.tga (texture),
-    // .vert+.frag (shader pair).
-    void preload(const std::vector<std::string>& paths,
-                 AssetProgressCallback progress = nullptr);
-
     // ---- Unload unused assets (ref count == 1 means only cache owns it) ----
     void unload_unused();
 
@@ -71,7 +58,7 @@ public:
     // Load a cooked asset manifest. When loaded, get_* will try cooked assets
     // before falling back to raw source loading.
     // cooked_dir is the directory containing the .pino_cooked files.
-    bool load_cooked_manifest(const char* manifest_path, const char* cooked_dir);
+    bool load_cooked_manifest(const char* manifest_path, const char* cooked_dir, FileSystem& fs);
 
     // Check if cooked manifest is loaded
     bool is_cooked_mode() const { return m_cooked_source != nullptr; }
@@ -80,8 +67,6 @@ public:
     u32 mesh_cache_size()    const { return static_cast<u32>(m_mesh_cache.size()); }
     u32 texture_cache_size() const { return static_cast<u32>(m_tex_cache.size()); }
     u32 shader_cache_size()  const { return static_cast<u32>(m_shader_cache.size()); }
-
-    FileSystem& filesystem() const { return m_fs; }
 
     // Access the asset registry (for tools / debugging)
     const AssetRegistry* registry() const { return &m_registry; }
@@ -103,11 +88,6 @@ private:
     bool load_texture_from_raw_blob(const BinaryBlob& blob, Texture*& out_tex, std::shared_ptr<Texture>& out_shared);
     bool load_shader_from_raw_blobs(const BinaryBlob& vert_blob, const BinaryBlob& frag_blob,
                                     Shader*& out_shader, std::shared_ptr<Shader>& out_shared);
-
-    // Strip file extension: "models/cube.obj" -> "models/cube"
-    static std::string strip_extension(const std::string& path);
-
-    FileSystem& m_fs;
 
     std::unordered_map<std::string, std::shared_ptr<Mesh>>    m_mesh_cache;
     std::unordered_map<std::string, std::shared_ptr<Texture>> m_tex_cache;

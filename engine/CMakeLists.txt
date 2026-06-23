@@ -61,6 +61,7 @@ set(PINO_ENGINE_SOURCES
     assets/stb_image.cpp
     assets/asset_manager.cpp
     assets/asset_pack.cpp
+    assets/asset_utils.cpp
     assets/asset_manifest.cpp
     assets/asset_registry.cpp
     assets/cooked_file_source.cpp
