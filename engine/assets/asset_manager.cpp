@@ -5,6 +5,7 @@
 #include "engine/assets/cooked_file_source.h"
 #include "engine/assets/raw_file_source.h"
 #include "engine/assets/asset_utils.h"
+#include "engine/renderer/mesh_upload.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -61,26 +62,11 @@ bool AssetManager::load_mesh_from_cooked_blob(const BinaryBlob& blob,
         return false;
     }
 
-    if (mesh_data.vertex_count == 0 || mesh_data.vertex_data.empty()) {
-        PINO_ERROR("Cooked mesh has no vertices: %s", blob.debug_path.c_str());
+    std::shared_ptr<Mesh> mesh = upload_cooked_mesh(mesh_data, blob.debug_path.c_str());
+    if (!mesh) {
+        PINO_ERROR("Failed to upload cooked mesh: %s", blob.debug_path.c_str());
         return false;
     }
-
-    auto mesh = std::make_shared<Mesh>();
-    const Vertex* verts = reinterpret_cast<const Vertex*>(mesh_data.vertex_data.data());
-    const u32* idx = mesh_data.indices.data();
-    mesh->upload(verts, mesh_data.vertex_count, idx, mesh_data.index_count);
-
-    // Upload tangent/bitangent if present
-    if (!mesh_data.tangent_data.empty() && !mesh_data.bitangent_data.empty()) {
-        const glm::vec3* tangents = reinterpret_cast<const glm::vec3*>(mesh_data.tangent_data.data());
-        const glm::vec3* bitangents = reinterpret_cast<const glm::vec3*>(mesh_data.bitangent_data.data());
-        mesh->upload_tangents(tangents, bitangents, mesh_data.vertex_count);
-    }
-
-    PINO_INFO("Loaded cooked mesh (%u verts, %u indices%s)",
-              mesh_data.vertex_count, mesh_data.index_count,
-              mesh_data.tangent_data.empty() ? "" : ", with tangents");
 
     out_mesh = mesh.get();
     out_shared = std::move(mesh);
