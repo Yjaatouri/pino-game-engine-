@@ -10,6 +10,7 @@ add_executable(asset_cooker
     ${CMAKE_SOURCE_DIR}/engine/core/binary_chunk.cpp
     ${CMAKE_SOURCE_DIR}/engine/core/serializer.cpp
     ${CMAKE_SOURCE_DIR}/engine/serialization/cooked_asset.cpp
+    ${CMAKE_SOURCE_DIR}/engine/assets/asset_manifest.cpp
 )
 
 target_include_directories(asset_cooker

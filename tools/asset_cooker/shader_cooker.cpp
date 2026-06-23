@@ -26,6 +26,7 @@ static bool read_file(const std::string& path, std::vector<u8>& out) {
 class ShaderCooker : public ICooker {
 public:
     std::string extension() const override { return "vert"; }
+    u32 asset_type() const override { return CookedType::Shader; }
 
     CookResult cook(const CookInput& input, BinaryChunkWriter& writer) override {
         // Find matching .frag file
@@ -47,7 +48,7 @@ public:
         shader.frag_stage = std::move(frag_data);
 
         write_cooked_shader(writer, CookedPlatform::Desktop, shader);
-        return {true, ""};
+        return {true, "", CookedType::Shader, {}};
     }
 };
 

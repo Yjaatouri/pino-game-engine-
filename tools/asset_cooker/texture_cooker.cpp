@@ -13,6 +13,7 @@ namespace {
 class TextureCooker : public ICooker {
 public:
     std::string extension() const override { return "png"; }
+    u32 asset_type() const override { return CookedType::Texture; }
 
     bool accepts(const std::string& ext) const override {
         return ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "ppm";
@@ -41,7 +42,7 @@ public:
         stbi_image_free(pixels);
 
         write_cooked_texture(writer, CookedPlatform::Desktop, tex);
-        return {true, ""};
+        return {true, "", CookedType::Texture, {}};
     }
 };
 

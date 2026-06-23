@@ -1,10 +1,12 @@
 #include "cooker.h"
+#include "engine/assets/asset_manifest.h"
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 using namespace pino;
@@ -15,9 +17,18 @@ struct Options {
     bool     verbose = false;
 };
 
+struct CookedEntry {
+    std::string key;
+    u32         type_id;
+    u64         asset_hash;
+    u32         file_size;
+    std::vector<std::string> dependencies;
+};
+
 static void print_usage() {
     printf("Usage: asset_cooker --input <dir> --output <dir> [--verbose]\n");
     printf("  Cooks raw assets from --input into .pino_cooked files in --output.\n");
+    printf("  Produces asset_manifest.bin for runtime loading.\n");
     printf("  Supported: .obj .png .jpg .jpeg .ppm .vert (.vert+.frag pairs)\n");
 }
 
@@ -60,12 +71,12 @@ static std::string ext_lower(const std::string& path) {
 struct SourceAsset {
     fs::path full_path;
     std::string ext;
-    std::string rel_path;     // relative to input_dir, e.g. "models/cube.obj"
-    std::string asset_name;   // stem, e.g. "cube"
-    std::string identifier;   // without extension, e.g. "models/cube"
+    std::string rel_path;
+    std::string asset_name;
+    std::string identifier;
 };
 
-static std::vector<SourceAsset> scan_directory(const fs::path& root, CookerRegistry&) {
+static std::vector<SourceAsset> scan_directory(const fs::path& root) {
     std::vector<SourceAsset> assets;
     if (!fs::exists(root)) {
         printf("Error: input directory '%s' does not exist\n", root.string().c_str());
@@ -88,7 +99,6 @@ static std::vector<SourceAsset> scan_directory(const fs::path& root, CookerRegis
         asset.rel_path    = rel_str;
         asset.asset_name  = path.stem().string();
 
-        // identifier = rel_path without extension
         auto id = rel_str;
         auto dot = id.rfind('.');
         if (dot != std::string::npos) id.resize(dot);
@@ -97,6 +107,10 @@ static std::vector<SourceAsset> scan_directory(const fs::path& root, CookerRegis
         assets.push_back(asset);
     }
     return assets;
+}
+
+static std::string asset_path_to_key(const std::string& identifier, u32) {
+    return identifier;
 }
 
 int main(int argc, char** argv) {
@@ -108,16 +122,15 @@ int main(int argc, char** argv) {
     CookerRegistry reg;
     register_all_cookers(reg);
 
-    auto assets = scan_directory(opts.input_dir, reg);
+    auto assets = scan_directory(opts.input_dir);
     if (assets.empty()) {
         printf("No supported assets found in '%s'\n", opts.input_dir.string().c_str());
         return 1;
     }
 
-    // Create output directory
     fs::create_directories(opts.output_dir);
 
-    int cooked_count = 0;
+    std::vector<CookedEntry> cooked_entries;
     int error_count = 0;
     int skipped_count = 0;
 
@@ -125,12 +138,17 @@ int main(int argc, char** argv) {
            opts.input_dir.string().c_str(),
            opts.output_dir.string().c_str());
 
+    // Sort assets by identifier for deterministic ordering
+    std::sort(assets.begin(), assets.end(),
+              [](const SourceAsset& a, const SourceAsset& b) {
+                  return a.identifier < b.identifier;
+              });
+
     for (const auto& asset : assets) {
         ICooker* cooker = reg.find(asset.ext);
         if (!cooker) {
-            if (opts.verbose) {
+            if (opts.verbose)
                 printf("  SKIP  %s  (no cooker for .%s)\n", asset.rel_path.c_str(), asset.ext.c_str());
-            }
             ++skipped_count;
             continue;
         }
@@ -140,9 +158,8 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if (opts.verbose) {
+        if (opts.verbose)
             printf("  COOK  %s\n", asset.rel_path.c_str());
-        }
 
         CookInput input;
         input.source_path = asset.full_path.string();
@@ -158,12 +175,9 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        // Write output: asset_identifier.pino_cooked
-        // Replace directory separators with underscores to avoid creating subdirectories
+        std::string asset_key = asset_path_to_key(asset.identifier, result.asset_type);
         std::string out_name = asset.identifier;
-        for (auto& c : out_name) {
-            if (c == '/' || c == '\\') c = '_';
-        }
+        for (auto& c : out_name) if (c == '/' || c == '\\') c = '_';
         fs::path out_path = opts.output_dir / (out_name + ".pino_cooked");
 
         const auto& buf = writer.getBuffer();
@@ -176,30 +190,61 @@ int main(int argc, char** argv) {
         out_file.write(reinterpret_cast<const char*>(buf.data()), buf.size());
         out_file.close();
 
-        if (opts.verbose) {
-            printf("  -> %s (%zu bytes)\n", out_path.filename().string().c_str(), buf.size());
-        }
-        ++cooked_count;
+        u32 file_size = static_cast<u32>(buf.size());
+        u64 asset_hash = cooked_hash_fnv1a(buf.data(), file_size);
+
+        cooked_entries.push_back({asset_key, result.asset_type, asset_hash, file_size, result.dependencies});
+
+        if (opts.verbose)
+            printf("  -> %s (%u bytes)\n", out_path.filename().string().c_str(), file_size);
     }
 
-    printf("\nResults: %d cooked, %d errors, %d skipped\n",
-           cooked_count, error_count, skipped_count);
+    printf("\nResults: %zu cooked, %d errors, %d skipped\n",
+           cooked_entries.size(), error_count, skipped_count);
 
-    // Write a simple manifest
-    fs::path manifest_path = opts.output_dir / "asset_manifest.txt";
-    std::ofstream mf(manifest_path);
+    // ── Write binary manifest ─────────────────────────────────────
+    AssetManifestData manifest;
+    manifest.entries.reserve(cooked_entries.size());
+    manifest.keys.reserve(cooked_entries.size());
+    manifest.dependencies.reserve(cooked_entries.size());
+
+    for (const auto& entry : cooked_entries) {
+        AssetManifestEntry me;
+        me.key_hash     = asset_key_hash(entry.key);
+        me.type_id      = entry.type_id;
+        me.file_offset  = 0; // loose file
+        me.file_size    = entry.file_size;
+        me.asset_hash   = entry.asset_hash;
+        me.platform_tag = static_cast<u32>(CookedPlatform::Desktop);
+        me.flags        = CAF_None;
+
+        std::vector<u64> dep_hashes;
+        dep_hashes.reserve(entry.dependencies.size());
+        for (const auto& dep : entry.dependencies)
+            dep_hashes.push_back(asset_key_hash(dep));
+
+        me.dep_count = static_cast<u32>(dep_hashes.size());
+
+        manifest.entries.push_back(me);
+        manifest.keys.push_back(entry.key);
+        manifest.dependencies.push_back(dep_hashes);
+    }
+
+    BinaryChunkWriter manifest_writer;
+    write_asset_manifest(manifest_writer, manifest);
+
+    fs::path manifest_path = opts.output_dir / "asset_manifest.bin";
+    const auto& mbuf = manifest_writer.getBuffer();
+    std::ofstream mf(manifest_path, std::ios::binary);
     if (mf) {
-        mf << "# Pino Game Engine - Cooked Asset Manifest\n";
-        mf << "# Generated by asset_cooker\n\n";
-        for (const auto& asset : assets) {
-            ICooker* cooker = reg.find(asset.ext);
-            if (!cooker) continue;
-            if (cooker->extension() == "vert" && asset.ext == "frag") continue;
-            std::string out_name = asset.identifier;
-            for (auto& c : out_name) if (c == '/' || c == '\\') c = '_';
-            mf << asset.identifier << " = " << out_name << ".pino_cooked\n";
-        }
+        mf.write(reinterpret_cast<const char*>(mbuf.data()), mbuf.size());
         mf.close();
+        printf("Manifest: %s (%zu entries, %zu bytes)\n",
+               manifest_path.filename().string().c_str(),
+               manifest.entries.size(), mbuf.size());
+    } else {
+        printf("  ERROR: cannot write manifest\n");
+        ++error_count;
     }
 
     return error_count > 0 ? 1 : 0;

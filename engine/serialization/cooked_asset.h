@@ -21,7 +21,8 @@ namespace CookedType {
     static constexpr u32 Mesh     = 400;
     static constexpr u32 Texture  = 401;
     static constexpr u32 Shader   = 402;
-    static constexpr u32 Material = 403;
+    static constexpr u32 Material  = 403;
+    static constexpr u32 Manifest = 500;
 }
 
 // ── Version constants ────────────────────────────────────────────
@@ -29,7 +30,8 @@ namespace CookedVersion {
     static constexpr u32 Mesh     = 1;
     static constexpr u32 Texture  = 1;
     static constexpr u32 Shader   = 1;
-    static constexpr u32 Material = 1;
+    static constexpr u32 Material  = 1;
+    static constexpr u32 Manifest  = 1;
 }
 
 // ── Texture pixel format ─────────────────────────────────────────

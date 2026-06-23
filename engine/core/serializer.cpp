@@ -18,6 +18,10 @@ void Serializer::endChunk() {
     m_chunk_open = false;
 }
 
+void Serializer::writeUInt64(uint64_t value) {
+    m_writer->writeUInt64(value);
+}
+
 void Serializer::writeUInt32(uint32_t value) {
     m_writer->writeUInt32(value);
 }
@@ -104,6 +108,16 @@ bool Deserializer::isValid() const {
 
 bool Deserializer::canRead(uint32_t size) const {
     return m_has_chunk && m_valid && size <= m_remaining;
+}
+
+uint64_t Deserializer::readUInt64() {
+    if (!canRead(8)) {
+        m_valid = false;
+        return 0;
+    }
+    uint64_t val = m_reader->readUInt64();
+    m_remaining -= 8;
+    return val;
 }
 
 uint32_t Deserializer::readUInt32() {

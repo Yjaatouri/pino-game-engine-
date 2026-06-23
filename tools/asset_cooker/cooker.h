@@ -11,6 +11,8 @@ namespace pino {
 struct CookResult {
     bool        ok    = false;
     std::string error;
+    u32         asset_type = 0;                          // CookedType::*
+    std::vector<std::string> dependencies;               // asset keys this depends on
 };
 
 struct CookInput {
@@ -24,6 +26,7 @@ public:
     virtual ~ICooker() = default;
     virtual std::string extension() const = 0;
     virtual bool accepts(const std::string& ext) const;
+    virtual u32  asset_type() const = 0;                 // CookedType::Mesh, Texture, etc.
     virtual CookResult cook(const CookInput& input, BinaryChunkWriter& writer) = 0;
 };
 

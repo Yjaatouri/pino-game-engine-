@@ -23,6 +23,7 @@ public:
 
     void writeBytes(const void* data, uint32_t size);
     void writeUInt32(uint32_t value);
+    void writeUInt64(uint64_t value);
     void writeFloat(float value);
     void writeInt32(int32_t value);
     void writeBool(bool value);
@@ -52,6 +53,7 @@ public:
 
     void readBytes(void* out, uint32_t size);
     uint32_t readUInt32();
+    uint64_t readUInt64();
     float readFloat();
     int32_t readInt32();
     bool readBool();

@@ -74,6 +74,13 @@ void BinaryChunkWriter::writeBytes(const void* data, uint32_t size) {
     writeRaw(data, size);
 }
 
+void BinaryChunkWriter::writeUInt64(uint64_t value) {
+    uint8_t buf[8];
+    writeLE32(buf + 0, static_cast<uint32_t>(value & 0xFFFFFFFFull));
+    writeLE32(buf + 4, static_cast<uint32_t>((value >> 32) & 0xFFFFFFFFull));
+    writeRaw(buf, 8);
+}
+
 void BinaryChunkWriter::writeUInt32(uint32_t value) {
     uint8_t buf[4];
     writeLE32(buf, value);
@@ -194,6 +201,16 @@ void BinaryChunkReader::readBytes(void* out, uint32_t size) {
 
     std::memcpy(out, m_data + m_payload_cursor, size);
     m_payload_cursor += size;
+}
+
+uint64_t BinaryChunkReader::readUInt64() {
+    assert(m_has_chunk);
+    assert(m_payload_cursor + 8 <= m_payload_end);
+
+    uint64_t lo = readLE32(m_data + m_payload_cursor);
+    uint64_t hi = readLE32(m_data + m_payload_cursor + 4);
+    m_payload_cursor += 8;
+    return lo | (hi << 32);
 }
 
 uint32_t BinaryChunkReader::readUInt32() {

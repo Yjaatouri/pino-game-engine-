@@ -14,6 +14,7 @@ public:
     void endChunk();
 
     void writeUInt32(uint32_t value);
+    void writeUInt64(uint64_t value);
     void writeInt32(int32_t value);
     void writeFloat(float value);
     void writeBool(bool value);
@@ -41,6 +42,7 @@ public:
     bool isValid() const;
 
     uint32_t readUInt32();
+    uint64_t readUInt64();
     int32_t readInt32();
     float readFloat();
     bool readBool();

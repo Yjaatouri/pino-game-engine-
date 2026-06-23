@@ -12,6 +12,7 @@ namespace {
 class MeshCooker : public ICooker {
 public:
     std::string extension() const override { return "obj"; }
+    u32 asset_type() const override { return CookedType::Mesh; }
 
     CookResult cook(const CookInput& input, BinaryChunkWriter& writer) override {
         std::ifstream file(input.source_path, std::ios::binary);
@@ -104,7 +105,7 @@ public:
         mesh.bounds_radius = radius;
 
         write_cooked_mesh(writer, CookedPlatform::Desktop, mesh);
-        return {true, ""};
+        return {true, "", CookedType::Mesh, {}};
     }
 };
 

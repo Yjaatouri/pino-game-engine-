@@ -61,6 +61,8 @@ set(PINO_ENGINE_SOURCES
     assets/stb_image.cpp
     assets/asset_manager.cpp
     assets/asset_pack.cpp
+    assets/asset_manifest.cpp
+    assets/asset_registry.cpp
     scene/entity.cpp
     scene/scene.cpp
     input/gamepad.cpp
