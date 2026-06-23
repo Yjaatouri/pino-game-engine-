@@ -366,15 +366,25 @@ Mesh* AssetManager::load_mesh(const char* path) {
 
     // ── 1. Resolve asset key via registry (if cooked mode) ────────
     std::string resolved;
-    if (m_cooked_source)
+    bool have_cooked = false;
+    if (m_cooked_source) {
         resolved = m_registry.resolve(key.c_str());
+        if (resolved.empty())
+            PINO_WARN("Cooked mesh \"%s\" not in manifest, falling back to raw", path);
+        else
+            have_cooked = true;
+    }
 
     // ── 2–3. Query active source → load blob ─────────────────────
     BinaryBlob blob;
     bool is_cooked = false;
-    if (!resolved.empty()) {
+    if (have_cooked) {
         blob = m_cooked_source->load(resolved.c_str());
-        is_cooked = !blob.data.empty();
+        if (blob.data.empty()) {
+            PINO_WARN("Cooked mesh \"%s\" file missing, falling back to raw", resolved.c_str());
+        } else {
+            is_cooked = true;
+        }
     }
     if (!is_cooked)
         blob = m_raw_source->load(key.c_str());
@@ -384,7 +394,7 @@ Mesh* AssetManager::load_mesh(const char* path) {
         if (!m_registry.verify_integrity(resolved.c_str(),
                                          blob.data.data(),
                                          static_cast<u32>(blob.data.size()))) {
-            PINO_WARN("Cooked mesh hash mismatch for %s, falling back to raw", path);
+            PINO_WARN("Cooked mesh \"%s\" hash mismatch, falling back to raw", path);
             blob = m_raw_source->load(key.c_str());
             is_cooked = false;
         }
@@ -431,15 +441,25 @@ Texture* AssetManager::load_texture(const char* path) {
 
     // 1. Resolve asset key via registry (if cooked)
     std::string resolved;
-    if (m_cooked_source)
+    bool have_cooked = false;
+    if (m_cooked_source) {
         resolved = m_registry.resolve(key.c_str());
+        if (resolved.empty())
+            PINO_WARN("Cooked texture \"%s\" not in manifest, falling back to raw", path);
+        else
+            have_cooked = true;
+    }
 
     // 2–3. Query active source → load blob
     BinaryBlob blob;
     bool is_cooked = false;
-    if (!resolved.empty()) {
+    if (have_cooked) {
         blob = m_cooked_source->load(resolved.c_str());
-        is_cooked = !blob.data.empty();
+        if (blob.data.empty()) {
+            PINO_WARN("Cooked texture \"%s\" file missing, falling back to raw", resolved.c_str());
+        } else {
+            is_cooked = true;
+        }
     }
     if (!is_cooked)
         blob = m_raw_source->load(key.c_str());
@@ -449,7 +469,7 @@ Texture* AssetManager::load_texture(const char* path) {
         if (!m_registry.verify_integrity(resolved.c_str(),
                                          blob.data.data(),
                                          static_cast<u32>(blob.data.size()))) {
-            PINO_WARN("Cooked texture hash mismatch for %s, falling back to raw", path);
+            PINO_WARN("Cooked texture \"%s\" hash mismatch, falling back to raw", path);
             blob = m_raw_source->load(key.c_str());
             is_cooked = false;
         }
@@ -497,15 +517,25 @@ Shader* AssetManager::load_shader(const char* vert_path, const char* frag_path) 
 
     // 1. Resolve asset key via registry (if cooked)
     std::string resolved;
-    if (m_cooked_source)
+    bool have_cooked = false;
+    if (m_cooked_source) {
         resolved = m_registry.resolve(vert_norm.c_str());
+        if (resolved.empty())
+            PINO_WARN("Cooked shader \"%s\" not in manifest, falling back to raw", vert_path);
+        else
+            have_cooked = true;
+    }
 
     // 2–3. Query active source → load blob
     BinaryBlob blob;
     bool is_cooked = false;
-    if (!resolved.empty()) {
+    if (have_cooked) {
         blob = m_cooked_source->load(resolved.c_str());
-        is_cooked = !blob.data.empty();
+        if (blob.data.empty()) {
+            PINO_WARN("Cooked shader \"%s\" file missing, falling back to raw", resolved.c_str());
+        } else {
+            is_cooked = true;
+        }
     }
 
     // 4. Validate hash (cooked)
@@ -513,7 +543,7 @@ Shader* AssetManager::load_shader(const char* vert_path, const char* frag_path) 
         if (!m_registry.verify_integrity(resolved.c_str(),
                                          blob.data.data(),
                                          static_cast<u32>(blob.data.size()))) {
-            PINO_WARN("Cooked shader hash mismatch for %s, falling back to raw", vert_path);
+            PINO_WARN("Cooked shader \"%s\" hash mismatch, falling back to raw", vert_path);
             is_cooked = false;
             blob.data.clear();
         }
