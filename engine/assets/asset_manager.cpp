@@ -5,7 +5,7 @@
 #include "engine/assets/cooked_file_source.h"
 #include "engine/assets/raw_file_source.h"
 #include "engine/assets/asset_utils.h"
-#include "engine/renderer/mesh_upload.h"
+#include "engine/renderer/mesh_uploader.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -62,7 +62,7 @@ bool AssetManager::load_mesh_from_cooked_blob(const BinaryBlob& blob,
         return false;
     }
 
-    std::shared_ptr<Mesh> mesh = upload_cooked_mesh(mesh_data, blob.debug_path.c_str());
+    std::shared_ptr<Mesh> mesh = MeshUploader::upload(mesh_data, blob.debug_path.c_str());
     if (!mesh) {
         PINO_ERROR("Failed to upload cooked mesh: %s", blob.debug_path.c_str());
         return false;

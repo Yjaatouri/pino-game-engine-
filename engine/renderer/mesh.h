@@ -20,8 +20,11 @@ struct Vertex {
     }
 };
 
+class MeshUploader; // forward decl for friendship
+
 class Mesh {
 public:
+    friend class MeshUploader;
     Mesh() = default;
     ~Mesh();
 

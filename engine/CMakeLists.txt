@@ -55,7 +55,7 @@ set(PINO_ENGINE_SOURCES
     renderer/shadow_map.cpp
     renderer/skybox.cpp
     renderer/material.cpp
-    renderer/mesh_upload.cpp
+    renderer/mesh_uploader.cpp
     renderer/render_queue.cpp
     renderer/frustum.cpp
     renderer/lod_group.cpp
