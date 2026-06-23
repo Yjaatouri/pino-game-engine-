@@ -127,10 +127,30 @@ void MeshUploader::compute_bounds(Mesh& mesh, const CookedMeshData& data) {
     }
 }
 
+// ── Layout validation — fails inside MeshUploader, never in AssetManager ──
+static bool validate_layout(const CookedMeshData& data) {
+    if (data.vertex_stride == 0) {
+        PINO_ERROR("MeshUploader: vertex_stride is 0"); return false;
+    }
+    if (data.has_positions && (data.position_attrib.component_count == 0 || data.position_attrib.byte_size == 0)) {
+        PINO_ERROR("MeshUploader: position attribute metadata missing"); return false;
+    }
+    if (data.has_normals && (data.normal_attrib.component_count == 0 || data.normal_attrib.byte_size == 0)) {
+        PINO_ERROR("MeshUploader: normal attribute metadata missing"); return false;
+    }
+    if (data.has_uvs && (data.uv_attrib.component_count == 0 || data.uv_attrib.byte_size == 0)) {
+        PINO_ERROR("MeshUploader: uv attribute metadata missing"); return false;
+    }
+    return true;
+}
+
 // ── Public upload entry point ────────────────────────────────────
 std::shared_ptr<Mesh> MeshUploader::upload(const CookedMeshData& data, const char* debug_name) {
     if (data.vertex_count == 0 || data.vertex_data.empty()) {
         PINO_ERROR("MeshUploader: no vertex data (%s)", debug_name ? debug_name : "");
+        return nullptr;
+    }
+    if (!validate_layout(data)) {
         return nullptr;
     }
 

@@ -298,107 +298,144 @@ int main() {
         // Version rejection
         TEST("unknown version is rejected",  test_version_rejection());
 
-        // Old v1 format rejected (current is v4)
+        // ── v1 transparent loading (no flags, no tangents) ──
         {
+            // Write a small mesh in v1 format (count+count+stride+data+bounds)
+            std::vector<u8> verts(64, 0xAB);
+            std::vector<u32> idxs = {0,1,2};
             BinaryChunkWriter writer;
-            CookedMeshData dummy;
-            auto write_v1 = [&](Serializer& s) {
-                // v1 format: count + count + stride (no tangent/bitangent at all)
-                s.writeUInt32(0); // vertex_count
-                s.writeUInt32(0); // index_count
-                s.writeUInt32(0); // vertex_stride
-            };
-            BinaryChunkWriter tmp;
-            Serializer s_tmp(tmp);
-            write_v1(s_tmp);
-            auto buf = tmp.getBuffer();
-            u64 hash = cooked_hash_fnv1a(buf.data(), static_cast<u32>(buf.size()));
-
-            writer.beginChunk(CookedType::Mesh, 1); // v1
             {
-                Serializer s_real(writer);
-                CookedAssetHeader h;
-                h.asset_hash = hash; h.platform_tag = 0; h.flags = CAF_None;
-                write_cooked_header(s_real, h);
-                s_real.writeBytes(buf.data(), static_cast<u32>(buf.size()));
+                BinaryChunkWriter tmp;
+                Serializer s_tmp(tmp);
+                s_tmp.beginChunk(0, 0);
+                s_tmp.writeUInt32(2);            // vertex_count
+                s_tmp.writeUInt32(3);            // index_count
+                s_tmp.writeUInt32(32);           // vertex_stride
+                s_tmp.writeBytes(verts.data(), 64);
+                s_tmp.writeBytes(idxs.data(), 3 * sizeof(u32));
+                s_tmp.writeVec3({-1,-1,-1});     // bounds_min
+                s_tmp.writeVec3({ 1, 1, 1});     // bounds_max
+                s_tmp.writeVec3({ 0, 0, 0});     // bounds_center
+                s_tmp.writeFloat(1.732f);        // bounds_radius
+                s_tmp.endChunk();
+
+                auto buf = tmp.getBuffer();
+                u64 hash = cooked_hash_fnv1a(buf.data(), static_cast<u32>(buf.size()));
+                writer.beginChunk(CookedType::Mesh, 1);
+                {
+                    Serializer s_real(writer);
+                    CookedAssetHeader h = {hash, 0, CAF_None};
+                    write_cooked_header(s_real, h);
+                    s_real.writeBytes(buf.data(), static_cast<u32>(buf.size()));
+                }
+                writer.endChunk();
             }
-            writer.endChunk();
 
             CookedMeshData result;
             BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
-            TEST("old v1 format is rejected", !read_cooked_mesh(reader, result));
+            bool ok = read_cooked_mesh(reader, result);
+            TEST("v1 mesh loads transparently", ok);
+            if (ok) {
+                TEST("v1: vertex_count",       result.vertex_count == 2);
+                TEST("v1: index_count",        result.index_count == 3);
+                TEST("v1: vertex_stride",      result.vertex_stride == 32);
+                TEST("v1: position metadata",   result.position_attrib.byte_offset == 0 && result.position_attrib.component_count == 3);
+                TEST("v1: normal metadata",     result.normal_attrib.byte_offset == 12 && result.normal_attrib.component_count == 3);
+                TEST("v1: uv metadata",         result.uv_attrib.byte_offset == 24 && result.uv_attrib.component_count == 2);
+                TEST("v1: position flag",       result.has_positions);
+                TEST("v1: normal flag",         result.has_normals);
+                TEST("v1: uv flag",             result.has_uvs);
+                TEST("v1: no tangents",         !result.has_tangents && !result.has_bitangents);
+            }
         }
 
-        // Old v2 format rejected (missing explicit attribute flags)
+        // ── v2 transparent loading (single has_tangents bool) ──
         {
+            std::vector<u8> verts(64, 0xCD);
+            std::vector<u32> idxs = {0,1,2};
+            std::vector<u8> tan_data(2 * 12, 0xAA);  // 2 verts * vec3
+            std::vector<u8> bitan_data(2 * 12, 0xBB);
             BinaryChunkWriter writer;
-            CookedMeshData dummy;
-            auto write_v2 = [&](Serializer& s) {
-                // v2 format: count + count + stride + data fields + has_tangents(bool) + data
-                s.writeUInt32(0); // vertex_count
-                s.writeUInt32(0); // index_count
-                s.writeUInt32(0); // vertex_stride
-                s.writeBool(false); // has_tangents (v2 bool, no explicit flags)
-            };
-            BinaryChunkWriter tmp;
-            Serializer s_tmp(tmp);
-            write_v2(s_tmp);
-            auto buf = tmp.getBuffer();
-            u64 hash = cooked_hash_fnv1a(buf.data(), static_cast<u32>(buf.size()));
-
-            writer.beginChunk(CookedType::Mesh, 2); // v2
             {
-                Serializer s_real(writer);
-                CookedAssetHeader h;
-                h.asset_hash = hash; h.platform_tag = 0; h.flags = CAF_None;
-                write_cooked_header(s_real, h);
-                s_real.writeBytes(buf.data(), static_cast<u32>(buf.size()));
+                BinaryChunkWriter tmp;
+                Serializer s_tmp(tmp);
+                s_tmp.beginChunk(0, 0);
+                s_tmp.writeUInt32(2);            // vertex_count
+                s_tmp.writeUInt32(3);            // index_count
+                s_tmp.writeUInt32(32);           // vertex_stride
+                s_tmp.writeBytes(verts.data(), 64);
+                s_tmp.writeBytes(idxs.data(), 3 * sizeof(u32));
+                s_tmp.writeBool(true);           // has_tangents (single bool)
+                s_tmp.writeBytes(tan_data.data(), 24);
+                s_tmp.writeBytes(bitan_data.data(), 24);
+                s_tmp.writeVec3({-1,-1,-1});
+                s_tmp.writeVec3({ 1, 1, 1});
+                s_tmp.writeVec3({ 0, 0, 0});
+                s_tmp.writeFloat(1.732f);
+                s_tmp.endChunk();
+
+                auto buf = tmp.getBuffer();
+                u64 hash = cooked_hash_fnv1a(buf.data(), static_cast<u32>(buf.size()));
+                writer.beginChunk(CookedType::Mesh, 2);
+                {
+                    Serializer s_real(writer);
+                    CookedAssetHeader h = {hash, 0, CAF_None};
+                    write_cooked_header(s_real, h);
+                    s_real.writeBytes(buf.data(), static_cast<u32>(buf.size()));
+                }
+                writer.endChunk();
             }
-            writer.endChunk();
 
             CookedMeshData result;
             BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
-            TEST("old v2 format is rejected", !read_cooked_mesh(reader, result));
+            bool ok = read_cooked_mesh(reader, result);
+            TEST("v2 mesh loads transparently", ok);
+            if (ok) {
+                TEST("v2: vertex_count",       result.vertex_count == 2);
+                TEST("v2: position metadata",   result.position_attrib.byte_offset == 0 && result.position_attrib.component_count == 3);
+                TEST("v2: has tangents+bitangents", result.has_tangents && result.has_bitangents);
+                TEST("v2: tangent data size",   result.tangent_data.size() == 24);
+                TEST("v2: bitangent data size", result.bitangent_data.size() == 24);
+            }
         }
 
-        // Old v3 format rejected (missing vertex layout metadata)
+        // ── v2 without tangents loads correctly ──
         {
             BinaryChunkWriter writer;
-            CookedMeshData dummy;
-            auto write_v3 = [&](Serializer& s) {
-                // v3 format: count + count + stride + data + flags(5×bool) + optional data + bounds
-                s.writeUInt32(0); // vertex_count
-                s.writeUInt32(0); // index_count
-                s.writeUInt32(0); // vertex_stride
-                s.writeBool(true);  // has_positions
-                s.writeBool(true);  // has_normals
-                s.writeBool(true);  // has_uvs
-                s.writeBool(false); // has_tangents
-                s.writeBool(false); // has_bitangents
-                s.writeVec3({0,0,0}); // bounds_min
-                s.writeVec3({0,0,0}); // bounds_max
-                s.writeVec3({0,0,0}); // bounds_center
-                s.writeFloat(0);      // bounds_radius
-            };
-            BinaryChunkWriter tmp;
-            Serializer s_tmp(tmp);
-            write_v3(s_tmp);
-            auto buf = tmp.getBuffer();
-            u64 hash = cooked_hash_fnv1a(buf.data(), static_cast<u32>(buf.size()));
-
-            writer.beginChunk(CookedType::Mesh, 3); // v3
             {
-                Serializer s_real(writer);
-                CookedAssetHeader h;
-                h.asset_hash = hash; h.platform_tag = 0; h.flags = CAF_None;
-                write_cooked_header(s_real, h);
-                s_real.writeBytes(buf.data(), static_cast<u32>(buf.size()));
+                BinaryChunkWriter tmp;
+                Serializer s_tmp(tmp);
+                s_tmp.beginChunk(0, 0);
+                s_tmp.writeUInt32(0);
+                s_tmp.writeUInt32(0);
+                s_tmp.writeUInt32(0);
+                s_tmp.writeBool(false);          // has_tangents = false
+                s_tmp.writeVec3({0,0,0});
+                s_tmp.writeVec3({0,0,0});
+                s_tmp.writeVec3({0,0,0});
+                s_tmp.writeFloat(0);
+                s_tmp.endChunk();
+
+                auto buf = tmp.getBuffer();
+                u64 hash = cooked_hash_fnv1a(buf.data(), static_cast<u32>(buf.size()));
+                writer.beginChunk(CookedType::Mesh, 2);
+                {
+                    Serializer s_real(writer);
+                    CookedAssetHeader h = {hash, 0, CAF_None};
+                    write_cooked_header(s_real, h);
+                    s_real.writeBytes(buf.data(), static_cast<u32>(buf.size()));
+                }
+                writer.endChunk();
             }
-            writer.endChunk();
 
             CookedMeshData result;
             BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
-            TEST("old v3 format is rejected", !read_cooked_mesh(reader, result));
+            bool ok = read_cooked_mesh(reader, result);
+            TEST("v2 no-tangent loads transparently", ok);
+            if (ok) {
+                TEST("v2 no-tangent: no tangents", !result.has_tangents && !result.has_bitangents);
+                TEST("v2 no-tangent: metadata populated", result.position_attrib.component_count == 3);
+            }
         }
 
         // Corrupted hash

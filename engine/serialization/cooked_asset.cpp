@@ -139,6 +139,87 @@ void read_cooked_mesh_payload(Deserializer& d, CookedMeshData& mesh) {
     mesh.bounds_radius = d.readFloat();
 }
 
+// ── v1 backward-compatible reader (no flags, no tangents) ─────────
+// Upgrades to v4 in-memory with standard layout defaults.
+static void read_cooked_mesh_payload_v1(Deserializer& d, CookedMeshData& mesh) {
+    mesh.vertex_count   = d.readUInt32();
+    mesh.index_count    = d.readUInt32();
+    mesh.vertex_stride  = d.readUInt32();
+
+    u32 vert_bytes = mesh.vertex_count * mesh.vertex_stride;
+    mesh.vertex_data.resize(vert_bytes);
+    if (vert_bytes > 0)
+        d.readBytes(mesh.vertex_data.data(), vert_bytes);
+
+    mesh.indices.resize(mesh.index_count);
+    if (mesh.index_count > 0)
+        d.readBytes(mesh.indices.data(), mesh.index_count * sizeof(u32));
+
+    // v1 assumed standard interleaved Vertex layout
+    mesh.position_attrib   = { 0, 12, 3 };
+    mesh.normal_attrib     = { 12, 12, 3 };
+    mesh.uv_attrib         = { 24, 8, 2 };
+    mesh.has_positions     = true;
+    mesh.has_normals       = true;
+    mesh.has_uvs           = true;
+    mesh.has_tangents      = false;
+    mesh.has_bitangents    = false;
+    mesh.tangent_per_vertex   = 12;
+    mesh.bitangent_per_vertex = 12;
+
+    mesh.bounds_min    = d.readVec3();
+    mesh.bounds_max    = d.readVec3();
+    mesh.bounds_center = d.readVec3();
+    mesh.bounds_radius = d.readFloat();
+}
+
+// ── v2 backward-compatible reader (single has_tangents bool, no explicit flags) ──
+// Upgrades to v4 in-memory with standard layout defaults.
+static void read_cooked_mesh_payload_v2(Deserializer& d, CookedMeshData& mesh) {
+    mesh.vertex_count   = d.readUInt32();
+    mesh.index_count    = d.readUInt32();
+    mesh.vertex_stride  = d.readUInt32();
+
+    u32 vert_bytes = mesh.vertex_count * mesh.vertex_stride;
+    mesh.vertex_data.resize(vert_bytes);
+    if (vert_bytes > 0)
+        d.readBytes(mesh.vertex_data.data(), vert_bytes);
+
+    mesh.indices.resize(mesh.index_count);
+    if (mesh.index_count > 0)
+        d.readBytes(mesh.indices.data(), mesh.index_count * sizeof(u32));
+
+    // v2 assumed standard interleaved Vertex layout
+    mesh.position_attrib   = { 0, 12, 3 };
+    mesh.normal_attrib     = { 12, 12, 3 };
+    mesh.uv_attrib         = { 24, 8, 2 };
+    mesh.has_positions     = true;
+    mesh.has_normals       = true;
+    mesh.has_uvs           = true;
+    mesh.tangent_per_vertex   = 12;
+    mesh.bitangent_per_vertex = 12;
+
+    // v2: single has_tangents bool (paired tangents+bitangents)
+    bool has_tangents = d.readBool();
+    mesh.has_tangents    = has_tangents;
+    mesh.has_bitangents  = has_tangents;
+
+    if (has_tangents) {
+        u32 attr_bytes = mesh.vertex_count * sizeof(glm::vec3);
+        mesh.tangent_data.resize(attr_bytes);
+        mesh.bitangent_data.resize(attr_bytes);
+        if (attr_bytes > 0) {
+            d.readBytes(mesh.tangent_data.data(), attr_bytes);
+            d.readBytes(mesh.bitangent_data.data(), attr_bytes);
+        }
+    }
+
+    mesh.bounds_min    = d.readVec3();
+    mesh.bounds_max    = d.readVec3();
+    mesh.bounds_center = d.readVec3();
+    mesh.bounds_radius = d.readFloat();
+}
+
 // ═══════════════════════════════════════════════════════════════
 //  CookedTexture payload
 // ═══════════════════════════════════════════════════════════════
@@ -400,7 +481,9 @@ bool read_cooked_mesh(BinaryChunkReader& reader, CookedMeshData& mesh) {
     if (!reader.nextChunk()) { PINO_ERROR("Cooked mesh: no chunk"); return false; }
     const ChunkHeader& hdr = reader.getHeader();
     if (hdr.type_id != CookedType::Mesh) { PINO_ERROR("Cooked mesh: bad type %u", hdr.type_id); return false; }
-    if (hdr.version != CookedVersion::Mesh) { PINO_ERROR("Cooked mesh: bad version %u", hdr.version); return false; }
+    if (hdr.version != 1 && hdr.version != 2 && hdr.version != CookedVersion::Mesh) {
+        PINO_ERROR("Cooked mesh: unsupported version %u", hdr.version); return false;
+    }
 
     u32 hash_lo = reader.readUInt32();
     u32 hash_hi = reader.readUInt32();
@@ -419,7 +502,12 @@ bool read_cooked_mesh(BinaryChunkReader& reader, CookedMeshData& mesh) {
     BinaryChunkReader nested_reader(nested.data(), nested_size);
     Deserializer d(nested_reader);
     if (!d.nextChunk()) { PINO_ERROR("Cooked mesh: nested chunk missing"); return false; }
-    read_cooked_mesh_payload(d, mesh);
+
+    switch (hdr.version) {
+        case 1: read_cooked_mesh_payload_v1(d, mesh); break;
+        case 2: read_cooked_mesh_payload_v2(d, mesh); break;
+        default: read_cooked_mesh_payload(d, mesh); break;
+    }
     return d.isValid();
 }
 
