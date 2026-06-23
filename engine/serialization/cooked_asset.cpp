@@ -344,6 +344,7 @@ bool read_cooked_mesh(BinaryChunkReader& reader, CookedMeshData& mesh) {
     u32 flags    = reader.readUInt32(); (void)flags;
     u64 expected_hash = (static_cast<u64>(hash_hi) << 32) | hash_lo;
 
+    if (hdr.size < 16) { PINO_ERROR("Cooked mesh: chunk too small (%u bytes)", hdr.size); return false; }
     u32 nested_size = hdr.size - 16;
     std::vector<u8> nested(nested_size);
     if (nested_size > 0) reader.readBytes(nested.data(), nested_size);
@@ -370,6 +371,7 @@ bool read_cooked_texture(BinaryChunkReader& reader, CookedTextureData& tex) {
     u32 flags    = reader.readUInt32(); (void)flags;
     u64 expected_hash = (static_cast<u64>(hash_hi) << 32) | hash_lo;
 
+    if (hdr.size < 16) { PINO_ERROR("Cooked tex: chunk too small (%u bytes)", hdr.size); return false; }
     u32 nested_size = hdr.size - 16;
     std::vector<u8> nested(nested_size);
     if (nested_size > 0) reader.readBytes(nested.data(), nested_size);
@@ -396,6 +398,7 @@ bool read_cooked_shader(BinaryChunkReader& reader, CookedShaderData& shader) {
     u32 flags    = reader.readUInt32(); (void)flags;
     u64 expected_hash = (static_cast<u64>(hash_hi) << 32) | hash_lo;
 
+    if (hdr.size < 16) { PINO_ERROR("Cooked shader: chunk too small (%u bytes)", hdr.size); return false; }
     u32 nested_size = hdr.size - 16;
     std::vector<u8> nested(nested_size);
     if (nested_size > 0) reader.readBytes(nested.data(), nested_size);
@@ -422,6 +425,7 @@ bool read_cooked_material(BinaryChunkReader& reader, CookedMaterialData& mat) {
     u32 flags    = reader.readUInt32(); (void)flags;
     u64 expected_hash = (static_cast<u64>(hash_hi) << 32) | hash_lo;
 
+    if (hdr.size < 16) { PINO_ERROR("Cooked mat: chunk too small (%u bytes)", hdr.size); return false; }
     u32 nested_size = hdr.size - 16;
     std::vector<u8> nested(nested_size);
     if (nested_size > 0) reader.readBytes(nested.data(), nested_size);

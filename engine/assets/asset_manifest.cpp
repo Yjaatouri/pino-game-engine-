@@ -98,6 +98,7 @@ bool read_asset_manifest(BinaryChunkReader& reader, AssetManifestData& manifest)
     u64 expected_hash = (static_cast<u64>(hash_hi) << 32) | hash_lo;
 
     // Read nested chunk
+    if (hdr.size < 16) { PINO_ERROR("Asset manifest: chunk too small (%u bytes)", hdr.size); return false; }
     u32 nested_size = hdr.size - 16;
     std::vector<u8> nested(nested_size);
     if (nested_size > 0)
