@@ -1,6 +1,7 @@
 #include "asset_manager.h"
 #include "engine/core/log.h"
 #include "engine/core/math_utils.h"
+#include "engine/serialization/cooked_asset.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -19,10 +20,8 @@ std::string normalize_asset_path(const char* path) {
     if (!path || !path[0]) return {};
 
     std::string p = path;
-    // Convert backslashes to forward slashes
     for (auto& ch : p) if (ch == '\\') ch = '/';
 
-    // Collapse "." and ".." segments
     std::vector<std::string> segments;
     std::istringstream ss(p);
     std::string seg;
@@ -35,14 +34,12 @@ std::string normalize_asset_path(const char* path) {
         }
     }
 
-    // Rejoin
     std::string result;
     for (usize i = 0; i < segments.size(); ++i) {
         if (i > 0) result += '/';
         result += segments[i];
     }
 
-    // Lowercase on Windows (case-insensitive FS)
 #if defined(_WIN32)
     for (auto& ch : result) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 #endif
@@ -61,13 +58,201 @@ std::string AssetManager::shader_key(const char* vert_path, const char* frag_pat
     return normalize_asset_path(vert_path) + "|" + normalize_asset_path(frag_path);
 }
 
+// ═══════════════════════════════════════════════════════════════════
+//  Cooked manifest support
+// ═══════════════════════════════════════════════════════════════════
+
+bool AssetManager::load_cooked_manifest(const char* manifest_path, const char* cooked_dir) {
+    m_cooked_dir = cooked_dir;
+    for (auto& ch : m_cooked_dir) if (ch == '\\') ch = '/';
+    if (!m_cooked_dir.empty() && m_cooked_dir.back() != '/')
+        m_cooked_dir.push_back('/');
+
+    if (!m_registry.load_from_path(manifest_path)) {
+        PINO_ERROR("AssetManager: failed to load cooked manifest: %s", manifest_path);
+        m_cooked_manifest_loaded = false;
+        return false;
+    }
+
+    m_cooked_manifest_loaded = true;
+    PINO_INFO("AssetManager: cooked manifest loaded (%u entries, dir: %s)",
+              m_registry.entry_count(), m_cooked_dir.c_str());
+    return true;
+}
+
+std::string AssetManager::asset_key_from_path(const std::string& normalized_path) const {
+    // Strip the last extension: "models/cube.obj" -> "models/cube"
+    auto dot = normalized_path.rfind('.');
+    if (dot == std::string::npos) return normalized_path;
+    return normalized_path.substr(0, dot);
+}
+
+std::string AssetManager::cooked_file_path(const std::string& asset_key) const {
+    // "models/cube" -> "{cooked_dir}models_cube.pino_cooked"
+    std::string filename = asset_key;
+    for (auto& ch : filename) if (ch == '/') ch = '_';
+    return m_cooked_dir + filename + ".pino_cooked";
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  Cooked mesh loading
+// ═══════════════════════════════════════════════════════════════════
+
+bool AssetManager::load_mesh_cooked(const std::string& asset_key,
+                                    Mesh*& out_mesh, std::shared_ptr<Mesh>& out_shared)
+{
+    const auto* entry = m_registry.find(asset_key.c_str());
+    if (!entry) return false;
+
+    std::string path = cooked_file_path(asset_key);
+    std::vector<u8> file_data = m_fs.read_binary(path.c_str());
+    if (file_data.empty()) {
+        PINO_WARN("Cooked mesh file missing: %s", path.c_str());
+        return false;
+    }
+
+    // Verify file integrity against manifest hash
+    u64 file_hash = cooked_hash_fnv1a(file_data.data(), static_cast<u32>(file_data.size()));
+    if (file_hash != entry->asset_hash) {
+        PINO_ERROR("Cooked mesh hash mismatch for %s", asset_key.c_str());
+        return false;
+    }
+
+    CookedMeshData mesh_data;
+    BinaryChunkReader reader(file_data.data(), static_cast<u32>(file_data.size()));
+    if (!read_cooked_mesh(reader, mesh_data)) {
+        PINO_ERROR("Failed to deserialize cooked mesh: %s", asset_key.c_str());
+        return false;
+    }
+
+    if (mesh_data.vertex_count == 0 || mesh_data.vertex_data.empty()) {
+        PINO_ERROR("Cooked mesh has no vertices: %s", asset_key.c_str());
+        return false;
+    }
+
+    auto mesh = std::make_shared<Mesh>();
+    const Vertex* verts = reinterpret_cast<const Vertex*>(mesh_data.vertex_data.data());
+    const u32* idx = mesh_data.indices.data();
+    mesh->upload(verts, mesh_data.vertex_count, idx, mesh_data.index_count);
+
+    PINO_INFO("Loaded cooked mesh: %s (%u verts, %u indices)",
+              asset_key.c_str(), mesh_data.vertex_count, mesh_data.index_count);
+
+    out_mesh = mesh.get();
+    out_shared = std::move(mesh);
+    return true;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  Cooked texture loading
+// ═══════════════════════════════════════════════════════════════════
+
+bool AssetManager::load_texture_cooked(const std::string& asset_key,
+                                       Texture*& out_tex, std::shared_ptr<Texture>& out_shared)
+{
+    const auto* entry = m_registry.find(asset_key.c_str());
+    if (!entry) return false;
+
+    std::string path = cooked_file_path(asset_key);
+    std::vector<u8> file_data = m_fs.read_binary(path.c_str());
+    if (file_data.empty()) {
+        PINO_WARN("Cooked texture file missing: %s", path.c_str());
+        return false;
+    }
+
+    u64 file_hash = cooked_hash_fnv1a(file_data.data(), static_cast<u32>(file_data.size()));
+    if (file_hash != entry->asset_hash) {
+        PINO_ERROR("Cooked texture hash mismatch for %s", asset_key.c_str());
+        return false;
+    }
+
+    CookedTextureData tex_data;
+    BinaryChunkReader reader(file_data.data(), static_cast<u32>(file_data.size()));
+    if (!read_cooked_texture(reader, tex_data)) {
+        PINO_ERROR("Failed to deserialize cooked texture: %s", asset_key.c_str());
+        return false;
+    }
+
+    if (tex_data.width == 0 || tex_data.height == 0 || tex_data.mip_data.empty()) {
+        PINO_ERROR("Cooked texture has no pixels: %s", asset_key.c_str());
+        return false;
+    }
+
+    auto tex = std::make_shared<Texture>();
+    tex->upload_rgba(tex_data.mip_data.data(),
+                     static_cast<i32>(tex_data.width),
+                     static_cast<i32>(tex_data.height));
+
+    PINO_INFO("Loaded cooked texture: %s (%dx%d)",
+              asset_key.c_str(), tex_data.width, tex_data.height);
+
+    out_tex = tex.get();
+    out_shared = std::move(tex);
+    return true;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  Cooked shader loading
+// ═══════════════════════════════════════════════════════════════════
+
+bool AssetManager::load_shader_cooked(const std::string& asset_key,
+                                      Shader*& out_shader, std::shared_ptr<Shader>& out_shared)
+{
+    const auto* entry = m_registry.find(asset_key.c_str());
+    if (!entry) return false;
+
+    std::string path = cooked_file_path(asset_key);
+    std::vector<u8> file_data = m_fs.read_binary(path.c_str());
+    if (file_data.empty()) {
+        PINO_WARN("Cooked shader file missing: %s", path.c_str());
+        return false;
+    }
+
+    u64 file_hash = cooked_hash_fnv1a(file_data.data(), static_cast<u32>(file_data.size()));
+    if (file_hash != entry->asset_hash) {
+        PINO_ERROR("Cooked shader hash mismatch for %s", asset_key.c_str());
+        return false;
+    }
+
+    CookedShaderData shader_data;
+    BinaryChunkReader reader(file_data.data(), static_cast<u32>(file_data.size()));
+    if (!read_cooked_shader(reader, shader_data)) {
+        PINO_ERROR("Failed to deserialize cooked shader: %s", asset_key.c_str());
+        return false;
+    }
+
+    if (shader_data.vert_stage.empty() || shader_data.frag_stage.empty()) {
+        PINO_ERROR("Cooked shader has no source: %s", asset_key.c_str());
+        return false;
+    }
+
+    // Ensure null-terminated strings for Shader::load
+    auto vec_to_str = [](const std::vector<u8>& vec) -> std::string {
+        if (vec.empty()) return {};
+        if (vec.back() == '\0') return reinterpret_cast<const char*>(vec.data());
+        return std::string(reinterpret_cast<const char*>(vec.data()), vec.size());
+    };
+
+    std::string vert_src = vec_to_str(shader_data.vert_stage);
+    std::string frag_src = vec_to_str(shader_data.frag_stage);
+
+    auto shader = std::make_shared<Shader>();
+    if (!shader->load(vert_src.c_str(), frag_src.c_str())) {
+        PINO_ERROR("Failed to compile cooked shader: %s", asset_key.c_str());
+        return false;
+    }
+
+    PINO_INFO("Loaded cooked shader: %s", asset_key.c_str());
+
+    out_shader = shader.get();
+    out_shared = std::move(shader);
+    return true;
+}
+
 // ── Fallback assets ─────────────────────────────────────────────
 void AssetManager::init_fallback_assets() {
-    // Fallback texture: 8x8 magenta/black checkerboard
     m_fallback_tex = std::make_unique<Texture>();
     {
-        // RGBA bytes stored as u32 (little-endian: 0xAABBGGRR)
-        // Magenta = 0xFFFF00FF, Black (opaque) = 0xFF000000
         static const u32 fb_tex_data[8 * 8] = {
             0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,
             0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,0xFF000000,0xFFFF00FF,
@@ -81,10 +266,8 @@ void AssetManager::init_fallback_assets() {
         m_fallback_tex->upload_rgba(reinterpret_cast<const u8*>(fb_tex_data), 8, 8);
     }
 
-    // Fallback mesh: unit cube
     m_fallback_mesh = std::make_unique<Mesh>();
     {
-        // Unit cube vertices (pos, normal, uv)
         struct V { glm::vec3 p, n; glm::vec2 uv; };
         std::vector<V> verts;
         std::vector<u32> idx;
@@ -94,28 +277,19 @@ void AssetManager::init_fallback_assets() {
             idx.push_back(static_cast<u32>(idx.size()));
         };
 
-        // Each face: 4 verts, 6 indices (triangulated)
-        // +X face
-        glm::vec3 px(1,1,1), nx(1,1,1);
         emit({ 1,-1,-1},{ 1,0,0},{1,1}); emit({ 1, 1,-1},{ 1,0,0},{1,0});
         emit({ 1, 1, 1},{ 1,0,0},{0,0}); emit({ 1,-1, 1},{ 1,0,0},{0,1});
-        // -X face
         emit({-1,-1, 1},{-1,0,0},{1,1}); emit({-1, 1, 1},{-1,0,0},{1,0});
         emit({-1, 1,-1},{-1,0,0},{0,0}); emit({-1,-1,-1},{-1,0,0},{0,1});
-        // +Y face
         emit({-1, 1,-1},{0, 1,0},{1,1}); emit({ 1, 1,-1},{0, 1,0},{1,0});
         emit({ 1, 1, 1},{0, 1,0},{0,0}); emit({-1, 1, 1},{0, 1,0},{0,1});
-        // -Y face
         emit({-1,-1, 1},{0,-1,0},{1,1}); emit({ 1,-1, 1},{0,-1,0},{1,0});
         emit({ 1,-1,-1},{0,-1,0},{0,0}); emit({-1,-1,-1},{0,-1,0},{0,1});
-        // +Z face
         emit({-1,-1, 1},{0,0, 1},{1,1}); emit({ 1,-1, 1},{0,0, 1},{1,0});
         emit({ 1, 1, 1},{0,0, 1},{0,0}); emit({-1, 1, 1},{0,0, 1},{0,1});
-        // -Z face
         emit({ 1,-1,-1},{0,0,-1},{1,1}); emit({-1,-1,-1},{0,0,-1},{1,0});
         emit({-1, 1,-1},{0,0,-1},{0,0}); emit({ 1, 1,-1},{0,0,-1},{0,1});
 
-        // Generate proper index buffer for 6 faces (4 verts each = 24 verts, 36 indices)
         std::vector<u32> indices;
         for (u32 i = 0; i < 24; i += 4) {
             indices.push_back(i);   indices.push_back(i+1); indices.push_back(i+2);
@@ -127,7 +301,6 @@ void AssetManager::init_fallback_assets() {
                                 indices.data(), static_cast<u32>(indices.size()));
     }
 
-    // Fallback shader: simple vertex-lit color shader
     m_fallback_shader = std::make_unique<Shader>();
     {
         static const char* vert = R"(
@@ -149,12 +322,25 @@ void main(){ fc=u_color; })";
     PINO_INFO("Fallback assets initialized");
 }
 
-// ── Mesh loading — tinyobjloader ────────────────────────────────
+// ── Mesh loading (cooked first, then raw OBJ) ─────────────────
 Mesh* AssetManager::load_mesh(const char* path) {
     std::string key = normalize_asset_path(path);
     auto it = m_mesh_cache.find(key);
     if (it != m_mesh_cache.end()) return it->second.get();
 
+    // Try cooked first if manifest is loaded
+    if (m_cooked_manifest_loaded) {
+        std::string asset_key = asset_key_from_path(key);
+        Mesh* mesh_ptr = nullptr;
+        std::shared_ptr<Mesh> mesh_shared;
+        if (load_mesh_cooked(asset_key, mesh_ptr, mesh_shared)) {
+            m_mesh_cache[key] = std::move(mesh_shared);
+            return mesh_ptr;
+        }
+        PINO_INFO("Cooked mesh not found for %s, falling back to raw", path);
+    }
+
+    // Raw OBJ loading
     std::string src = m_fs.read_text(path);
     if (src.empty()) {
         PINO_ERROR("Failed to read .obj: %s  (using fallback mesh)", path);
@@ -244,7 +430,6 @@ AssetHandle<Mesh> AssetManager::get_mesh(const char* path) {
     if (it != m_mesh_cache.end())
         return AssetHandle<Mesh>(it->second);
 
-    // Load via the standard path; returns raw ptr but we need the shared_ptr
     load_mesh(path);
     it = m_mesh_cache.find(key);
     if (it != m_mesh_cache.end())
@@ -252,11 +437,22 @@ AssetHandle<Mesh> AssetManager::get_mesh(const char* path) {
     return AssetHandle<Mesh>();
 }
 
-// ── Texture loading — stb_image ─────────────────────────────────
+// ── Texture loading (cooked first, then raw) ───────────────────
 Texture* AssetManager::load_texture(const char* path) {
     std::string key = normalize_asset_path(path);
     auto it = m_tex_cache.find(key);
     if (it != m_tex_cache.end()) return it->second.get();
+
+    if (m_cooked_manifest_loaded) {
+        std::string asset_key = asset_key_from_path(key);
+        Texture* tex_ptr = nullptr;
+        std::shared_ptr<Texture> tex_shared;
+        if (load_texture_cooked(asset_key, tex_ptr, tex_shared)) {
+            m_tex_cache[key] = std::move(tex_shared);
+            return tex_ptr;
+        }
+        PINO_INFO("Cooked texture not found for %s, falling back to raw", path);
+    }
 
     std::vector<u8> file_data = m_fs.read_binary(path);
     if (file_data.empty()) {
@@ -299,11 +495,24 @@ AssetHandle<Texture> AssetManager::get_texture(const char* path) {
     return AssetHandle<Texture>();
 }
 
-// ── Shader loading ──────────────────────────────────────────────
+// ── Shader loading (cooked first, then raw) ─────────────────────
 Shader* AssetManager::load_shader(const char* vert_path, const char* frag_path) {
     std::string key = shader_key(vert_path, frag_path);
     auto it = m_shader_cache.find(key);
     if (it != m_shader_cache.end()) return it->second.get();
+
+    if (m_cooked_manifest_loaded) {
+        // Derive shader key from vert path: "shaders/lit.vert" -> "shaders/lit"
+        std::string vert_norm = normalize_asset_path(vert_path);
+        std::string asset_key = asset_key_from_path(vert_norm);
+        Shader* shader_ptr = nullptr;
+        std::shared_ptr<Shader> shader_shared;
+        if (load_shader_cooked(asset_key, shader_ptr, shader_shared)) {
+            m_shader_cache[key] = std::move(shader_shared);
+            return shader_ptr;
+        }
+        PINO_INFO("Cooked shader not found for %s, falling back to raw", asset_key.c_str());
+    }
 
     std::string vert_src = m_fs.read_text(vert_path);
     std::string frag_src = m_fs.read_text(frag_path);
@@ -344,7 +553,6 @@ void AssetManager::preload(const std::vector<std::string>& paths,
     for (u32 i = 0; i < total; ++i) {
         const std::string& p = paths[i];
 
-        // Determine type by extension
         auto dot = p.rfind('.');
         std::string ext;
         if (dot != std::string::npos) {
@@ -358,7 +566,6 @@ void AssetManager::preload(const std::vector<std::string>& paths,
                    ext == ".bmp" || ext == ".tga") {
             load_texture(p.c_str());
         } else if (ext == ".vert") {
-            // Assume paired .frag file with same name
             std::string frag = p.substr(0, p.size() - 4) + "frag";
             load_shader(p.c_str(), frag.c_str());
         } else {
@@ -377,7 +584,6 @@ void AssetManager::unload_unused() {
 
     auto purge = [&](auto& cache) {
         for (auto it = cache.begin(); it != cache.end(); ) {
-            // use_count == 1 means only the cache holds a reference
             if (it->second.use_count() == 1) {
                 it = cache.erase(it);
                 ++freed;
@@ -405,12 +611,10 @@ void AssetManager::clear() {
 
 // ── Invalidate all GPU resources (for context loss) ────────────
 void AssetManager::invalidate_all() {
-    // Release cached GPU resources (old GL handles from lost context)
     m_mesh_cache.clear();
     m_tex_cache.clear();
     m_shader_cache.clear();
 
-    // Release and re-create fallback assets
     m_fallback_tex.reset();
     m_fallback_mesh.reset();
     m_fallback_shader.reset();
