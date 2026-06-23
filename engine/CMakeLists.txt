@@ -72,6 +72,7 @@ set(PINO_ENGINE_SOURCES
     serialization/asset_serializer.cpp
     serialization/save_game_serializer.cpp
     serialization/async_save.cpp
+    serialization/cooked_asset.cpp
     renderer/debug_overlay.cpp
     debug/debug_console.cpp
     debug/profiler_overlay.cpp
