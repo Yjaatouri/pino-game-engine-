@@ -39,6 +39,9 @@ if(PINO_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
+# Tools (always built)
+add_subdirectory(tools)
+
 # ─── Run target ────────────────────────────────────────────────
 add_custom_target(run
     COMMAND $<TARGET_FILE:game_demo>

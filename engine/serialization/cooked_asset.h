@@ -2,7 +2,6 @@
 
 #include "engine/core/types.h"
 #include "engine/core/serializer.h"
-#include "engine/renderer/material.h"
 #include <string>
 #include <vector>
 #include <glm/glm.hpp>
@@ -107,9 +106,20 @@ struct CookedTextureBinding {
     std::string texture_ref;
 };
 
+struct CookedUniformValue {
+    enum Type : u8 { None, Int, Float, Vec3, Vec4, Mat3, Mat4 };
+    Type      type = None;
+    i32       i_val = 0;
+    float     f_val = 0.0f;
+    glm::vec3 v3{0.0f};
+    glm::vec4 v4{0.0f};
+    glm::mat3 m3{1.0f};
+    glm::mat4 m4{1.0f};
+};
+
 struct CookedUniformDefault {
-    std::string  name;
-    UniformValue value;
+    std::string        name;
+    CookedUniformValue value;
 };
 
 struct CookedMaterialData {

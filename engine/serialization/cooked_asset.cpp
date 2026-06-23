@@ -145,29 +145,29 @@ void read_cooked_shader_payload(Deserializer& d, CookedShaderData& shader) {
 //  CookedMaterial payload
 // ═══════════════════════════════════════════════════════════════
 
-static void write_uniform_value(Serializer& s, const UniformValue& uv) {
+static void write_cooked_uniform_value(Serializer& s, const CookedUniformValue& uv) {
     s.writeUInt32(static_cast<u32>(uv.type));
     switch (uv.type) {
-        case UniformValue::Int:   s.writeInt32(uv.i_val); break;
-        case UniformValue::Float: s.writeFloat(uv.f_val); break;
-        case UniformValue::Vec3:  s.writeVec3(uv.v3); break;
-        case UniformValue::Vec4:  s.writeVec4(uv.v4); break;
-        case UniformValue::Mat3:  s.writeBytes(&uv.m3, sizeof(glm::mat3)); break;
-        case UniformValue::Mat4:  s.writeBytes(&uv.m4, sizeof(glm::mat4)); break;
+        case CookedUniformValue::Int:   s.writeInt32(uv.i_val); break;
+        case CookedUniformValue::Float: s.writeFloat(uv.f_val); break;
+        case CookedUniformValue::Vec3:  s.writeVec3(uv.v3); break;
+        case CookedUniformValue::Vec4:  s.writeVec4(uv.v4); break;
+        case CookedUniformValue::Mat3:  s.writeBytes(&uv.m3, sizeof(glm::mat3)); break;
+        case CookedUniformValue::Mat4:  s.writeBytes(&uv.m4, sizeof(glm::mat4)); break;
         default: break;
     }
 }
 
-static UniformValue read_uniform_value(Deserializer& d) {
-    UniformValue uv;
-    uv.type = static_cast<UniformValue::Type>(d.readUInt32());
+static CookedUniformValue read_cooked_uniform_value(Deserializer& d) {
+    CookedUniformValue uv;
+    uv.type = static_cast<CookedUniformValue::Type>(d.readUInt32());
     switch (uv.type) {
-        case UniformValue::Int:   uv.i_val = d.readInt32(); break;
-        case UniformValue::Float: uv.f_val = d.readFloat(); break;
-        case UniformValue::Vec3:  uv.v3 = d.readVec3(); break;
-        case UniformValue::Vec4:  uv.v4 = d.readVec4(); break;
-        case UniformValue::Mat3:  d.readBytes(&uv.m3, sizeof(glm::mat3)); break;
-        case UniformValue::Mat4:  d.readBytes(&uv.m4, sizeof(glm::mat4)); break;
+        case CookedUniformValue::Int:   uv.i_val = d.readInt32(); break;
+        case CookedUniformValue::Float: uv.f_val = d.readFloat(); break;
+        case CookedUniformValue::Vec3:  uv.v3 = d.readVec3(); break;
+        case CookedUniformValue::Vec4:  uv.v4 = d.readVec4(); break;
+        case CookedUniformValue::Mat3:  d.readBytes(&uv.m3, sizeof(glm::mat3)); break;
+        case CookedUniformValue::Mat4:  d.readBytes(&uv.m4, sizeof(glm::mat4)); break;
         default: break;
     }
     return uv;
@@ -185,7 +185,7 @@ void write_cooked_material_payload(Serializer& s, const CookedMaterialData& mat)
     s.writeUInt32(static_cast<u32>(mat.uniforms.size()));
     for (const auto& u : mat.uniforms) {
         s.writeString(u.name);
-        write_uniform_value(s, u.value);
+        write_cooked_uniform_value(s, u.value);
     }
 
     s.writeUInt32(mat.render_state_flags);
@@ -205,7 +205,7 @@ void read_cooked_material_payload(Deserializer& d, CookedMaterialData& mat) {
     mat.uniforms.resize(uniform_count);
     for (u32 i = 0; i < uniform_count; ++i) {
         mat.uniforms[i].name  = d.readString();
-        mat.uniforms[i].value = read_uniform_value(d);
+        mat.uniforms[i].value = read_cooked_uniform_value(d);
     }
 
     mat.render_state_flags = d.readUInt32();

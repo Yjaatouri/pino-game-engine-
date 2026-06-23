@@ -1,5 +1,7 @@
 #include "engine/core/binary_chunk.h"
 #include "engine/core/serializer.h"
+#include "engine/renderer/mesh.h"
+#include "engine/renderer/material.h"
 #include "engine/serialization/cooked_asset.h"
 #include <cstdio>
 #include <cstring>
@@ -219,9 +221,9 @@ int main() {
         mat.texture_bindings.push_back({"Diffuse", "textures/diffuse_01"});
         mat.texture_bindings.push_back({"Normal",  "textures/normal_01"});
         mat.uniforms.push_back({"u_mat_shininess",
-                                []{ UniformValue uv; uv.type = UniformValue::Float; uv.f_val = 32.0f; return uv; }()});
+                                []{ CookedUniformValue uv; uv.type = CookedUniformValue::Float; uv.f_val = 32.0f; return uv; }()});
         mat.uniforms.push_back({"u_mat_diffuse",
-                                []{ UniformValue uv; uv.type = UniformValue::Vec3; uv.v3 = {0.8f, 0.2f, 0.2f}; return uv; }()});
+                                []{ CookedUniformValue uv; uv.type = CookedUniformValue::Vec3; uv.v3 = {0.8f, 0.2f, 0.2f}; return uv; }()});
         mat.render_state_flags = RS_DepthTest | RS_CullBack;
 
         CookedMaterialData empty_mat;
