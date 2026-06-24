@@ -190,6 +190,15 @@ typedef char           GLchar;
 #define GL_TEXTURE_BASE_LEVEL                0x813C
 #define GL_TEXTURE_MAX_LEVEL                 0x813D
 
+// Compressed texture formats (ES 3.0 / KHR_texture_compression_astc)
+#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT      0x83F0
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT     0x83F1
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT     0x83F2
+#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT     0x83F3
+#define GL_COMPRESSED_RGB8_ETC2              0x9274
+#define GL_COMPRESSED_RGBA8_ETC2_EAC         0x9278
+#define GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 0x9276
+
 // Pixel formats
 #define GL_UNPACK_ALIGNMENT                  0x0CF5
 #define GL_PACK_ALIGNMENT                    0x0D05
@@ -400,6 +409,7 @@ PINO_GL_FUNC(void,         glGenTextures,            (GLsizei n, GLuint* texture
 PINO_GL_FUNC(void,         glDeleteTextures,         (GLsizei n, const GLuint* textures));
 PINO_GL_FUNC(void,         glBindTexture,            (GLenum target, GLuint texture));
 PINO_GL_FUNC(void,         glTexImage2D,             (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels));
+PINO_GL_FUNC(void,         glCompressedTexImage2D,   (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const void* data));
 PINO_GL_FUNC(void,         glTexParameteri,          (GLenum target, GLenum pname, GLint param));
 PINO_GL_FUNC(void,         glTexParameterf,          (GLenum target, GLenum pname, GLfloat param));
 PINO_GL_FUNC(void,         glGenerateMipmap,         (GLenum target));

@@ -15,6 +15,7 @@ struct Options {
     fs::path input_dir;
     fs::path output_dir;
     bool     verbose = false;
+    CookedPlatform target = CookedPlatform::Desktop;
 };
 
 struct CookedEntry {
@@ -26,10 +27,11 @@ struct CookedEntry {
 };
 
 static void print_usage() {
-    printf("Usage: asset_cooker --input <dir> --output <dir> [--verbose]\n");
+    printf("Usage: asset_cooker --input <dir> --output <dir> [--verbose] [--target <platform>]\n");
     printf("  Cooks raw assets from --input into .pino_cooked files in --output.\n");
     printf("  Produces asset_manifest.bin for runtime loading.\n");
-    printf("  Supported: .obj .png .jpg .jpeg .ppm .vert (.vert+.frag pairs)\n");
+    printf("  --target: desktop (default), android, ios, any\n");
+    printf("  Supported: .obj .png .jpg .jpeg .bmp .ppm .tga .vert (.vert+.frag pairs)\n");
 }
 
 static bool parse_args(int argc, char** argv, Options& opts) {
@@ -40,6 +42,13 @@ static bool parse_args(int argc, char** argv, Options& opts) {
             opts.output_dir = argv[++i];
         } else if (strcmp(argv[i], "--verbose") == 0) {
             opts.verbose = true;
+        } else if (strcmp(argv[i], "--target") == 0 && i + 1 < argc) {
+            std::string t = argv[++i];
+            if (t == "desktop")       opts.target = CookedPlatform::Desktop;
+            else if (t == "android")  opts.target = CookedPlatform::Android;
+            else if (t == "ios")      opts.target = CookedPlatform::iOS;
+            else if (t == "any")      opts.target = CookedPlatform::Any;
+            else { printf("Unknown target: %s (desktop|android|ios|any)\n", t.c_str()); return false; }
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             print_usage();
             return false;
@@ -162,9 +171,10 @@ int main(int argc, char** argv) {
             printf("  COOK  %s\n", asset.rel_path.c_str());
 
         CookInput input;
-        input.source_path = asset.full_path.string();
-        input.asset_name  = asset.asset_name;
-        input.identifier  = asset.identifier;
+        input.source_path    = asset.full_path.string();
+        input.asset_name     = asset.asset_name;
+        input.identifier     = asset.identifier;
+        input.target_platform = opts.target;
 
         BinaryChunkWriter writer;
         auto result = cooker->cook(input, writer);
@@ -215,7 +225,7 @@ int main(int argc, char** argv) {
         me.file_offset  = 0; // loose file
         me.file_size    = entry.file_size;
         me.asset_hash   = entry.asset_hash;
-        me.platform_tag = static_cast<u32>(CookedPlatform::Desktop);
+        me.platform_tag = static_cast<u32>(opts.target);
         me.flags        = CAF_None;
 
         std::vector<u64> dep_hashes;

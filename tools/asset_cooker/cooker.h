@@ -19,6 +19,7 @@ struct CookInput {
     std::string source_path;
     std::string asset_name;
     std::string identifier;
+    CookedPlatform target_platform = CookedPlatform::Desktop;
 };
 
 class ICooker {

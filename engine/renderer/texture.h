@@ -5,6 +5,8 @@
 
 namespace pino {
 
+struct CookedTextureData;  // defined in cooked_asset.h
+
 class Texture {
 public:
     Texture() = default;
@@ -17,6 +19,9 @@ public:
 
     // Upload raw RGBA pixels to the GPU (2D texture)
     void upload_rgba(const u8* pixels, i32 width, i32 height);
+
+    // Upload from CookedTextureData (supports mip chains and compressed formats)
+    void upload_cooked(const CookedTextureData& tex);
 
     // Create a procedural checkerboard texture (2D)
     void make_checkerboard(i32 size = 64, i32 tile = 8);

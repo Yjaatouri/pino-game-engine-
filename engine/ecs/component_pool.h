@@ -6,7 +6,11 @@
 
 namespace pino {
 
-// Sparse component storage indexed by entity index.
+// Packed component storage using a sparse→dense index mapping.
+// Components are stored contiguously in m_dense for cache-friendly
+// iteration. Swap-with-last removal keeps the dense array packed with
+// no holes.
+//
 // Cross-checks with EntityRegistry to detect stale IDs from
 // destroyed entities, even when the slot has not been reused.
 //
@@ -16,26 +20,30 @@ namespace pino {
 template <typename T>
 class ComponentPool {
 public:
-    ComponentPool() { m_slots.reserve(64); }
+    static constexpr u32 SENTINEL = UINT32_MAX;
+
+    ComponentPool() { m_dense.reserve(64); }
 
     // Optional registry for cross-checking entity liveness.
     void set_registry(const EntityRegistry* reg) { m_registry = reg; }
 
     // Returns pointer to component if entity has one, else nullptr.
     T* get(EntityId entity) {
-        if (entity.index >= m_slots.size()) return nullptr;
-        auto& slot = m_slots[entity.index];
-        if (!slot.exists) return nullptr;
-        if (slot.generation != entity.generation) return nullptr;
+        if (entity.index >= m_sparse.size()) return nullptr;
+        u32 dense_idx = m_sparse[entity.index];
+        if (dense_idx == SENTINEL) return nullptr;
+        auto& slot = m_dense[dense_idx];
+        if (slot.id.generation != entity.generation) return nullptr;
         if (m_registry && !m_registry->alive(entity)) return nullptr;
         return &slot.data;
     }
 
     const T* get(EntityId entity) const {
-        if (entity.index >= m_slots.size()) return nullptr;
-        const auto& slot = m_slots[entity.index];
-        if (!slot.exists) return nullptr;
-        if (slot.generation != entity.generation) return nullptr;
+        if (entity.index >= m_sparse.size()) return nullptr;
+        u32 dense_idx = m_sparse[entity.index];
+        if (dense_idx == SENTINEL) return nullptr;
+        const auto& slot = m_dense[dense_idx];
+        if (slot.id.generation != entity.generation) return nullptr;
         if (m_registry && !m_registry->alive(entity)) return nullptr;
         return &slot.data;
     }
@@ -45,65 +53,93 @@ public:
     }
 
     // Add a component (default-constructed). Returns reference.
+    // If the entity already has a component, it is overwritten.
     T& add(EntityId entity) {
-        if (entity.index >= m_slots.size())
-            m_slots.resize(entity.index + 1);
-        auto& slot = m_slots[entity.index];
-        slot.data = T{};
-        slot.generation = entity.generation;
-        slot.exists = true;
+        if (entity.index >= m_sparse.size())
+            m_sparse.resize(entity.index + 1, SENTINEL);
+
+        u32 dense_idx = m_sparse[entity.index];
+        if (dense_idx != SENTINEL) {
+            auto& slot = m_dense[dense_idx];
+            if (slot.id.generation == entity.generation) {
+                // Existing component — overwrite data only.
+                slot.data = T{};
+                return slot.data;
+            }
+            // Stale sparse entry (generation mismatch from entity
+            // destroyed without component removal) — reclaim the
+            // dense slot by updating the stored entity ID.
+            slot.id = entity;
+            slot.data = T{};
+            return slot.data;
+        }
+
+        // New entry.
+        dense_idx = static_cast<u32>(m_dense.size());
+        m_dense.push_back({entity, T{}});
+        m_sparse[entity.index] = dense_idx;
         ++m_count;
-        return slot.data;
+        return m_dense.back().data;
     }
 
     // Remove component from entity.
     void remove(EntityId entity) {
-        auto* ptr = get(entity);
-        if (!ptr) return;
-        m_slots[entity.index].exists = false;
-        --m_count;
+        if (entity.index >= m_sparse.size()) return;
+        u32 dense_idx = m_sparse[entity.index];
+        if (dense_idx == SENTINEL) return;
+        // Stale generation or dead registry entry is still a valid
+        // removal — clean up the dense slot regardless.
+        if (m_dense[dense_idx].id.generation != entity.generation) return;
+        remove_at(dense_idx, entity.index);
     }
 
     void clear() {
-        m_slots.clear();
+        m_dense.clear();
+        m_sparse.clear();
         m_count = 0;
     }
 
     u32 count() const { return m_count; }
 
     // Iterate all alive components. Callback receives (EntityId, T&).
+    // Dense iteration is cache-friendly — no empty slots visited.
     template <typename F>
     void each(F&& func) {
-        for (u32 i = 0; i < m_slots.size(); ++i) {
-            auto& slot = m_slots[i];
-            if (slot.exists) {
-                EntityId id{i, slot.generation};
-                func(id, slot.data);
-            }
+        for (u32 i = 0; i < static_cast<u32>(m_dense.size()); ++i) {
+            func(m_dense[i].id, m_dense[i].data);
         }
     }
 
     template <typename F>
     void each(F&& func) const {
-        for (u32 i = 0; i < m_slots.size(); ++i) {
-            const auto& slot = m_slots[i];
-            if (slot.exists) {
-                EntityId id{i, slot.generation};
-                func(id, slot.data);
-            }
+        for (u32 i = 0; i < static_cast<u32>(m_dense.size()); ++i) {
+            func(m_dense[i].id, m_dense[i].data);
         }
     }
 
 private:
-    struct Slot {
-        T data{};
-        u32 generation = 0;
-        bool exists = false;
+    // Remove the component at the given dense index (swap-with-last).
+    void remove_at(u32 dense_idx, u32 entity_idx) {
+        u32 last_idx = static_cast<u32>(m_dense.size()) - 1;
+        if (dense_idx != last_idx) {
+            auto& last_slot = m_dense[last_idx];
+            m_dense[dense_idx] = last_slot;
+            m_sparse[last_slot.id.index] = dense_idx;
+        }
+        m_dense.pop_back();
+        m_sparse[entity_idx] = SENTINEL;
+        --m_count;
+    }
+
+    struct DenseSlot {
+        EntityId id;
+        T data;
     };
 
-    std::vector<Slot> m_slots;
-    u32 m_count = 0;
-    const EntityRegistry* m_registry = nullptr;
+    std::vector<DenseSlot> m_dense;
+    std::vector<u32>       m_sparse;  // entity.index → dense index (or SENTINEL)
+    u32                    m_count = 0;
+    const EntityRegistry*  m_registry = nullptr;
 };
 
 } // namespace pino

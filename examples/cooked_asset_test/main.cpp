@@ -521,6 +521,193 @@ int main() {
         }
     }
 
+    // ── Texture cooker mip chain and compression tests ──
+    {
+        printf("\n-- Texture Cooker (mip chain + compression) --\n");
+
+        // Generate a synthetic 64x64 RGBA gradient
+        u32 tw = 64, th = 64;
+        std::vector<u8> src(tw * th * 4);
+        for (u32 y = 0; y < th; ++y)
+            for (u32 x = 0; x < tw; ++x) {
+                u32 idx = (y * tw + x) * 4;
+                src[idx + 0] = static_cast<u8>(x * 4);       // R
+                src[idx + 1] = static_cast<u8>(y * 4);       // G
+                src[idx + 2] = static_cast<u8>((x + y) * 2); // B
+                src[idx + 3] = 255;
+            }
+
+        // ── Test 1: Mip chain with RGBA8 ──
+        {
+            // Build cooked texture (single mip, RGBA8 — base level only)
+            CookedTextureData tex;
+            tex.width     = tw;
+            tex.height    = th;
+            tex.format    = static_cast<u32>(CookedTextureFormat::RGBA8);
+            tex.mip_count = 7;  // 64→32→16→8→4→2→1
+            u32 offset = 0;
+            u32 cw = tw, ch = th;
+            for (u32 i = 0; i < tex.mip_count; ++i) {
+                u32 sz = cw * ch * 4;
+                tex.mip_sizes.push_back(sz);
+                tex.mip_data.resize(tex.mip_data.size() + sz);
+                offset += sz;
+                cw = std::max(cw / 2, 1u);
+                ch = std::max(ch / 2, 1u);
+            }
+
+            // Round-trip
+            TEST("RGBA8 multi-mip round-trips", roundtrip_texture(tex));
+
+            // Verify read-back
+            BinaryChunkWriter writer;
+            write_cooked_texture(writer, CookedPlatform::Desktop, tex);
+            CookedTextureData out;
+            BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+            TEST("RGBA8 multi-mip read succeeds", read_cooked_texture(reader, out));
+            TEST("RGBA8 mip_count preserved", out.mip_count == 7);
+            TEST("RGBA8 total data matches", out.mip_data.size() == tex.mip_data.size());
+        }
+
+        // ── Test 2: BC1 compressed texture round-trip ──
+        {
+            // Build a cooked texture with format BC1 and multiple mips
+            // The mip sizes approximate BC1: 8 bytes per 4x4 block
+            CookedTextureData tex;
+            tex.width     = 64;
+            tex.height    = 64;
+            tex.format    = static_cast<u32>(CookedTextureFormat::BC1);
+            tex.mip_count = 7;
+            u32 cw = 64, ch = 64;
+            u32 total = 0;
+            for (u32 i = 0; i < tex.mip_count; ++i) {
+                u32 bw = (cw + 3) / 4;
+                u32 bh = (ch + 3) / 4;
+                u32 sz = bw * bh * 8;
+                tex.mip_sizes.push_back(sz);
+                total += sz;
+                cw = std::max(cw / 2, 1u);
+                ch = std::max(ch / 2, 1u);
+            }
+            tex.mip_data.resize(total, 0xAA);
+
+            TEST("BC1 multi-mip round-trips", roundtrip_texture(tex));
+
+            BinaryChunkWriter writer;
+            write_cooked_texture(writer, CookedPlatform::Desktop, tex);
+            CookedTextureData out;
+            BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+            TEST("BC1 read succeeds", read_cooked_texture(reader, out));
+            TEST("BC1 mip_count", out.mip_count == 7);
+            TEST("BC1 format preserved", out.format == static_cast<u32>(CookedTextureFormat::BC1));
+            TEST("BC1 total data", out.mip_data.size() == total);
+        }
+
+        // ── Test 3: ETC2 compressed texture round-trip ──
+        {
+            CookedTextureData tex;
+            tex.width     = 32;
+            tex.height    = 32;
+            tex.format    = static_cast<u32>(CookedTextureFormat::ETC2_RGB);
+            tex.mip_count = 6;
+            u32 cw = 32, ch = 32;
+            u32 total = 0;
+            for (u32 i = 0; i < tex.mip_count; ++i) {
+                u32 bw = (cw + 3) / 4;
+                u32 bh = (ch + 3) / 4;
+                u32 sz = bw * bh * 8;
+                tex.mip_sizes.push_back(sz);
+                total += sz;
+                cw = std::max(cw / 2, 1u);
+                ch = std::max(ch / 2, 1u);
+            }
+            tex.mip_data.resize(total, 0xBB);
+
+            TEST("ETC2 multi-mip round-trips", roundtrip_texture(tex));
+
+            BinaryChunkWriter writer;
+            write_cooked_texture(writer, CookedPlatform::Android, tex);
+            CookedTextureData out;
+            BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+            TEST("ETC2 read succeeds", read_cooked_texture(reader, out));
+            TEST("ETC2 format", out.format == static_cast<u32>(CookedTextureFormat::ETC2_RGB));
+        }
+
+        // ── Test 4: Platform tag propagation ──
+        {
+            CookedTextureData tex;
+            tex.width = 16; tex.height = 16;
+            tex.format = static_cast<u32>(CookedTextureFormat::RGBA8);
+            tex.mip_count = 1;
+            tex.mip_sizes = {16 * 16 * 4};
+            tex.mip_data.resize(16 * 16 * 4, 0xFF);
+
+            BinaryChunkWriter writer;
+            write_cooked_texture(writer, CookedPlatform::Android, tex);
+
+            BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+            TEST("reads with Android platform tag", reader.nextChunk());
+
+            u32 hash_lo = reader.readUInt32();
+            u32 hash_hi = reader.readUInt32(); (void)hash_hi;
+            u32 platform = reader.readUInt32();
+            u32 flags    = reader.readUInt32(); (void)flags;
+            (void)hash_lo;
+
+            TEST("platform tag is Android", platform == static_cast<u32>(CookedPlatform::Android));
+        }
+
+        // ── Test 5: Single-pixel edge case (smallest mip = 1x1) ──
+        {
+            CookedTextureData tex;
+            tex.width  = 1;
+            tex.height = 1;
+            tex.format = static_cast<u32>(CookedTextureFormat::RGBA8);
+            tex.mip_count = 1;
+            tex.mip_sizes = {4};
+            tex.mip_data = {128, 64, 32, 255};
+
+            TEST("1x1 texture round-trips", roundtrip_texture(tex));
+
+            BinaryChunkWriter writer;
+            write_cooked_texture(writer, CookedPlatform::Desktop, tex);
+            CookedTextureData out;
+            BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+            TEST("1x1 read succeeds", read_cooked_texture(reader, out));
+            TEST("1x1 pixel data", out.mip_data.size() == 4 && out.mip_data[0] == 128);
+        }
+
+        // ── Test 6: Non-square texture ──
+        {
+            CookedTextureData tex;
+            tex.width  = 32;
+            tex.height = 16;
+            tex.format = static_cast<u32>(CookedTextureFormat::BC3);
+            tex.mip_count = 6;  // 32x16 → 16x8 → 8x4 → 4x2 → 2x1 → 1x1
+            u32 cw = 32, ch = 16;
+            u32 total = 0;
+            for (u32 i = 0; i < tex.mip_count; ++i) {
+                u32 bw = (cw + 3) / 4;
+                u32 bh = (ch + 3) / 4;
+                u32 sz = bw * bh * 16;  // BC3 = 16 bytes/block
+                tex.mip_sizes.push_back(sz);
+                total += sz;
+                cw = std::max(cw / 2, 1u);
+                ch = std::max(ch / 2, 1u);
+            }
+            tex.mip_data.resize(total, 0xCC);
+
+            TEST("BC3 non-square round-trips", roundtrip_texture(tex));
+
+            BinaryChunkWriter writer;
+            write_cooked_texture(writer, CookedPlatform::Desktop, tex);
+            CookedTextureData out;
+            BinaryChunkReader reader(writer.getBuffer().data(), writer.getBuffer().size());
+            TEST("BC3 non-square read", read_cooked_texture(reader, out));
+            TEST("BC3 format preserved", out.format == static_cast<u32>(CookedTextureFormat::BC3));
+        }
+    }
+
     // ── Summary ──
     printf("\n=== Results: %d passed, %d failed ===\n", s_pass, s_fail);
     return s_fail > 0 ? 1 : 0;

@@ -1,4 +1,5 @@
 #include "texture.h"
+#include "engine/serialization/cooked_asset.h"
 #include <cstring>
 #include <vector>
 
@@ -83,6 +84,75 @@ bool Texture::create_cubemap(const u8* face_data[6], i32 face_width, i32 face_he
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     return true;
+}
+
+void Texture::upload_cooked(const CookedTextureData& tex) {
+    destroy();
+    m_width  = static_cast<i32>(tex.width);
+    m_height = static_cast<i32>(tex.height);
+    m_is_cubemap = false;
+
+    CookedTextureFormat fmt = static_cast<CookedTextureFormat>(tex.format);
+    bool compressed = (fmt != CookedTextureFormat::RGBA8);
+
+    glGenTextures(1, &m_handle);
+    glBindTexture(GL_TEXTURE_2D, m_handle);
+
+    u32 data_offset = 0;
+    for (u32 level = 0; level < tex.mip_count; ++level) {
+        u32 lw = std::max(tex.width >> level, 1u);
+        u32 lh = std::max(tex.height >> level, 1u);
+        u32 sz = tex.mip_sizes[level];
+        const void* data = tex.mip_data.data() + data_offset;
+
+        if (compressed) {
+            GLenum gl_fmt = GL_RGBA8;
+            switch (fmt) {
+                case CookedTextureFormat::BC1:
+                    gl_fmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+                    break;
+                case CookedTextureFormat::BC3:
+                    gl_fmt = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+                    break;
+                case CookedTextureFormat::BC5:
+                    gl_fmt = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+                    break;
+                case CookedTextureFormat::ETC2_RGB:
+                    gl_fmt = GL_COMPRESSED_RGB8_ETC2;
+                    break;
+                case CookedTextureFormat::ETC2_RGBA:
+                    gl_fmt = GL_COMPRESSED_RGBA8_ETC2_EAC;
+                    break;
+                default:
+                    break;
+            }
+            glCompressedTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(level),
+                                   gl_fmt,
+                                   static_cast<GLsizei>(lw),
+                                   static_cast<GLsizei>(lh),
+                                   0, static_cast<GLsizei>(sz), data);
+        } else {
+            glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(level), GL_RGBA8,
+                         static_cast<GLsizei>(lw), static_cast<GLsizei>(lh),
+                         0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        }
+
+        data_offset += sz;
+    }
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    tex.mip_count > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    if (tex.mip_count > 1) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL,
+                        static_cast<GLint>(tex.mip_count - 1));
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::bind(u32 slot) const {

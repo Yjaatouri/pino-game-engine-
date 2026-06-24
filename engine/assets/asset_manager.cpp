@@ -89,11 +89,10 @@ bool AssetManager::load_texture_from_cooked_blob(const BinaryBlob& blob,
     }
 
     auto tex = std::make_shared<Texture>();
-    tex->upload_rgba(tex_data.mip_data.data(),
-                     static_cast<i32>(tex_data.width),
-                     static_cast<i32>(tex_data.height));
+    tex->upload_cooked(tex_data);
 
-    PINO_INFO("Loaded cooked texture (%dx%d)", tex_data.width, tex_data.height);
+    PINO_INFO("Loaded cooked texture (%dx%d, %u mips, format=%u)",
+              tex_data.width, tex_data.height, tex_data.mip_count, tex_data.format);
 
     out_tex = tex.get();
     out_shared = std::move(tex);
